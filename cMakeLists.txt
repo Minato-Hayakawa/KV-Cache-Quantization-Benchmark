@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.14)
+project(kvq_bench CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 最適化フラグ (-O3) の設定
+if(MSVC)
+    add_compile_options(/O2)
+else()
+    add_compile_options(-O3 -march=native)
+endif()
+
+include_directories(core_cpp/include)
+
+add_executable(bench_kv core_cpp/bench_main.cpp)
