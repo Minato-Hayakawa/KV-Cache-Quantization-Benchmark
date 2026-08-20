@@ -6,7 +6,9 @@
 #SBATCH --gres=gpu:1
 #SBATCH --time=02:00:00
 
-# 環境変数のセットアップ
+# ユーザー領域の Python パッケージパスを追加
+export PATH=$HOME/.local/bin:$PATH
+export PYTHONPATH=$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH
 export PYTHONUNBUFFERED=1
 
 echo "=================================================="
