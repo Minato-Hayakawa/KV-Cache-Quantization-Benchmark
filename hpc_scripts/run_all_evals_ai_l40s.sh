@@ -1,45 +1,45 @@
 #!/bin/bash
-#SBATCH --job-name=eval_l40s
+#SBATCH --job-name=kv_bench_all
 #SBATCH --output=logs/all_l40s_%j.log
 #SBATCH --error=logs/all_l40s_%j.err
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --partition=l40s          # ご自身の環境のパーティション名に合わせる
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=8
-#SBATCH --time=12:00:00
-#SBATCH --partition=ai-l40s
+#SBATCH --time=02:00:00
 
-mkdir -p logs
-mkdir -p results/ai-l40s
-
-# 公式モジュールをロード
-module load system/ai-l40s
-
-# パスを通す
-export PATH="$HOME/.local/bin:$PATH"
-export PYTHONPATH="$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH"
-export PYTHONPATH="$(pwd):$(pwd)/eval:$(pwd)/eval_pt:$PYTHONPATH"
+# 1. 評価したいモデルのリストを配列で定義する
+MODELS=(
+    "meta-llama/Meta-Llama-3.1-8B"
+    "Qwen/Qwen2.5-7B"
+    "mistralai/Mistral-7B-v0.3"
+)
 
 echo "=================================================="
-echo "NVIDIA [ai-l40s] | Starting Full Evaluations"
+echo "NVIDIA [ai-l40s] | Starting Multi-Model Evaluations"
 echo "=================================================="
 
-# 1. Perplexity (PPL) の評価
-echo "-> Running PPL Evaluation..."
-python3 -m eval_pt.eval_ppl
+# 2. モデルごとにループを回す
+for model_id in "${MODELS[@]}"; do
+    echo ""
+    echo "##################################################"
+    echo "Evaluating Model: $model_id"
+    echo "##################################################"
 
-# 2. Fidelity の評価
-echo "-> Running Fidelity Evaluation..."
-python3 -m eval_pt.eval_fidelity
+    # PPL評価
+    echo "-> Running PPL Evaluation..."
+    python eval_pt/eval_ppl.py --model_name "$model_id" # ※スクリプトの引数仕様に合わせて調整してください
 
-# 3. Needle In A Haystack (Niah) の評価
-echo "-> Running NIAH Evaluation..."
-python3 -m eval_pt.eval_niah
+    # Fidelity評価
+    echo "-> Running Fidelity Evaluation..."
+    python eval_pt/eval_fidelity.py --model_name "$model_id"
 
-# 4. LongBench の評価
-echo "-> Running LongBench Evaluation..."
-python3 -m eval_pt.eval_longbench
+    # NIAH評価
+    echo "-> Running NIAH Evaluation..."
+    python eval_pt/eval_niah.py --model_name "$model_id"
+
+    echo "Finished evaluation for: $model_id"
+    echo "--------------------------------------------------"
+done
 
 echo "=================================================="
-echo "NVIDIA [ai-l40s] | All Evaluations Finished Successfully!"
+echo "NVIDIA [ai-l40s] | All Models and Evaluations Finished!"
 echo "=================================================="
