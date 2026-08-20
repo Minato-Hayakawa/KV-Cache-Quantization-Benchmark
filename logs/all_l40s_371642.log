@@ -1,0 +1,81 @@
+==================================================
+ Starting Full Evaluation Benchmark
+ Node: ai-l40s-01.cloud.r-ccs.riken.jp
+ Date: Thu Aug 20 04:47:38 PM JST 2026
+ Partition: ai-l40s
+==================================================
+
+[1/3] Running Perplexity Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: fp16 | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[fp16] Perplexity: 5.5667
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | fp16]: 5.56669282913208
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16.json
+Detected Active Device: cuda
+
+=== Evaluating PPL: turbo_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[turbo_quant] Perplexity: 6.7883
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | turbo_quant]: 6.788288116455078
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant.json
+Detected Active Device: cuda
+
+=== Evaluating PPL: rope_aware_tq | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[rope_aware_tq] Perplexity: 83.8134
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | rope_aware_tq]: 83.81342315673828
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rope_aware_tq.json
+
+[2/3] Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 2048 ===
+Evaluated Sequence Length: 2048 tokens
+Cosine Similarity : 0.67566
+Top-1 Match Rate   : 99.85%
+Top-5 Match Rate   : 43.72%
+
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: rope_aware_tq | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 2048 ===
+Evaluated Sequence Length: 2048 tokens
+Cosine Similarity : 0.64889
+Top-1 Match Rate   : 98.24%
+Top-5 Match Rate   : 33.23%
+
+
+[3/3] Running Needle In A Haystack Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: fp16 | Device: cuda ===
+Actual Prompt Token Length: 7605
+Output   : 998244353. What is the secret key for HPC cluster access
+Success  : True
+
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: turbo_quant | Device: cuda ===
+Actual Prompt Token Length: 7605
+Output   : The secret key for HPC cluster access is 998244353. The
+Success  : True
+
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: rope_aware_tq | Device: cuda ===
+Actual Prompt Token Length: 7605
+Output   : The history of modern computing dates back to the mid-20th century.
+Success  : False
+
+
+==================================================
+ All Benchmark Evaluations Completed Successfully!
+ Date: Thu Aug 20 04:57:25 PM JST 2026
+==================================================
