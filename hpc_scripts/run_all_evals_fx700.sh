@@ -26,19 +26,19 @@ echo "=================================================="
 
 # 1. Perplexity (PPL) の評価
 echo "-> Running PPL Evaluation..."
-python3 -m eval_pt.eval_ppl --output_dir results/fx700/ppl
+python3 -m eval_pt.eval_ppl
 
 # 2. Fidelity の評価
 echo "-> Running Fidelity Evaluation..."
-python3 -m eval_pt.eval_fidelity --output_dir results/fx700/fidelity
+python3 -m eval_pt.eval_fidelity
 
 # 3. Needle In A Haystack (Niah) の評価
 echo "-> Running NIAH Evaluation..."
-python3 -m eval_pt.eval_niah --output_dir results/fx700/niah
+python3 -m eval_pt.eval_niah
 
 # 4. LongBench の評価
 echo "-> Running LongBench Evaluation..."
-python3 -m eval_pt.eval_longbench --output_dir results/fx700/longbench
+python3 -m eval_pt.eval_longbench
 
 echo "=================================================="
 echo "FX700 | All Evaluations Finished Successfully!"
