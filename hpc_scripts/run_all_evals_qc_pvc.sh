@@ -15,9 +15,10 @@ mkdir -p results/qc-pvc
 # 公式モジュールをロード
 module load system/qc-pvc
 
-# ユーザー領域にインストールしたPythonパッケージのパスを通す
+# パスを通す
 export PATH="$HOME/.local/bin:$PATH"
 export PYTHONPATH="$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH"
+export PYTHONPATH="$(pwd):$(pwd)/eval:$(pwd)/eval_pt:$PYTHONPATH"
 
 echo "=================================================="
 echo "Intel [qc-pvc] | Starting Full Evaluations"

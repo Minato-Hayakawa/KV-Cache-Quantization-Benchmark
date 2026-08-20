@@ -4,6 +4,7 @@
 #SBATCH --error=logs/all_fx700_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
+#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=16
 #SBATCH --time=24:00:00
 #SBATCH --partition=fx700
@@ -14,9 +15,10 @@ mkdir -p results/fx700
 # 公式モジュールをロード
 module load system/fx700
 
-# ユーザー領域にインストールしたPythonパッケージのパスを通す
+# パスを通す
 export PATH="$HOME/.local/bin:$PATH"
 export PYTHONPATH="$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH"
+export PYTHONPATH="$(pwd):$(pwd)/eval:$(pwd)/eval_pt:$PYTHONPATH"
 
 echo "=================================================="
 echo "FX700 | Starting Full Evaluations"

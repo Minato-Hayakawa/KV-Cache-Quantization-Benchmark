@@ -15,9 +15,10 @@ mkdir -p results/ai-l40s
 # 公式モジュールをロード
 module load system/ai-l40s
 
-# ユーザー領域にインストールしたPythonパッケージのパスを通す
+# ユーザー領域のパッケージ ＋ プロジェクトのルート ＋ eval/eval_ptディレクトリにパスを通す
 export PATH="$HOME/.local/bin:$PATH"
 export PYTHONPATH="$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH"
+export PYTHONPATH="$(pwd):$(pwd)/eval:$(pwd)/eval_pt:$PYTHONPATH"
 
 echo "=================================================="
 echo "NVIDIA [ai-l40s] | Starting Full Evaluations"
