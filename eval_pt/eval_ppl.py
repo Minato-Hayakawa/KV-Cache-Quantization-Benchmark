@@ -10,11 +10,11 @@ from custom_cache import QuantizedKVCache
 def get_optimal_device():
     """実行環境に合わせた最適なデバイスを自動判定"""
     if torch.cuda.is_available():
-        return "cuda"  # NVIDIA (b300, a100, h200等) および AMD (fs-mi300x)
+        return "cuda"  # NVIDIA / AMD GPU
     elif hasattr(torch, "xpu") and torch.xpu.is_available():
-        return "xpu"   # Intel GPU (qc-pvc)
+        return "xpu"   # Intel GPU
     else:
-        return "cpu"   # 富岳等 (fx700)
+        return "cpu"   # CPU
 
 
 def evaluate_ppl(
@@ -28,8 +28,8 @@ def evaluate_ppl(
 
     print(f"=== Evaluating PPL: {method} | Device: {device} | Model: {model_id} ===")
 
-    # CPU環境（富岳など）の場合は float32、GPU環境は float16
-    torch_dtype = torch.float32 if device == "cpu" else torch.float16
+    # 【重要】Llama 3.1のオーバーフローを防ぐため、GPU時は bfloat16 を使用
+    torch_dtype = torch.float32 if device == "cpu" else torch.bfloat16
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     model = (
@@ -57,12 +57,22 @@ def evaluate_ppl(
         target_ids = input_ids.clone()
         target_ids[:, :-trg_len] = -100
 
+        # 【重要】グローバルな位置情報を維持するための position_ids を生成
+        position_ids = torch.arange(
+            begin_loc, end_loc, dtype=torch.long, device=device
+        ).unsqueeze(0)
+
         cache = QuantizedKVCache(method=method)
 
         with torch.no_grad():
-            outputs = model(input_ids, past_key_values=cache, use_cache=True)
+            outputs = model(
+                input_ids,
+                position_ids=position_ids,
+                past_key_values=cache,
+                use_cache=True,
+            )
             
-            # 【修正点】Logit[t] と Target[t+1] を比較するための Shift 処理
+            # Logit[t] と Target[t+1] を比較する Shift 処理
             shift_logits = outputs.logits[..., :-1, :].contiguous()
             shift_labels = target_ids[..., 1:].contiguous()
 
@@ -70,7 +80,7 @@ def evaluate_ppl(
                 shift_logits.view(-1, shift_logits.size(-1)),
                 shift_labels.view(-1),
                 reduction="sum",
-                ignore_index=-100,  # マスク(-100)のトークンは損失計算から除外
+                ignore_index=-100,
             )
 
         num_valid_tokens = (shift_labels != -100).sum().item()
@@ -89,7 +99,6 @@ def evaluate_ppl(
 
 
 if __name__ == "__main__":
-    # コマンドライン引数の設定
     parser = argparse.ArgumentParser(description="Evaluate PPL for KV Cache Quantization")
     parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3.1-8B", help="Hugging Face model ID")
     parser.add_argument("--method", type=str, default="turbo_quant", help="Quantization method")
@@ -99,7 +108,6 @@ if __name__ == "__main__":
     target_device = get_optimal_device()
     print(f"Detected Active Device: {target_device}\n")
 
-    # 引数で指定されたモデルと手法で実行
     ppl_result = evaluate_ppl(
         model_id=args.model_name,
         method=args.method,
