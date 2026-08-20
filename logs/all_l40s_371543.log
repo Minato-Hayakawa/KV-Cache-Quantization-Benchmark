@@ -1,0 +1,22 @@
+==================================================
+NVIDIA [ai-l40s] | Starting Full Evaluations
+==================================================
+-> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: turbo_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+-> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+-> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: rope_aware_tq | Device: cuda ===
+-> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: meta-llama/Meta-Llama-3.1-8B | Method: rope_aware_tq | Device: cuda ===
+==================================================
+NVIDIA [ai-l40s] | All Evaluations Finished Successfully!
+==================================================
