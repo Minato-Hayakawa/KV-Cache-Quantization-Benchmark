@@ -2,7 +2,7 @@
 #SBATCH --job-name=eval_fp16_base
 #SBATCH --output=logs/fp16_baseline_%j.log
 #SBATCH --error=logs/fp16_baseline_%j.err
-#SBATCH --partition-l40s          # ご自身の環境のパーティション名に合わせてください
+#SBATCH --partition=ai-l40s       # ← ここを ai-l40s に変更！
 #SBATCH --gres=gpu:1
 #SBATCH --time=00:30:00
 
