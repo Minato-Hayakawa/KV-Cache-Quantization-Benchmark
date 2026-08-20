@@ -28,7 +28,7 @@ def evaluate_ppl(
 
     print(f"=== Evaluating PPL: {method} | Device: {device} | Model: {model_id} ===")
 
-    # CPU環境（富岳など）の場合は、互換性と安定性を考慮して float32 を推奨
+    # CPU環境（富岳など）の場合は float32、GPU環境は float16
     torch_dtype = torch.float32 if device == "cpu" else torch.float16
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -61,13 +61,19 @@ def evaluate_ppl(
 
         with torch.no_grad():
             outputs = model(input_ids, past_key_values=cache, use_cache=True)
+            
+            # 【修正点】Logit[t] と Target[t+1] を比較するための Shift 処理
+            shift_logits = outputs.logits[..., :-1, :].contiguous()
+            shift_labels = target_ids[..., 1:].contiguous()
+
             neg_log_likelihood = F.cross_entropy(
-                outputs.logits.view(-1, outputs.logits.size(-1)),
-                target_ids.view(-1),
+                shift_logits.view(-1, shift_logits.size(-1)),
+                shift_labels.view(-1),
                 reduction="sum",
+                ignore_index=-100,  # マスク(-100)のトークンは損失計算から除外
             )
 
-        num_valid_tokens = (target_ids != -100).sum().item()
+        num_valid_tokens = (shift_labels != -100).sum().item()
         nll_sum += neg_log_likelihood.item()
         n_tokens += num_valid_tokens
         
