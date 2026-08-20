@@ -9,12 +9,7 @@ if root_path not in sys.path:
 import torch
 from transformers.cache_utils import DynamicCache
 
-# 2. ルートからの絶対インポート
-from core_pt.quantizers.base import BaseQuantizer
-from core_pt.quantizers.turbo_quant import TurboQuantizer
-from core_pt.quantizers.rope_aware_tq import RoPEAwareTurboQuantizer
-from core_pt.quantizers.hyper_quant import HyperQuantizer
-from core_pt.quantizers.ultra_quant import UltraQuantizer
+# ※ ここにあった core_pt からのインポートは循環参照を防ぐため削除しました
 
 
 class QuantizedKVCache(DynamicCache):
@@ -35,7 +30,7 @@ class QuantizedKVCache(DynamicCache):
         self.num_bits = num_bits
         self.head_dim = head_dim
         self.bits_per_band = bits_per_band or [4, 2]
-        self.quantizer: BaseQuantizer = None
+        self.quantizer = None  # 型ヒント BaseQuantizer は遅延インポート後に使用
 
     def _lazy_init_quantizer(self, device: torch.device, head_dim: int):
         """初回 update 呼び出し時にデバイスと次元に合わせて量子化器を動的初期化"""
@@ -46,6 +41,13 @@ class QuantizedKVCache(DynamicCache):
 
         self.head_dim = head_dim
         
+        # 循環インポートを防ぐため、ここで必要な量子化器をローカルインポートする
+        from core_pt.quantizers.base import BaseQuantizer
+        from core_pt.quantizers.turbo_quant import TurboQuantizer
+        from core_pt.quantizers.rope_aware_tq import RoPEAwareTurboQuantizer
+        from core_pt.quantizers.hyper_quant import HyperQuantizer
+        from core_pt.quantizers.ultra_quant import UltraQuantizer
+
         # デバイスタイプを動的に判定 ("cuda", "xpu", "cpu" などに対応)
         device_str = device.type
 
