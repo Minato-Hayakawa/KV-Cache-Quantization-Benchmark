@@ -4,36 +4,40 @@
 #SBATCH --error=logs/all_fx700_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=32
-#SBATCH --time=24:00:00               # CPU実行は時間がかかるため長めに設定
+#SBATCH --cpus-per-task=16
+#SBATCH --time=24:00:00
 #SBATCH --partition=fx700
 
 mkdir -p logs
+mkdir -p results/fx700
 
-MODELS=(
-    "meta-llama/Meta-Llama-3.1-8B"
-    "Qwen/Qwen2.5-7B"
-    "mistralai/Mistral-7B-v0.3"
-)
+# 公式モジュールをロード
+module load system/fx700
 
-METHODS=(
-    "fp16"
-    "turbo_quant"
-    "rope_aware_tq"
-    "ultra_quant"
-)
+# ユーザー領域にインストールしたPythonパッケージのパスを通す
+export PATH="$HOME/.local/bin:$PATH"
+export PYTHONPATH="$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH"
 
-for model in "${MODELS[@]}"; do
-    for method in "${METHODS[@]}"; do
-        echo "=================================================="
-        echo "Fujitsu CPU [fx700] | Model: $model | Method: $method"
-        echo "=================================================="
+echo "=================================================="
+echo "FX700 | Starting Full Evaluations"
+echo "=================================================="
 
-        python -m eval_pt.eval_ppl --model_name "$model" --method "$method"
-        python -m eval_pt.eval_fidelity --model_name "$model" --method "$method"
-        python -m eval_pt.eval_niah --model_name "$model" --method "$method"
-        python -m eval_pt.eval_longbench --model_name "$model" --method "$method"
+# 1. Perplexity (PPL) の評価
+echo "-> Running PPL Evaluation..."
+python3 -m eval_pt.eval_ppl --output_dir results/fx700/ppl
 
-        echo ""
-    done
-done
+# 2. Fidelity の評価
+echo "-> Running Fidelity Evaluation..."
+python3 -m eval_pt.eval_fidelity --output_dir results/fx700/fidelity
+
+# 3. Needle In A Haystack (Niah) の評価
+echo "-> Running NIAH Evaluation..."
+python3 -m eval_pt.eval_niah --output_dir results/fx700/niah
+
+# 4. LongBench の評価
+echo "-> Running LongBench Evaluation..."
+python3 -m eval_pt.eval_longbench --output_dir results/fx700/longbench
+
+echo "=================================================="
+echo "FX700 | All Evaluations Finished Successfully!"
+echo "=================================================="

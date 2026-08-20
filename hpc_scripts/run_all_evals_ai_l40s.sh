@@ -10,31 +10,35 @@
 #SBATCH --partition=ai-l40s
 
 mkdir -p logs
+mkdir -p results/ai-l40s
 
-MODELS=(
-    "meta-llama/Meta-Llama-3.1-8B"
-    "Qwen/Qwen2.5-7B"
-    "mistralai/Mistral-7B-v0.3"
-)
+# 公式モジュールをロード
+module load system/ai-l40s
 
-METHODS=(
-    "fp16"
-    "turbo_quant"
-    "rope_aware_tq"
-    "ultra_quant"
-)
+# ユーザー領域にインストールしたPythonパッケージのパスを通す
+export PATH="$HOME/.local/bin:$PATH"
+export PYTHONPATH="$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH"
 
-for model in "${MODELS[@]}"; do
-    for method in "${METHODS[@]}"; do
-        echo "=================================================="
-        echo "NVIDIA [ai-l40s] | Model: $model | Method: $method"
-        echo "=================================================="
+echo "=================================================="
+echo "NVIDIA [ai-l40s] | Starting Full Evaluations"
+echo "=================================================="
 
-        python -m eval_pt.eval_ppl --model_name "$model" --method "$method"
-        python -m eval_pt.eval_fidelity --model_name "$model" --method "$method"
-        python -m eval_pt.eval_niah --model_name "$model" --method "$method"
-        python -m eval_pt.eval_longbench --model_name "$model" --method "$method"
+# 1. Perplexity (PPL) の評価
+echo "-> Running PPL Evaluation..."
+python3 -m eval_pt.eval_ppl --output_dir results/ai-l40s/ppl
 
-        echo ""
-    done
-done
+# 2. Fidelity の評価
+echo "-> Running Fidelity Evaluation..."
+python3 -m eval_pt.eval_fidelity --output_dir results/ai-l40s/fidelity
+
+# 3. Needle In A Haystack (Niah) の評価
+echo "-> Running NIAH Evaluation..."
+python3 -m eval_pt.eval_niah --output_dir results/ai-l40s/niah
+
+# 4. LongBench の評価
+echo "-> Running LongBench Evaluation..."
+python3 -m eval_pt.eval_longbench --output_dir results/ai-l40s/longbench
+
+echo "=================================================="
+echo "NVIDIA [ai-l40s] | All Evaluations Finished Successfully!"
+echo "=================================================="
