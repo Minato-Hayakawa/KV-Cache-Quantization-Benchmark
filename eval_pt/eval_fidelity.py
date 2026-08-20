@@ -12,7 +12,7 @@ def get_optimal_device():
     elif hasattr(torch, "xpu") and torch.xpu.is_available():
         return "xpu"   # Intel GPU (qc-pvc)
     else:
-        return "cpu"   # 富岳等 (fx700)
+        return "cpu"   # CPU
 
 
 def evaluate_fidelity(
@@ -27,42 +27,51 @@ def evaluate_fidelity(
         f"=== Evaluating Fidelity: {method} | Model: {model_id} | SeqLen: {seq_len} ==="
     )
 
-    text = "The rapid evolution of artificial intelligence and large language models has fundamentally transformed computation." * 30
+    # 確実に seq_len に到達するよう十分な長さを確保
+    base_text = "The rapid evolution of artificial intelligence and large language models has fundamentally transformed computation. "
+    text = base_text * (seq_len // 10 + 10)
     inputs = tokenizer(
         text, return_tensors="pt", max_length=seq_len, truncation=True
     ).to(device)
 
-    # 1. FP16 ベースライン
+    actual_seq_len = inputs.input_ids.size(1)
+    print(f"Evaluated Sequence Length: {actual_seq_len} tokens")
+
+    # RoPEを正しく適用するための position_ids 明示指定
+    position_ids = torch.arange(0, actual_seq_len, dtype=torch.long, device=device).unsqueeze(0)
+
+    # 1. FP16/BF16 ベースライン計算
     with torch.no_grad():
         baseline_cache = QuantizedKVCache(method="fp16")
-        out_base = model(**inputs, past_key_values=baseline_cache, use_cache=True)
-        logits_base = out_base.logits[:, -1, :]
+        out_base = model(**inputs, position_ids=position_ids, past_key_values=baseline_cache, use_cache=True)
+        logits_base = out_base.logits.float()  # 指標計算精度の安定化のため float32 化
 
-    # 2. 量子化手法
+    # 2. 量子化手法での計算
     with torch.no_grad():
         quant_cache = QuantizedKVCache(method=method)
-        out_quant = model(**inputs, past_key_values=quant_cache, use_cache=True)
-        logits_quant = out_quant.logits[:, -1, :]
+        out_quant = model(**inputs, position_ids=position_ids, past_key_values=quant_cache, use_cache=True)
+        logits_quant = out_quant.logits.float()  # 指標計算精度の安定化のため float32 化
 
-    # 指標算出
-    cos_sim = F.cosine_similarity(
-        logits_base.float(), logits_quant.float(), dim=-1
-    ).mean().item()
+    # --- 指標算出（単一トークンではなく全シーケンス位置での集約評価） ---
+    
+    # Cosine Similarity (全位置の平均)
+    cos_sim = F.cosine_similarity(logits_base, logits_quant, dim=-1).mean().item()
 
+    # Top-1 Match Rate (全位置の平均一致率)
     top1_base = logits_base.argmax(dim=-1)
     top1_quant = logits_quant.argmax(dim=-1)
     top1_match = (top1_base == top1_quant).float().mean().item() * 100
 
+    # Top-5 Match Rate (ベクトル演算による全位置の平均 Top-5 重なり率)
     top5_base = logits_base.topk(5, dim=-1).indices
     top5_quant = logits_quant.topk(5, dim=-1).indices
     
-    top5_base_set = set(top5_base[0].tolist())
-    top5_quant_set = set(top5_quant[0].tolist())
-    top5_match = (len(top5_quant_set & top5_base_set) / 5.0) * 100
+    matches = (top5_base.unsqueeze(-1) == top5_quant.unsqueeze(-2)).any(dim=-1)
+    top5_match = (matches.sum(dim=-1).float() / 5.0).mean().item() * 100
 
     print(f"Cosine Similarity : {cos_sim:.5f}")
-    print(f"Top-1 Match Rate  : {top1_match:.2f}%")
-    print(f"Top-5 Match Rate  : {top5_match:.2f}%\n")
+    print(f"Top-1 Match Rate   : {top1_match:.2f}%")
+    print(f"Top-5 Match Rate   : {top5_match:.2f}%\n")
 
 
 if __name__ == "__main__":
@@ -75,8 +84,8 @@ if __name__ == "__main__":
     target_device = get_optimal_device()
     print(f"Detected Active Device: {target_device}\n")
 
-    # CPU環境の場合は安定性を考慮して float32 を使用
-    torch_dtype = torch.float32 if target_device == "cpu" else torch.float16
+    # GPU実行時は Llama 3.1 等でのオーバーフローを防ぐため bfloat16 を使用
+    torch_dtype = torch.float32 if target_device == "cpu" else torch.bfloat16
 
     print(f"Loading model {args.model_name}...")
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
