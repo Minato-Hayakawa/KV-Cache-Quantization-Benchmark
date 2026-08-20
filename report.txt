@@ -61,8 +61,22 @@ Tritonカーネル	PyTorchの100-650倍高速（量子化/逆量子化）
   ・Turbo Quant × Rope aware
   ・Hyper Quant
   ・Ultra Quant
+ ・計算資源
+  ・b300(Nvidia)
+  ・fs-mi300x(AMD CDNAクラスタ)
+  ・qc-pvc(Intel Ponte Vecchio)
+  ・fx700(富士通)
+
+  ・ai-h100l
+  ・qc-pvc
+  ・mi100
+  ・fx700
+  ・富岳
+ ・使用するLLM
+  ・Meta-Llama 3.1 8B
+  ・Qwen 2.5 7B
+  ・Mistral 7B v0.3
  ・実験内容:
-富岳、GPUクラスタ、その他スパコン(未定)を用いて
 ・それぞれのハードでの実行速度
 ・圧縮率(8Kコンテキスト、FP16ベースライン289MB, 2, 4, 8ビットで検証)
 ・速度向上

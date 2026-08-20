@@ -2,7 +2,6 @@ import sys
 import os
 
 # 1. プロジェクトのルートディレクトリ（KV-Cache Quantization Benchmark）へのパスを通す
-# eval_pt/ のひとつ上がルートフォルダ
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if root_path not in sys.path:
     sys.path.insert(0, root_path)
@@ -10,7 +9,7 @@ if root_path not in sys.path:
 import torch
 from transformers.cache_utils import DynamicCache
 
-# 2. ルートからの絶対インポートに統一する
+# 2. ルートからの絶対インポート
 from core_pt.quantizers.base import BaseQuantizer
 from core_pt.quantizers.turbo_quant import TurboQuantizer
 from core_pt.quantizers.rope_aware_tq import RoPEAwareTurboQuantizer
@@ -28,7 +27,7 @@ class QuantizedKVCache(DynamicCache):
         self,
         method: str = "turbo_quant",
         num_bits: int = 3,
-        head_dim: int = 128,
+        head_dim: int = None,
         bits_per_band: list = None,
     ):
         super().__init__()
@@ -41,7 +40,9 @@ class QuantizedKVCache(DynamicCache):
     def _lazy_init_quantizer(self, device: torch.device, head_dim: int):
         """初回 update 呼び出し時にデバイスと次元に合わせて量子化器を動的初期化"""
         if self.quantizer is not None:
-            return
+            # 既に初期化済みであっても、ヘッド次元が万が一異なるモデルに切り替わった場合に備えて更新
+            if self.head_dim == head_dim:
+                return
 
         self.head_dim = head_dim
         
@@ -80,7 +81,7 @@ class QuantizedKVCache(DynamicCache):
         """
         key_states, value_states shape: (batch_size, num_heads, seq_len, head_dim)
         """
-        # 初回呼出時に量子化器を動的初期化
+        # 初回呼出時、あるいはモデル変更時に量子化器を動的初期化・追従
         self._lazy_init_quantizer(
             device=key_states.device, head_dim=key_states.shape[-1]
         )

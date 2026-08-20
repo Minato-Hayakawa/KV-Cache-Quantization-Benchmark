@@ -1,13 +1,24 @@
+import argparse
 import torch
 import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from custom_cache import QuantizedKVCache
 
 
+def get_optimal_device():
+    """実行環境に合わせた最適なデバイスを自動判定"""
+    if torch.cuda.is_available():
+        return "cuda"  # NVIDIA および AMD (fs-mi300x)
+    elif hasattr(torch, "xpu") and torch.xpu.is_available():
+        return "xpu"   # Intel GPU (qc-pvc)
+    else:
+        return "cpu"   # 富岳等 (fx700)
+
+
 def evaluate_fidelity(
     model,
     tokenizer,
-    model_id="meta-llama/Llama-3.2-1B",
+    model_id="meta-llama/Meta-Llama-3.1-8B",
     method="rope_aware_tq",
     seq_len=1024,
     device="cuda",
@@ -55,18 +66,33 @@ def evaluate_fidelity(
 
 
 if __name__ == "__main__":
-    model_id = "meta-llama/Llama-3.2-1B"
-    device = "cuda"
-    
-    print(f"Loading model {model_id}...")
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    parser = argparse.ArgumentParser(description="Evaluate Fidelity for KV Cache Quantization")
+    parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3.1-8B", help="Hugging Face model ID")
+    parser.add_argument("--method", type=str, default="turbo_quant", help="Quantization method")
+    parser.add_argument("--seq_len", type=int, default=1024, help="Sequence length for evaluation")
+    args = parser.parse_args()
+
+    target_device = get_optimal_device()
+    print(f"Detected Active Device: {target_device}\n")
+
+    # CPU環境の場合は安定性を考慮して float32 を使用
+    torch_dtype = torch.float32 if target_device == "cpu" else torch.float16
+
+    print(f"Loading model {args.model_name}...")
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
     model = (
         AutoModelForCausalLM.from_pretrained(
-            model_id, torch_dtype=torch.float16, device_map=device
+            args.model_name, torch_dtype=torch_dtype, device_map=target_device
         )
         .eval()
     )
     print("Model loaded successfully.\n")
 
-    for m in ["turbo_quant", "rope_aware_tq", "hyper_quant", "ultra_quant"]:
-        evaluate_fidelity(model, tokenizer, model_id=model_id, method=m, device=device)
+    evaluate_fidelity(
+        model,
+        tokenizer,
+        model_id=args.model_name,
+        method=args.method,
+        seq_len=args.seq_len,
+        device=target_device,
+    )

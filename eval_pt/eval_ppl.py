@@ -1,17 +1,11 @@
-import sys
-import os
-
-# core_pt フォルダの絶対パスを Python の検索パスに追加する
-core_pt_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../core_pt'))
-if core_pt_path not in sys.path:
-    sys.path.insert(0, core_pt_path)
-
+import argparse
 import torch
 import torch.nn.functional as F
 from datasets import load_dataset
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from custom_cache import QuantizedKVCache  # これで core_pt/custom_cache.py が見つかる
+from custom_cache import QuantizedKVCache
+
 
 def get_optimal_device():
     """実行環境に合わせた最適なデバイスを自動判定"""
@@ -24,7 +18,7 @@ def get_optimal_device():
 
 
 def evaluate_ppl(
-    model_id="meta-llama/Llama-3.2-1B",
+    model_id="meta-llama/Meta-Llama-3.1-8B",
     method="rope_aware_tq",
     stride=512,
     device=None,
@@ -89,9 +83,21 @@ def evaluate_ppl(
 
 
 if __name__ == "__main__":
+    # コマンドライン引数の設定
+    parser = argparse.ArgumentParser(description="Evaluate PPL for KV Cache Quantization")
+    parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3.1-8B", help="Hugging Face model ID")
+    parser.add_argument("--method", type=str, default="turbo_quant", help="Quantization method")
+    parser.add_argument("--stride", type=int, default=512, help="Stride for evaluation")
+    args = parser.parse_args()
+
     target_device = get_optimal_device()
     print(f"Detected Active Device: {target_device}\n")
 
-    methods = ["fp16", "turbo_quant", "rope_aware_tq", "ultra_quant"]
-    results = {m: evaluate_ppl(method=m, device=target_device) for m in methods}
-    print("Final Results:", results)
+    # 引数で指定されたモデルと手法で実行
+    ppl_result = evaluate_ppl(
+        model_id=args.model_name,
+        method=args.method,
+        stride=args.stride,
+        device=target_device
+    )
+    print(f"Final Result [{args.model_name} | {args.method}]: {ppl_result}")
