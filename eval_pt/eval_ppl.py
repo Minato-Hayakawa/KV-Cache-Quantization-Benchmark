@@ -103,6 +103,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3.1-8B", help="Hugging Face model ID")
     parser.add_argument("--method", type=str, default="turbo_quant", help="Quantization method")
     parser.add_argument("--stride", type=int, default=512, help="Stride for evaluation")
+    parser.add_argument("--seq_len", type=int, default=2048, help="Maximum sequence length")
     args = parser.parse_args()
 
     target_device = get_optimal_device()
