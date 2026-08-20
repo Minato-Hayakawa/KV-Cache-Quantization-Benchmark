@@ -1,0 +1,90 @@
+==================================================
+NVIDIA [ai-l40s] | Starting Multi-Model Evaluations
+==================================================
+
+##################################################
+Evaluating Model: meta-llama/Meta-Llama-3.1-8B
+##################################################
+-> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: turbo_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[turbo_quant] Perplexity: 6.7845
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | turbo_quant]: 6.78448486328125
+-> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.72423
+Top-1 Match Rate   : 99.61%
+Top-5 Match Rate   : 50.04%
+
+-> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: rope_aware_tq | Device: cuda ===
+Actual Prompt Token Length: 7605
+Output   : Access to the mid-20th century. The history of modern computing dates
+Success  : False
+
+Finished evaluation for: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+
+##################################################
+Evaluating Model: Qwen/Qwen2.5-7B
+##################################################
+-> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: turbo_quant | Device: cuda | Model: Qwen/Qwen2.5-7B ===
+[turbo_quant] Perplexity: 9816.0430
+
+Final Result [Qwen/Qwen2.5-7B | turbo_quant]: 9816.04296875
+-> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model Qwen/Qwen2.5-7B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: turbo_quant | Model: Qwen/Qwen2.5-7B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.56165
+Top-1 Match Rate   : 3.03%
+Top-5 Match Rate   : 10.04%
+
+-> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: Qwen/Qwen2.5-7B | Context: 8192 | Method: rope_aware_tq | Device: cuda ===
+Actual Prompt Token Length: 7651
+Output   : 000000 the0 the the00000
+Success  : False
+
+Finished evaluation for: Qwen/Qwen2.5-7B
+--------------------------------------------------
+
+##################################################
+Evaluating Model: mistralai/Mistral-7B-v0.3
+##################################################
+-> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: turbo_quant | Device: cuda | Model: mistralai/Mistral-7B-v0.3 ===
+-> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-v0.3...
+-> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-v0.3 | Context: 8192 | Method: rope_aware_tq | Device: cuda ===
+Finished evaluation for: mistralai/Mistral-7B-v0.3
+--------------------------------------------------
+==================================================
+NVIDIA [ai-l40s] | All Models and Evaluations Finished!
+==================================================

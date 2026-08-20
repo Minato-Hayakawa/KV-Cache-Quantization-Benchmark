@@ -1,0 +1,108 @@
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_ppl.py", line 2, in <module>
+    import torch
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 415, in <module>
+    _load_global_deps()
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 371, in _load_global_deps
+    raise err
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 320, in _load_global_deps
+    ctypes.CDLL(global_deps_lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/usr/lib64/python3.9/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /home/users/u0001988/.local/lib/python3.9/site-packages/torch/lib/libtorch_global_deps.so: cannot open shared object file: No such file or directory
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_fidelity.py", line 2, in <module>
+    import torch
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 415, in <module>
+    _load_global_deps()
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 371, in _load_global_deps
+    raise err
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 320, in _load_global_deps
+    ctypes.CDLL(global_deps_lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/usr/lib64/python3.9/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /home/users/u0001988/.local/lib/python3.9/site-packages/torch/lib/libtorch_global_deps.so: cannot open shared object file: No such file or directory
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_niah.py", line 2, in <module>
+    import torch
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 415, in <module>
+    _load_global_deps()
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 371, in _load_global_deps
+    raise err
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 320, in _load_global_deps
+    ctypes.CDLL(global_deps_lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/usr/lib64/python3.9/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /home/users/u0001988/.local/lib/python3.9/site-packages/torch/lib/libtorch_global_deps.so: cannot open shared object file: No such file or directory
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_ppl.py", line 2, in <module>
+    import torch
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 415, in <module>
+    _load_global_deps()
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 371, in _load_global_deps
+    raise err
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 320, in _load_global_deps
+    ctypes.CDLL(global_deps_lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/usr/lib64/python3.9/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /home/users/u0001988/.local/lib/python3.9/site-packages/torch/lib/libtorch_global_deps.so: cannot open shared object file: No such file or directory
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_fidelity.py", line 2, in <module>
+    import torch
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 415, in <module>
+    _load_global_deps()
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 371, in _load_global_deps
+    raise err
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 320, in _load_global_deps
+    ctypes.CDLL(global_deps_lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/usr/lib64/python3.9/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /home/users/u0001988/.local/lib/python3.9/site-packages/torch/lib/libtorch_global_deps.so: cannot open shared object file: No such file or directory
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_niah.py", line 2, in <module>
+    import torch
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 415, in <module>
+    _load_global_deps()
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 371, in _load_global_deps
+    raise err
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 320, in _load_global_deps
+    ctypes.CDLL(global_deps_lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/usr/lib64/python3.9/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /home/users/u0001988/.local/lib/python3.9/site-packages/torch/lib/libtorch_global_deps.so: cannot open shared object file: No such file or directory
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_ppl.py", line 2, in <module>
+    import torch
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 415, in <module>
+    _load_global_deps()
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 371, in _load_global_deps
+    raise err
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 320, in _load_global_deps
+    ctypes.CDLL(global_deps_lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/usr/lib64/python3.9/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /home/users/u0001988/.local/lib/python3.9/site-packages/torch/lib/libtorch_global_deps.so: cannot open shared object file: No such file or directory
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_fidelity.py", line 2, in <module>
+    import torch
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 415, in <module>
+    _load_global_deps()
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 371, in _load_global_deps
+    raise err
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 320, in _load_global_deps
+    ctypes.CDLL(global_deps_lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/usr/lib64/python3.9/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /home/users/u0001988/.local/lib/python3.9/site-packages/torch/lib/libtorch_global_deps.so: cannot open shared object file: No such file or directory
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_niah.py", line 2, in <module>
+    import torch
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 415, in <module>
+    _load_global_deps()
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 371, in _load_global_deps
+    raise err
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/__init__.py", line 320, in _load_global_deps
+    ctypes.CDLL(global_deps_lib_path, mode=ctypes.RTLD_GLOBAL)
+  File "/usr/lib64/python3.9/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /home/users/u0001988/.local/lib/python3.9/site-packages/torch/lib/libtorch_global_deps.so: cannot open shared object file: No such file or directory
