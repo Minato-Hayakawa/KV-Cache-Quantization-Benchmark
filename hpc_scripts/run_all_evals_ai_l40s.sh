@@ -7,7 +7,8 @@
 #SBATCH --time=02:00:00
 
 export PYTHONUNBUFFERED=1
-
+# 明示的にユーザーパッケージのパスを通す
+export PYTHONPATH=$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH
 echo "=================================================="
 echo " Starting Full Evaluation Benchmark"
 echo " Node: $(hostname)"
