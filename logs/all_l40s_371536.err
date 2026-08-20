@@ -1,0 +1,11 @@
+usage: eval_ppl.py [-h] [--model_name MODEL_NAME] [--method METHOD]
+                   [--stride STRIDE]
+eval_ppl.py: error: unrecognized arguments: --output_dir results/ai-l40s/ppl
+usage: eval_fidelity.py [-h] [--model_name MODEL_NAME] [--method METHOD]
+                        [--seq_len SEQ_LEN]
+eval_fidelity.py: error: unrecognized arguments: --output_dir results/ai-l40s/fidelity
+usage: eval_niah.py [-h] [--model_name MODEL_NAME] [--method METHOD]
+                    [--context_len CONTEXT_LEN]
+eval_niah.py: error: unrecognized arguments: --output_dir results/ai-l40s/niah
+usage: eval_longbench.py [-h] [--model_name MODEL_NAME] [--method METHOD]
+eval_longbench.py: error: unrecognized arguments: --output_dir results/ai-l40s/longbench
