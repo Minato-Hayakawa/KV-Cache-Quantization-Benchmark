@@ -2,7 +2,7 @@
 #SBATCH --job-name=kv_bench_all
 #SBATCH --output=logs/all_l40s_%j.log
 #SBATCH --error=logs/all_l40s_%j.err
-#SBATCH --partition-l40s          # ご自身の環境のパーティション名に合わせる
+#SBATCH --partition=l40s          # ご自身の環境のパーティション名に合わせる
 #SBATCH --gres=gpu:1
 #SBATCH --time=02:00:00
 
