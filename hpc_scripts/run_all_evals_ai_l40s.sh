@@ -2,44 +2,38 @@
 #SBATCH --job-name=kv_bench_all
 #SBATCH --output=logs/all_l40s_%j.log
 #SBATCH --error=logs/all_l40s_%j.err
-#SBATCH --partition=ng-dgx-m0       # ご自身の環境のパーティション名に合わせる
+#SBATCH --partition=ng-dgx-m0
 #SBATCH --gres=gpu:1
 #SBATCH --time=02:00:00
 
-# 1. 評価したいモデルのリストを配列で定義する
-MODELS=(
-    "meta-llama/Meta-Llama-3.1-8B"
-    "Qwen/Qwen2.5-7B"
-    "mistralai/Mistral-7B-v0.3"
-)
+# 環境変数のセットアップ
+export PYTHONUNBUFFERED=1
 
 echo "=================================================="
-echo "NVIDIA [ai-l40s] | Starting Multi-Model Evaluations"
+echo " Starting Full Evaluation Benchmark"
+echo " Node: $(hostname)"
+echo " Date: $(date)"
+echo " Partition: ng-dgx-m0"
 echo "=================================================="
 
-# 2. モデルごとにループを回す
-for model_id in "${MODELS[@]}"; do
-    echo ""
-    echo "##################################################"
-    echo "Evaluating Model: $model_id"
-    echo "##################################################"
+# 1. Perplexity (PPL) 評価
+echo -e "\n[1/3] Running Perplexity Evaluation..."
+python3 eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method fp16 --seq_len 2048
+python3 eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method turbo_quant --seq_len 2048
+python3 eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method rope_aware_tq --seq_len 2048
 
-    # PPL評価
-    echo "-> Running PPL Evaluation..."
-    python eval_pt/eval_ppl.py --model_name "$model_id" # ※スクリプトの引数仕様に合わせて調整してください
+# 2. Fidelity (CosSim / Top-k Match) 評価
+echo -e "\n[2/3] Running Fidelity Evaluation..."
+python3 eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method turbo_quant --seq_len 2048
+python3 eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method rope_aware_tq --seq_len 2048
 
-    # Fidelity評価
-    echo "-> Running Fidelity Evaluation..."
-    python eval_pt/eval_fidelity.py --model_name "$model_id"
+# 3. Needle In A Haystack (NIAH) 評価
+echo -e "\n[3/3] Running Needle In A Haystack Evaluation..."
+python3 eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method fp16 --context_len 8192
+python3 eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method turbo_quant --context_len 8192
+python3 eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method rope_aware_tq --context_len 8192
 
-    # NIAH評価
-    echo "-> Running NIAH Evaluation..."
-    python eval_pt/eval_niah.py --model_name "$model_id"
-
-    echo "Finished evaluation for: $model_id"
-    echo "--------------------------------------------------"
-done
-
-echo "=================================================="
-echo "NVIDIA [ai-l40s] | All Models and Evaluations Finished!"
+echo -e "\n=================================================="
+echo " All Benchmark Evaluations Completed Successfully!"
+echo " Date: $(date)"
 echo "=================================================="
