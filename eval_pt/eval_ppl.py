@@ -1,4 +1,6 @@
 import argparse
+import json
+import os
 import torch
 import torch.nn.functional as F
 from datasets import load_dataset
@@ -116,3 +118,24 @@ if __name__ == "__main__":
         device=target_device
     )
     print(f"Final Result [{args.model_name} | {args.method}]: {ppl_result}")
+
+    # === 追加：結果を JSON ファイルとして出力する処理 ===
+    results_data = {
+        "model_name": args.model_name,
+        "method": args.method,
+        "stride": args.stride,
+        "seq_len": args.seq_len,
+        "perplexity": ppl_result
+    }
+
+    # 出力先ディレクトリの自動作成
+    os.makedirs("results/ai-l40s", exist_ok=True)
+
+    # モデル名に含まれるスラッシュをアンダースコアに置換してファイル名にする
+    safe_model_name = args.model_name.replace("/", "_")
+    output_filename = f"results/ai-l40s/{safe_model_name}_{args.method}.json"
+
+    with open(output_filename, "w", encoding="utf-8") as f:
+        json.dump(results_data, f, indent=4, ensure_ascii=False)
+
+    print(f"Results successfully saved to {output_filename}")
