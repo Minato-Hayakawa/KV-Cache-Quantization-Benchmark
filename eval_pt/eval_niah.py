@@ -1,4 +1,6 @@
 import argparse
+import json
+import os
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from custom_cache import QuantizedKVCache
@@ -95,12 +97,18 @@ def run_niah(
             generated_tokens.append(next_token.item())
             curr_pos += 1
 
-    response = tokenizer.decode(generated_tokens, skip_special_tokens=True)
+    response = tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
     success = "998244353" in response
 
-    print(f"Output   : {response.strip()}")
+    print(f"Output   : {response}")
     print(f"Success  : {success}\n")
-    return success
+    
+    return {
+        "context_len": context_len,
+        "actual_prompt_len": actual_prompt_len,
+        "response": response,
+        "success": success
+    }
 
 
 if __name__ == "__main__":
@@ -113,9 +121,30 @@ if __name__ == "__main__":
     target_device = get_optimal_device()
     print(f"Detected Active Device: {target_device}\n")
 
-    run_niah(
+    metrics = run_niah(
         model_id=args.model_name,
         method=args.method,
         context_len=args.context_len,
         device=target_device
     )
+    
+    print(f"Final Result [{args.model_name} | {args.method}]: {metrics}")
+
+    # === 他の評価スクリプトと統一された出力先・命名規則による JSON 保存処理 ===
+    results_data = {
+        "model_name": args.model_name,
+        "method": args.method,
+        **metrics
+    }
+
+    # 出力先ディレクトリの自動作成
+    os.makedirs("results/ai-l40s", exist_ok=True)
+
+    # モデル名に含まれるスラッシュをアンダースコアに置換
+    safe_model_name = args.model_name.replace("/", "_")
+    output_filename = f"results/ai-l40s/{safe_model_name}_{args.method}_niah.json"
+
+    with open(output_filename, "w", encoding="utf-8") as f:
+        json.dump(results_data, f, indent=4, ensure_ascii=False)
+
+    print(f"Results successfully saved to {output_filename}")

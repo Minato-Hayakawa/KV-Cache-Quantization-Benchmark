@@ -1,4 +1,6 @@
 import argparse
+import json
+import os
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from custom_cache import QuantizedKVCache
@@ -53,8 +55,14 @@ def run_longbench_sample(
 
     generated_text = tokenizer.decode(
         output[0][inputs.input_ids.shape[1] :], skip_special_tokens=True
-    )
-    print(f"Generated Summary: {generated_text.strip()}\n")
+    ).strip()
+    
+    print(f"Generated Summary: {generated_text}\n")
+
+    return {
+        "generated_summary": generated_text,
+        "input_length": inputs.input_ids.shape[1]
+    }
 
 
 if __name__ == "__main__":
@@ -66,8 +74,29 @@ if __name__ == "__main__":
     target_device = get_optimal_device()
     print(f"Detected Active Device: {target_device}\n")
 
-    run_longbench_sample(
+    metrics = run_longbench_sample(
         model_id=args.model_name,
         method=args.method,
         device=target_device
     )
+    
+    print(f"Final Result [{args.model_name} | {args.method}]: {metrics}")
+
+    # === 他の評価スクリプトと統一された出力先・命名規則による JSON 保存処理 ===
+    results_data = {
+        "model_name": args.model_name,
+        "method": args.method,
+        **metrics
+    }
+
+    # 出力先ディレクトリの自動作成
+    os.makedirs("results/ai-l40s", exist_ok=True)
+
+    # モデル名に含まれるスラッシュをアンダースコアに置換
+    safe_model_name = args.model_name.replace("/", "_")
+    output_filename = f"results/ai-l40s/{safe_model_name}_{args.method}_longbench.json"
+
+    with open(output_filename, "w", encoding="utf-8") as f:
+        json.dump(results_data, f, indent=4, ensure_ascii=False)
+
+    print(f"Results successfully saved to {output_filename}")

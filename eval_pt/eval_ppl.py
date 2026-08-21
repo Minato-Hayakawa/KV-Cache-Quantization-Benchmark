@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
     # モデル名に含まれるスラッシュをアンダースコアに置換してファイル名にする
     safe_model_name = args.model_name.replace("/", "_")
-    output_filename = f"results/ai-l40s/{safe_model_name}_{args.method}.json"
+    output_filename = f"results/ai-l40s/{safe_model_name}_{args.method}_ppl.json"
 
     with open(output_filename, "w", encoding="utf-8") as f:
         json.dump(results_data, f, indent=4, ensure_ascii=False)

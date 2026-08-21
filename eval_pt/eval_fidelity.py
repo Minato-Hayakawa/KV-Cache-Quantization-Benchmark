@@ -1,4 +1,6 @@
 import argparse
+import json
+import os
 import torch
 import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -8,9 +10,9 @@ from custom_cache import QuantizedKVCache
 def get_optimal_device():
     """実行環境に合わせた最適なデバイスを自動判定"""
     if torch.cuda.is_available():
-        return "cuda"  # NVIDIA および AMD (fs-mi300x)
+        return "cuda"  # NVIDIA / AMD GPU
     elif hasattr(torch, "xpu") and torch.xpu.is_available():
-        return "xpu"   # Intel GPU (qc-pvc)
+        return "xpu"   # Intel GPU
     else:
         return "cpu"   # CPU
 
@@ -73,6 +75,13 @@ def evaluate_fidelity(
     print(f"Top-1 Match Rate   : {top1_match:.2f}%")
     print(f"Top-5 Match Rate   : {top5_match:.2f}%\n")
 
+    return {
+        "cosine_similarity": cos_sim,
+        "top1_match_rate": top1_match,
+        "top5_match_rate": top5_match,
+        "evaluated_seq_len": actual_seq_len
+    }
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate Fidelity for KV Cache Quantization")
@@ -97,7 +106,7 @@ if __name__ == "__main__":
     )
     print("Model loaded successfully.\n")
 
-    evaluate_fidelity(
+    metrics = evaluate_fidelity(
         model,
         tokenizer,
         model_id=args.model_name,
@@ -105,3 +114,27 @@ if __name__ == "__main__":
         seq_len=args.seq_len,
         device=target_device,
     )
+    
+    print(f"Final Result [{args.model_name} | {args.method}]: {metrics}")
+
+    # === PPL と合わせた出力ディレクトリ・命名規則での JSON 保存処理 ===
+    results_data = {
+        "model_name": args.model_name,
+        "method": args.method,
+        "seq_len": args.seq_len,
+        **metrics
+    }
+
+    # 出力先ディレクトリの自動作成
+    os.makedirs("results/ai-l40s", exist_ok=True)
+
+    # モデル名に含まれるスラッシュをアンダースコアに置換（PPLスクリプトと完全同仕様）
+    safe_model_name = args.model_name.replace("/", "_")
+    
+    # ファイル名がPPLと被らないよう、必要に応じてサフィックス（例: _fidelity）を付与
+    output_filename = f"results/ai-l40s/{safe_model_name}_{args.method}_fidelity.json"
+
+    with open(output_filename, "w", encoding="utf-8") as f:
+        json.dump(results_data, f, indent=4, ensure_ascii=False)
+
+    print(f"Results successfully saved to {output_filename}")
