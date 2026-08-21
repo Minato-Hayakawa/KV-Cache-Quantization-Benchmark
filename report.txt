@@ -57,28 +57,32 @@ Tritonカーネル	PyTorchの100-650倍高速（量子化/逆量子化）
   ・Hyper Quant
   ・Ultra Quant
  ・計算資源
-
   ・ai-l40s
-  ・fs-mi300x
-  ・qc-pvc
-  ・fx700
-
-  ・富岳
  ・使用するLLM
   ・Meta-Llama 3.1 8B
   ・Qwen 2.5 7B
   ・Mistral 7B v0.3
  ・実験内容:
-・それぞれのハードでの実行速度
-・圧縮率(8Kコンテキスト、FP16ベースライン289MB, 2, 4, 8ビットで検証)
-・速度向上
-・精度劣化
-・LongBench	長文の要約・QA・コード補完など多タスク
-・Needle In A Haystack	長文中の特定情報検索精度
-・ZeroSCROLLS	ゼロショットでの長文理解
-・RULER	合成タスクによるコンテキスト長スケーリング
-・L-Eval	長文評価の統合ベンチマーク
-・注意機構の忠実度（3-bit、36レイヤー・72 KVヘッド）
- ・コサイン類似度	0.9945 〜 0.9961
- ・Top-1トークン一致率	
- ・Top-5トークン一致率
+それぞれのハードでの実行速度 ＆ 速度向上
+
+➔ eval_pt/eval_speed.py （今回作成：8Kコンテキストでのプレフィル時間やトークン生成速度 / トークン毎秒を計測）
+
+圧縮率（8Kコンテキスト、FP16ベースライン289MB、2, 4, 8ビット）
+
+➔ eval_pt/eval_compression.py （今回作成：実際のKVキャッシュのメモリサイズをバイト単位で抽出し、FP16ベースラインに対する圧縮率を算出）
+
+精度劣化 ＆ 各種タスク評価
+
+➔ eval_pt/eval_longbench.py （LongBenchによる多タスク評価）
+
+Needle In A Haystack（長文中の特定情報検索精度）
+
+➔ eval_pt/eval_niah.py
+
+注意機構の忠実度（コサイン類似度、Top-1/Top-5トークン一致率）
+
+➔ eval_pt/eval_fidelity.py （オリジナルのFP16と量子化後のアテンション出力を直接比較）
+
+Perplexity（文章の自然さ・難解度）
+
+➔ eval_pt/eval_ppl.py
