@@ -7,8 +7,9 @@
 #SBATCH --time=03:00:00
 
 export PYTHONUNBUFFERED=1
-# 明示的にユーザーパッケージのパスを通す
-export PYTHONPATH=$HOME/.local/lib/python3.9/site-packages:$PYTHONPATH
+
+# 作成した仮想環境の Python の絶対パス
+PY_BIN="/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/venv_l40s/bin/python"
 
 echo "=================================================="
 echo " Starting Full Evaluation Benchmark (All Methods)"
@@ -19,26 +20,26 @@ echo "=================================================="
 
 # 1. Perplexity (PPL) 評価
 echo -e "\n[1/3] Running Perplexity Evaluation..."
-python3 eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method fp16 --seq_len 2048
-python3 eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method turbo_quant --seq_len 2048
-python3 eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method rotor_quant --seq_len 2048
-python3 eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method hyper_quant --seq_len 2048
-python3 eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method ultra_quant --seq_len 2048
+$PY_BIN eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method fp16 --seq_len 2048
+$PY_BIN eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method turbo_quant --seq_len 2048
+$PY_BIN eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method rotor_quant --seq_len 2048
+$PY_BIN eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method hyper_quant --seq_len 2048
+$PY_BIN eval_pt/eval_ppl.py --model_name meta-llama/Meta-Llama-3.1-8B --method ultra_quant --seq_len 2048
 
 # 2. Fidelity (CosSim / Top-k Match) 評価
 echo -e "\n[2/3] Running Fidelity Evaluation..."
-python3 eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method turbo_quant --seq_len 2048
-python3 eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method rotor_quant --seq_len 2048
-python3 eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method hyper_quant --seq_len 2048
-python3 eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method ultra_quant --seq_len 2048
+$PY_BIN eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method turbo_quant --seq_len 2048
+$PY_BIN eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method rotor_quant --seq_len 2048
+$PY_BIN eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method hyper_quant --seq_len 2048
+$PY_BIN eval_pt/eval_fidelity.py --model_name meta-llama/Meta-Llama-3.1-8B --method ultra_quant --seq_len 2048
 
 # 3. Needle In A Haystack (NIAH) 評価
 echo -e "\n[3/3] Running Needle In A Haystack Evaluation..."
-python3 eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method fp16 --context_len 8192
-python3 eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method turbo_quant --context_len 8192
-python3 eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method rotor_quant --context_len 8192
-python3 eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method hyper_quant --context_len 8192
-python3 eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method ultra_quant --context_len 8192
+$PY_BIN eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method fp16 --context_len 8192
+$PY_BIN eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method turbo_quant --context_len 8192
+$PY_BIN eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method rotor_quant --context_len 8192
+$PY_BIN eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method hyper_quant --context_len 8192
+$PY_BIN eval_pt/eval_niah.py --model_name meta-llama/Meta-Llama-3.1-8B --method ultra_quant --context_len 8192
 
 echo -e "\n=================================================="
 echo " All Benchmark Evaluations Completed Successfully!"
