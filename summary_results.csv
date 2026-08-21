@@ -1,0 +1,120 @@
+model_name,method,sequence_length,kv_cache_size_mb,baseline_mb,compression_ratio,file_name,benchmark,seq_len,cosine_similarity,top1_match_rate,top5_match_rate,evaluated_seq_len,generated_summary,input_length,context_len,actual_prompt_len,response,success,stride,perplexity,prefill_time_sec,decode_time_sec,generated_tokens,tokens_per_second
+meta-llama/Meta-Llama-3.1-8B,fp16,8192.0,1024.0,289.0,0.28,meta-llama_Meta-Llama-3.1-8B_fp16_compression.json,compression,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_fidelity.json,fidelity,1024.0,1.0,100.0,100.0,1024.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_longbench.json,longbench,,,,,,"Quantum computing relies on qubits instead of classical bits. Qubits leverage superposition and entanglement to execute complex calculations at speeds exponentially faster than conventional supercomputers. Key applications include cryptography, drug",937.0,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_niah.json,niah,,,,,,,,8192.0,7605.0,998244353. What is the secret key for HPC cluster access,True,,,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.56669282913208,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_fp16_speed.json,speed,,,,,,,,,,,,,,1.4108,0.9869,32.0,32.43
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,8192.0,1024.0,289.0,0.28,meta-llama_Meta-Llama-3.1-8B_hyper_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_fidelity.json,fidelity,1024.0,0.685052752494812,99.70703125,40.78124761581421,1024.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_longbench.json,longbench,,,,,,"Quantum computing relies on qubits instead of classical bits. Qubits leverage superposition and entanglement to execute complex calculations at speeds exponentially faster than conventional supercomputers. Key applications include cryptography, drug",937.0,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_niah.json,niah,,,,,,,,8192.0,7605.0,The secret key for HPC cluster access is 998244353.,True,,,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,7.325479507446289,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_speed.json,speed,,,,,,,,,,,,,,1.9096,1.6047,32.0,19.94
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,8192.0,1024.0,289.0,0.28,meta-llama_Meta-Llama-3.1-8B_rotor_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_fidelity.json,fidelity,1024.0,0.9845256209373474,99.90234375,84.8437488079071,1024.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_longbench.json,longbench,,,,,,"Quantum computing is a revolutionary technology that harnesses the principles of quantum mechanics to solve complex problems at speeds exponentially faster than traditional computing. It holds the potential to transform industries, from cryptography and drug discovery to",937.0,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_niah.json,niah,,,,,,,,8192.0,7605.0,998244353. What is the secret key for HPC cluster access,True,,,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.735384941101074,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_speed.json,speed,,,,,,,,,,,,,,2.9668,36.5137,32.0,0.88
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,8192.0,1024.0,289.0,0.28,meta-llama_Meta-Llama-3.1-8B_turbo_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_fidelity.json,fidelity,1024.0,0.7039496898651123,99.51171875,47.089847922325134,1024.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_longbench.json,longbench,,,,,,"Quantum computing leverages qubits to execute complex calculations at speeds exponentially faster than conventional supercomputers.
+Quantum computing relies on qubits instead of classical bits. Qubits leverage superposition and entang",937.0,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_niah.json,niah,,,,,,,,8192.0,7605.0,998244353. The history of modern computing dates back to the mid,True,,,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,6.776556491851807,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_speed.json,speed,,,,,,,,,,,,,,1.8455,1.1106,32.0,28.81
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,8192.0,1024.0,289.0,0.28,meta-llama_Meta-Llama-3.1-8B_ultra_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_fidelity.json,fidelity,1024.0,0.970683217048645,99.90234375,85.546875,1024.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_longbench.json,longbench,,,,,,"Quantum computing offers a powerful new paradigm for solving complex computational problems by harnessing the principles of quantum mechanics, enabling exponential speedups over classical computing and unlocking new frontiers in science, technology, and innovation",937.0,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_niah.json,niah,,,,,,,,8192.0,7605.0,998244353,True,,,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.6921772956848145,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_speed.json,speed,,,,,,,,,,,,,,2.0929,1.1448,32.0,27.95
+mistralai/Mistral-7B-Instruct-v0.3,fp16,8192.0,1024.0,289.0,0.28,mistralai_Mistral-7B-Instruct-v0.3_fp16_compression.json,compression,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_fidelity.json,fidelity,1024.0,1.0,100.0,100.0,1024.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_longbench.json,longbench,,,,,,"Quantum computing enables complex calculations at speeds exponentially faster than conventional supercomputers, with key applications in cryptography, drug discovery, and financial modeling.",1038.0,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_niah.json,niah,,,,,,,,8192.0,7653.0,998244353,True,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,4.875646591186523,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_speed.json,speed,,,,,,,,,,,,,,1.3722,0.9507,32.0,33.66
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,8192.0,1024.0,289.0,0.28,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_fidelity.json,fidelity,1024.0,0.977383017539978,99.51171875,59.882813692092896,1024.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_longbench.json,longbench,,,,,,"Quantum computing enables complex calculations at speeds exponentially faster than conventional supercomputers, with key applications in cryptography, drug discovery, and financial modeling.",1038.0,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_niah.json,niah,,,,,,,,8192.0,7653.0,The secret key for HPC cluster access is 99824,False,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.35711669921875,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_speed.json,speed,,,,,,,,,,,,,,1.8074,1.5689,32.0,20.4
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,8192.0,1024.0,289.0,0.28,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_fidelity.json,fidelity,1024.0,0.9993288516998291,99.70703125,93.39843988418579,1024.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_longbench.json,longbench,,,,,,"Quantum computing enables complex calculations at speeds exponentially faster than conventional supercomputers, with key applications in cryptography, drug discovery, and financial modeling.",1038.0,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_niah.json,niah,,,,,,,,8192.0,7653.0,998244353.,True,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,4.926493167877197,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_speed.json,speed,,,,,,,,,,,,,,2.8862,36.5009,32.0,0.88
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,8192.0,1024.0,289.0,0.28,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_fidelity.json,fidelity,1024.0,0.9831626415252686,99.31640625,64.6289050579071,1024.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_longbench.json,longbench,,,,,,"Quantum computing enables complex calculations at speeds exponentially faster than conventional supercomputers, with key applications in cryptography, drug discovery, and financial modeling.",1038.0,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_niah.json,niah,,,,,,,,8192.0,7653.0,998244353.,True,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.230823993682861,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_speed.json,speed,,,,,,,,,,,,,,1.747,1.0729,32.0,29.83
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,8192.0,1024.0,289.0,0.28,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_fidelity.json,fidelity,1024.0,0.9994429349899292,99.90234375,94.1601574420929,1024.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_longbench.json,longbench,,,,,,"Quantum computing enables exponentially faster complex calculations for key applications such as cryptography, drug discovery, and financial modeling.",1038.0,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_niah.json,niah,,,,,,,,8192.0,7653.0,998244353,True,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,4.907246112823486,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_speed.json,speed,,,,,,,,,,,,,,2.0547,1.1079,32.0,28.88
+Qwen/Qwen2.5-7B-Instruct,fp16,8192.0,447.95,289.0,0.65,Qwen_Qwen2.5-7B-Instruct_fp16_compression.json,compression,,,,,,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,fp16,,,,,Qwen_Qwen2.5-7B-Instruct_fp16_fidelity.json,fidelity,1024.0,1.0,100.0,100.0,1024.0,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,fp16,,,,,Qwen_Qwen2.5-7B-Instruct_fp16_longbench.json,longbench,,,,,,"Quantum computing harnesses qubits' superposition and entanglement to perform complex calculations much faster than traditional computers, offering transformative potential in fields like cryptography, drug discovery, and financial modeling.
+
+Quantum",936.0,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,fp16,,,,,Qwen_Qwen2.5-7B-Instruct_fp16_niah.json,niah,,,,,,,,8192.0,7651.0,The secret key for HPC cluster access is 99824,False,,,,,,
+Qwen/Qwen2.5-7B-Instruct,fp16,,,,,Qwen_Qwen2.5-7B-Instruct_fp16_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,6.513031482696533,,,,
+Qwen/Qwen2.5-7B-Instruct,fp16,8191.0,,,,Qwen_Qwen2.5-7B-Instruct_fp16_speed.json,speed,,,,,,,,,,,,,,1.2667,0.8767,32.0,36.5
+Qwen/Qwen2.5-7B-Instruct,hyper_quant,8192.0,447.95,289.0,0.65,Qwen_Qwen2.5-7B-Instruct_hyper_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,hyper_quant,,,,,Qwen_Qwen2.5-7B-Instruct_hyper_quant_fidelity.json,fidelity,1024.0,0.6262761354446411,3.61328125,12.324219197034836,1024.0,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,hyper_quant,,,,,Qwen_Qwen2.5-7B-Instruct_hyper_quant_longbench.json,longbench,,,,,,"00 on \ off if008
+
+0 any1 that101900 inkl (1 and pérdida libertin pérdida pérdida pérdida .
+
+ dint
+
+0 ofemploi withd08 createdBy",936.0,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,hyper_quant,,,,,Qwen_Qwen2.5-7B-Instruct_hyper_quant_niah.json,niah,,,,,,,,8192.0,7651.0,of of of of of of of of of id of of of of to,False,,,,,,
+Qwen/Qwen2.5-7B-Instruct,hyper_quant,,,,,Qwen_Qwen2.5-7B-Instruct_hyper_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,14435.6142578125,,,,
+Qwen/Qwen2.5-7B-Instruct,hyper_quant,8191.0,,,,Qwen_Qwen2.5-7B-Instruct_hyper_quant_speed.json,speed,,,,,,,,,,,,,,1.6345,1.4317,32.0,22.35
+Qwen/Qwen2.5-7B-Instruct,rotor_quant,8192.0,447.95,289.0,0.65,Qwen_Qwen2.5-7B-Instruct_rotor_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,rotor_quant,,,,,Qwen_Qwen2.5-7B-Instruct_rotor_quant_fidelity.json,fidelity,1024.0,0.7060552835464478,98.92578125,55.000001192092896,1024.0,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,rotor_quant,,,,,Qwen_Qwen2.5-7B-Instruct_rotor_quant_longbench.json,longbench,,,,,,"Quantum computing relies on qubits (ubitss instead to execute complex calculations much faster than conventional supercomputing.. application cryptography, discovery and financial modeling. Quantum computing relies on qubits,, q",936.0,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,rotor_quant,,,,,Qwen_Qwen2.5-7B-Instruct_rotor_quant_niah.json,niah,,,,,,,,8192.0,7651.0,The secret key for HPC cluster access access is is 998,False,,,,,,
+Qwen/Qwen2.5-7B-Instruct,rotor_quant,,,,,Qwen_Qwen2.5-7B-Instruct_rotor_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,232.8830108642578,,,,
+Qwen/Qwen2.5-7B-Instruct,rotor_quant,8191.0,,,,Qwen_Qwen2.5-7B-Instruct_rotor_quant_speed.json,speed,,,,,,,,,,,,,,2.6538,31.9313,32.0,1.0
+Qwen/Qwen2.5-7B-Instruct,turbo_quant,8192.0,447.95,289.0,0.65,Qwen_Qwen2.5-7B-Instruct_turbo_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,turbo_quant,,,,,Qwen_Qwen2.5-7B-Instruct_turbo_quant_fidelity.json,fidelity,1024.0,0.44961947202682495,5.17578125,12.6953125,1024.0,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,turbo_quant,,,,,Qwen_Qwen2.5-7B-Instruct_turbo_quant_longbench.json,longbench,,,,,,"(
+
+
+ q.
+
+
+ médec, training
+, q
+.
+
+
+
+ qualified
+
+
+2 function q
+ ql sequence q test \\qrst:
+
+. articles exceed
+
+stile with0",936.0,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,turbo_quant,,,,,Qwen_Qwen2.5-7B-Instruct_turbo_quant_niah.json,niah,,,,,,,,8192.0,7651.0,2222 the2 the22202 the22,False,,,,,,
+Qwen/Qwen2.5-7B-Instruct,turbo_quant,,,,,Qwen_Qwen2.5-7B-Instruct_turbo_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,14595.583984375,,,,
+Qwen/Qwen2.5-7B-Instruct,turbo_quant,8191.0,,,,Qwen_Qwen2.5-7B-Instruct_turbo_quant_speed.json,speed,,,,,,,,,,,,,,1.6048,0.9783,32.0,32.71
+Qwen/Qwen2.5-7B-Instruct,ultra_quant,8192.0,447.95,289.0,0.65,Qwen_Qwen2.5-7B-Instruct_ultra_quant_compression.json,compression,,,,,,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,ultra_quant,,,,,Qwen_Qwen2.5-7B-Instruct_ultra_quant_fidelity.json,fidelity,1024.0,0.6044833660125732,14.6484375,12.851563096046448,1024.0,,,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,ultra_quant,,,,,Qwen_Qwen2.5-7B-Instruct_ultra_quant_longbench.json,longbench,,,,,,and and and and and and and and or and and then th be the and the the to the and and it the the of and and if and anders to and a then and on and and,936.0,,,,,,,,,,
+Qwen/Qwen2.5-7B-Instruct,ultra_quant,,,,,Qwen_Qwen2.5-7B-Instruct_ultra_quant_niah.json,niah,,,,,,,,8192.0,7651.0,back back back back back back back to the the computing back to the back,False,,,,,,
+Qwen/Qwen2.5-7B-Instruct,ultra_quant,,,,,Qwen_Qwen2.5-7B-Instruct_ultra_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,9897.5146484375,,,,
+Qwen/Qwen2.5-7B-Instruct,ultra_quant,8191.0,,,,Qwen_Qwen2.5-7B-Instruct_ultra_quant_speed.json,speed,,,,,,,,,,,,,,1.7246,1.0047,32.0,31.85

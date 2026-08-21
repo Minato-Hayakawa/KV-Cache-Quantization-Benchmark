@@ -36,3 +36,28 @@ class TurboQuantizer(BaseQuantizer):
         # 3. 逆直交回転: recovered = rotated_deq @ R^T
         recovered = torch.matmul(dequantized, self.R.T.to(tensor.device))
         return recovered.to(orig_dtype)
+    def compress(self, tensor: torch.Tensor) -> torch.Tensor:
+        tensor_f32 = tensor.to(torch.float32)
+        rotated = torch.matmul(tensor_f32, self.R.to(tensor.device))
+        
+        qmax = (2 ** (self.num_bits - 1)) - 1
+        qmin = -(2 ** (self.num_bits - 1))
+        scale = rotated.abs().max(dim=-1, keepdim=True).values / qmax
+        scale = torch.where(scale == 0, torch.ones_like(scale), scale)
+        
+        quantized = torch.round(rotated / scale).clamp(qmin, qmax).to(torch.int8)
+        
+        # メモリ削減を有効にするため、量子化データとスケールをペア（タプル等）で保持する
+        return {"quantized": quantized, "scale": scale, "dtype": tensor.dtype}
+
+    def decompress(self, compressed_data: dict) -> torch.Tensor:
+        quantized = compressed_data["quantized"].to(torch.float32)
+        scale = compressed_data["scale"]
+        orig_dtype = compressed_data["dtype"]
+        
+        dequantized = quantized * scale
+        recovered = torch.matmul(dequantized, self.R.T.to(dequantized.device))
+        return recovered.to(orig_dtype)
+
+    def compress_and_decompress(self, tensor: torch.Tensor) -> torch.Tensor:
+        return self.decompress(self.compress(tensor))

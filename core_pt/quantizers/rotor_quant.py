@@ -101,3 +101,64 @@ class RotorQuantizer(nn.Module):
             result = reconstructed_main
             
         return result.to(orig_dtype)
+    def compress(self, tensor: torch.Tensor) -> torch.Tensor:
+        orig_dtype = tensor.dtype
+        x = tensor.to(torch.float32)
+        batch_shape = x.shape[:-1]
+        
+        main_part = x[..., :self.effective_dim]
+        reshaped = main_part.view(*batch_shape, self.num_blocks, self.block_size)
+        
+        quantized_blocks = []
+        scales = []
+        
+        for i in range(self.num_blocks):
+            block = reshaped[..., i, :]
+            R = self._get_rotor_matrix(self.rotors_param[i])
+            rotated = torch.matmul(block, R.t())
+            
+            scale = rotated.abs().max(dim=-1, keepdim=True).values / self.qmax
+            scale = torch.where(scale == 0, torch.ones_like(scale), scale)
+            
+            quantized = torch.round(rotated / scale).clamp(self.qmin, self.qmax).to(torch.int8)
+            quantized_blocks.append(quantized)
+            scales.append(scale)
+            
+        reconstructed_q = torch.stack(quantized_blocks, dim=-2)
+        stacked_scales = torch.stack(scales, dim=-3) # 簡略化のための保持
+        
+        return {
+            "quantized_main": reconstructed_q,
+            "scales": stacked_scales,
+            "tail": x[..., self.effective_dim:] if self.effective_dim < self.head_dim else None,
+            "dtype": orig_dtype
+        }
+
+    def decompress(self, compressed_data: dict) -> torch.Tensor:
+        q_main = compressed_data["quantized_main"].to(torch.float32)
+        scales = compressed_data["scales"]
+        tail = compressed_data["tail"]
+        orig_dtype = compressed_data["dtype"]
+        batch_shape = q_main.shape[:-2]
+        
+        processed_blocks = []
+        for i in range(self.num_blocks):
+            block = q_main[..., i, :]
+            scale = scales[..., i, :, :]
+            R = self._get_rotor_matrix(self.rotors_param[i])
+            
+            dequantized = block * scale
+            recovered = torch.matmul(dequantized, R)
+            processed_blocks.append(recovered)
+            
+        reconstructed_main = torch.stack(processed_blocks, dim=-2).view(*batch_shape, self.effective_dim)
+        
+        if tail is not None:
+            result = torch.cat([reconstructed_main, tail], dim=-1)
+        else:
+            result = reconstructed_main
+            
+        return result.to(orig_dtype)
+
+    def compress_and_decompress(self, tensor: torch.Tensor) -> torch.Tensor:
+        return self.decompress(self.compress(tensor))

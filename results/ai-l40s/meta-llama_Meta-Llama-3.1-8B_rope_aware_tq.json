@@ -1,7 +1,0 @@
-{
-    "model_name": "meta-llama/Meta-Llama-3.1-8B",
-    "method": "rope_aware_tq",
-    "stride": 512,
-    "seq_len": 2048,
-    "perplexity": 85.8439712524414
-}
