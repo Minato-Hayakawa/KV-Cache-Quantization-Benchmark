@@ -83,7 +83,6 @@ TurboQuantは「4-bitで高精度」を達成した画期的なアルゴリズ�
 | プラットフォーム | ベンダー |
 | :--- | :--- |
 | ai-l40s | NVIDIA（L40S） |
-| 富岳 | 理研 / 富士通 |
 
 ### 使用するLLM
 - Meta-Llama 3.1 8B
@@ -97,8 +96,6 @@ TurboQuantは「4-bitで高精度」を達成した画期的なアルゴリズ�
   → `eval_pt/eval_compression.py`
 - **精度劣化＆各種タスク評価**：
   - **LongBench**：多タスク評価 → `eval_pt/eval_longbench.py`
-  - **ZeroSCROLLS**：ゼロショットでの長文理解 → `eval_pt/eval_zeroscrolls.py`
-  - **L-Eval**：金融などの長文評価 → `eval_pt/eval_leval.py`
   - **Needle In A Haystack（NIAH）**：長文中の特定情報検索精度 → `eval_pt/eval_niah.py`
 - **注意機構の忠実度**（コサイン類似度、Top-1/Top-5トークン一致率）：オリジナルのFP16と量子化後のアテンション出力を直接比較。
   → `eval_pt/eval_fidelity.py`
@@ -177,21 +174,18 @@ kvq-bench/
 │   ├── eval_speed.py           # 8Kコンテキストでのプレフィル時間 & トークン毎秒
 │   ├── eval_compression.py     # KVキャッシュのメモリサイズ vs FP16ベースライン
 │   ├── eval_longbench.py       # LongBench 評価
-│   ├── eval_zeroscrolls.py     # ZeroSCROLLS ゼロショット長文理解
-│   ├── eval_leval.py           # L-Eval（金融など長文評価を含む）
 │   ├── eval_niah.py            # Needle In A Haystack
 │   ├── eval_fidelity.py        # Attention 忠実度 (Cosine, Top-1/5) vs FP16
 │   └── eval_ppl.py             # Perplexity
 │
-└── hpc_scripts/                # 4. スパコン (Slurm / Fugaku) ジョブスクリプト
-    ├── run_fugaku.sh           # A64FX / 富岳向け CPU ベンチ
+└── hpc_scripts/                # 4. スパコン (Slurm) ジョブスクリプト
     └── run_l40s_cluster.sbatch # ai-l40s (NVIDIA L40S) 向け分散評価
 ```
 
 * **`core_cpp/`**：上記クイックスタートで紹介しているスタンドアロンのC++17マイクロベンチマーク本体（エンコード/デコードレイテンシ、コサイン類似度、Attention Logit MAEを計測）。ヘッダオンリーの各量子化手法実装と、実行エントリポイントの`bench_main.cpp`から構成されます。
 * **`core_pt/`**：実際のモデルの生成ループ内で使えるよう`DynamicCache`風インターフェースに組み込んだPython/PyTorch実装。任意のTriton/CUDAカーネルも含みます。
-* **`eval_pt/`**：上記「実験方法」セクションに対応する、モデルレベルの自動評価スクリプト群（速度、圧縮率、LongBench、ZeroSCROLLS、L-Eval、NIAH、Attention忠実度、Perplexity）。
-* **`hpc_scripts/`**：上記の計算資源（富岳/A64FXは`run_fugaku.sh`、ai-l40s GPUクラスタは`run_l40s_cluster.sbatch`）でベンチマークを実行するためのジョブスクリプト。
+* **`eval_pt/`**：上記「実験方法」セクションに対応する、モデルレベルの自動評価スクリプト群（速度、圧縮率、LongBench、NIAH、Attention忠実度、Perplexity）。
+* **`hpc_scripts/`**：ai-l40s GPUクラスタでベンチマークを実行するためのジョブスクリプト（`run_l40s_cluster.sbatch`）。
 
 ---
 

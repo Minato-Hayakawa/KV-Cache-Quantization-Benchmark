@@ -81,7 +81,6 @@ Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 | Platform | Vendor |
 | :--- | :--- |
 | ai-l40s | NVIDIA (L40S) |
-| Fugaku | RIKEN / Fujitsu |
 
 ### Models evaluated
 - Meta-Llama 3.1 8B
@@ -95,8 +94,6 @@ Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
   → `eval_pt/eval_compression.py`
 - **Accuracy degradation**, evaluated on:
   - **LongBench** — long-document summarization, QA, and code completion across many tasks → `eval_pt/eval_longbench.py`
-  - **ZeroSCROLLS** — zero-shot long-document understanding → `eval_pt/eval_zeroscrolls.py`
-  - **L-Eval** — long-context evaluation, including financial documents → `eval_pt/eval_leval.py`
   - **Needle in a Haystack (NIAH)** — retrieval accuracy for specific facts buried in long context → `eval_pt/eval_niah.py`
 - **Attention fidelity** — cosine similarity and Top-1/Top-5 token match rate, comparing quantized attention output directly against the original FP16 output.
   → `eval_pt/eval_fidelity.py`
@@ -175,21 +172,18 @@ kvq-bench/
 │   ├── eval_speed.py           # Prefill time & tokens/sec at 8K context
 │   ├── eval_compression.py     # KV-cache memory footprint vs. FP16 baseline
 │   ├── eval_longbench.py       # LongBench evaluation
-│   ├── eval_zeroscrolls.py     # ZeroSCROLLS zero-shot long-doc understanding
-│   ├── eval_leval.py           # L-Eval (incl. long financial documents)
 │   ├── eval_niah.py            # Needle in a Haystack
 │   ├── eval_fidelity.py        # Attention fidelity (cosine, Top-1/5) vs. FP16
 │   └── eval_ppl.py             # Perplexity
 │
-└── hpc_scripts/                # 4. HPC (Slurm / Fugaku) job scripts
-    ├── run_fugaku.sh           # A64FX / Fugaku CPU benchmark
+└── hpc_scripts/                # 4. HPC (Slurm) job scripts
     └── run_l40s_cluster.sbatch # Distributed evaluation on ai-l40s (NVIDIA L40S)
 ```
 
 * **`core_cpp/`** — the standalone C++17 micro-benchmark (encode/decode latency, cosine similarity, attention logit MAE) referenced in the Quick Start above; header-only quantizer implementations plus `bench_main.cpp` as the driver.
 * **`core_pt/`** — Python/PyTorch implementations wired into a `DynamicCache`-style interface for use inside an actual model's generation loop, including optional Triton/CUDA kernels.
-* **`eval_pt/`** — model-level evaluation scripts (speed, compression, LongBench, ZeroSCROLLS, L-Eval, NIAH, attention fidelity, perplexity) corresponding to the *Experimental Setup* section above.
-* **`hpc_scripts/`** — job scripts for running the benchmark across the compute resources listed above (Fugaku/A64FX via `run_fugaku.sh`; the ai-l40s GPU cluster via `run_l40s_cluster.sbatch`).
+* **`eval_pt/`** — model-level evaluation scripts (speed, compression, LongBench, NIAH, attention fidelity, perplexity) corresponding to the *Experimental Setup* section above.
+* **`hpc_scripts/`** — job script for running the benchmark on the ai-l40s GPU cluster via `run_l40s_cluster.sbatch`.
 
 ---
 
