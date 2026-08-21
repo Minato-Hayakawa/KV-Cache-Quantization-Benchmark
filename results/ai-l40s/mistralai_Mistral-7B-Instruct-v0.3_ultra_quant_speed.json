@@ -1,0 +1,9 @@
+{
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "method": "ultra_quant",
+    "sequence_length": 8192,
+    "prefill_time_sec": 2.0547,
+    "decode_time_sec": 1.1079,
+    "generated_tokens": 32,
+    "tokens_per_second": 28.88
+}

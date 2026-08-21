@@ -1,0 +1,6 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "rotor_quant",
+    "generated_summary": "Quantum computing is a revolutionary technology that harnesses the principles of quantum mechanics to solve complex problems at speeds exponentially faster than traditional computing. It holds the potential to transform industries, from cryptography and drug discovery to",
+    "input_length": 937
+}

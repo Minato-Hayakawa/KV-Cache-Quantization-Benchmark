@@ -1,0 +1,7 @@
+{
+    "model_name": "Qwen/Qwen2.5-7B-Instruct",
+    "method": "fp16",
+    "stride": 512,
+    "seq_len": 2048,
+    "perplexity": 6.513031482696533
+}

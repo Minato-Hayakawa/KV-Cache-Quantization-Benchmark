@@ -1,0 +1,6 @@
+{
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "method": "rotor_quant",
+    "generated_summary": "Quantum computing enables complex calculations at speeds exponentially faster than conventional supercomputers, with key applications in cryptography, drug discovery, and financial modeling.",
+    "input_length": 1038
+}

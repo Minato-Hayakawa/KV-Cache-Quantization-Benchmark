@@ -1,0 +1,8 @@
+{
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "method": "ultra_quant",
+    "context_len": 8192,
+    "actual_prompt_len": 7653,
+    "response": "998244353",
+    "success": true
+}

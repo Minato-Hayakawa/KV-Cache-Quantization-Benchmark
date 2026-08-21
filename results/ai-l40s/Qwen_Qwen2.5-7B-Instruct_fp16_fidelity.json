@@ -1,0 +1,9 @@
+{
+    "model_name": "Qwen/Qwen2.5-7B-Instruct",
+    "method": "fp16",
+    "seq_len": 1024,
+    "cosine_similarity": 1.0,
+    "top1_match_rate": 100.0,
+    "top5_match_rate": 100.0,
+    "evaluated_seq_len": 1024
+}

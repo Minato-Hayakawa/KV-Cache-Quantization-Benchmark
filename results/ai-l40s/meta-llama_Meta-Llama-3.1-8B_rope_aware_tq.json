@@ -3,5 +3,5 @@
     "method": "rope_aware_tq",
     "stride": 512,
     "seq_len": 2048,
-    "perplexity": 83.81342315673828
+    "perplexity": 85.8439712524414
 }

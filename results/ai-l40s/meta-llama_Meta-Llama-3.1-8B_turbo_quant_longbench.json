@@ -1,0 +1,6 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "turbo_quant",
+    "generated_summary": "Quantum computing leverages qubits to execute complex calculations at speeds exponentially faster than conventional supercomputers.\nQuantum computing relies on qubits instead of classical bits. Qubits leverage superposition and entang",
+    "input_length": 937
+}

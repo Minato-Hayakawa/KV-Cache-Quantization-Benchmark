@@ -1,0 +1,8 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "turbo_quant",
+    "context_len": 8192,
+    "actual_prompt_len": 7605,
+    "response": "998244353. The history of modern computing dates back to the mid",
+    "success": true
+}

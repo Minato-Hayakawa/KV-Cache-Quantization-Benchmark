@@ -1,0 +1,8 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "hyper_quant",
+    "context_len": 8192,
+    "actual_prompt_len": 7605,
+    "response": "The secret key for HPC cluster access is 998244353.",
+    "success": true
+}

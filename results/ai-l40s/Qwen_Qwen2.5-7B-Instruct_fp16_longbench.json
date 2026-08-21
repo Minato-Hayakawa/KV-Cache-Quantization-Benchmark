@@ -1,0 +1,6 @@
+{
+    "model_name": "Qwen/Qwen2.5-7B-Instruct",
+    "method": "fp16",
+    "generated_summary": "Quantum computing harnesses qubits' superposition and entanglement to perform complex calculations much faster than traditional computers, offering transformative potential in fields like cryptography, drug discovery, and financial modeling.\n\nQuantum",
+    "input_length": 936
+}
