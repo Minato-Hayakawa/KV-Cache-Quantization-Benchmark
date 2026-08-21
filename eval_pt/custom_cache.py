@@ -44,9 +44,9 @@ class QuantizedKVCache(DynamicCache):
         # 循環インポートを防ぐため、ここで必要な量子化器をローカルインポートする
         from core_pt.quantizers.base import BaseQuantizer
         from core_pt.quantizers.turbo_quant import TurboQuantizer
-        from core_pt.quantizers.rope_aware_tq import RoPEAwareTurboQuantizer
         from core_pt.quantizers.hyper_quant import HyperQuantizer
         from core_pt.quantizers.ultra_quant import UltraQuantizer
+        from core_pt.quantizers.rotor_quant import RotorQuantizer  # ★ 追加
 
         # デバイスタイプを動的に判定 ("cuda", "xpu", "cpu" などに対応)
         device_str = device.type
@@ -57,12 +57,9 @@ class QuantizedKVCache(DynamicCache):
             self.quantizer = TurboQuantizer(
                 head_dim=head_dim, num_bits=self.num_bits, device=device_str
             )
-        elif self.method == "rope_aware_tq":
-            self.quantizer = RoPEAwareTurboQuantizer(
-                head_dim=head_dim,
-                num_bands=2,
-                bits_per_band=self.bits_per_band,
-                device=device_str,
+        elif self.method == "rotor_quant":  # ★ 追加
+            self.quantizer = RotorQuantizer(
+                head_dim=head_dim, bits=self.num_bits, device=device_str
             )
         elif self.method == "hyper_quant":
             self.quantizer = HyperQuantizer(
