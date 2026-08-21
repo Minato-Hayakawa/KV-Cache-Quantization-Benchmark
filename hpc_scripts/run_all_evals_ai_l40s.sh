@@ -1,28 +1,20 @@
 #!/bin/bash
-#SBATCH --job-name=kv_bench_full
+#SBATCH --job-name=kv_quant_eval
+#SBATCH --partition=ai-l40s
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=02:00:00
 #SBATCH --output=logs/full_eval_%j.log
 #SBATCH --error=logs/full_eval_%j.err
-#SBATCH --partition=ai-l40s
-#SBATCH --gres=gpu:1
-#SBATCH --time=08:00:00
 
-export PYTHONUNBUFFERED=1
+# 作業ディレクトリの設定
+cd /hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark
 
-# プロジェクトのルートディレクトリに移動し、パスを通す
-PROJECT_DIR="/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark"
-cd "$PROJECT_DIR" || exit 1
-export PYTHONPATH="$PROJECT_DIR:$PYTHONPATH"
-
-# 作成した仮想環境の Python の絶対パス
-PY_BIN="$PROJECT_DIR/venv_l40s/bin/python"
-
-# 実験計画に沿ったモデルと手法の定義
-MODELS=(
-    "meta-llama/Meta-Llama-3.1-8B"
-    "Qwen/Qwen2.5-7B-Instruct"
-    "mistralai/Mistral-7B-Instruct-v0.3"
-)
-METHODS=("fp16" "turbo_quant" "rotor_quant" "hyper_quant" "ultra_quant")
+# 環境の有効化（必要に応じて調整してください）
+# source ~/.bashrc
+# conda activate your_env_name
 
 echo "=================================================="
 echo " Starting Comprehensive KV Cache Quantization Benchmark"
@@ -32,43 +24,60 @@ echo " Date: $(date)"
 echo " Partition: ai-l40s"
 echo "=================================================="
 
-for model in "${MODELS[@]}"; do
+# 評価するモデルのリスト
+MODELS=(
+    "meta-llama/Meta-Llama-3.1-8B"
+    "Qwen/Qwen2.5-7B-Instruct"
+    "mistralai/Mistral-7B-Instruct-v0.3"
+)
+
+# 評価する手法のリスト
+METHODS=(
+    "fp16"
+    "turbo_quant"
+    "rotor_quant"
+    "hyper_quant"
+    "ultra_quant"
+)
+
+for MODEL in "${MODELS[@]}"; do
     echo "##################################################"
-    echo " Evaluating Model: $model"
+    echo " Evaluating Model: $MODEL"
     echo "##################################################"
 
-    for method in "${METHODS[@]}"; do
+    for METHOD in "${METHODS[@]}"; do
         echo "--------------------------------------------------"
-        echo " Current Method: $method | Model: $model"
+        echo " Current Method: $METHOD | Model: $MODEL"
         echo "--------------------------------------------------"
 
-        # 1. Perplexity (PPL) 評価
+        # 1. PPL評価
         echo ">>> Running PPL Evaluation..."
-        $PY_BIN eval_pt/eval_ppl.py --model_name "$model" --method "$method" --seq_len 2048
+        python eval_pt/eval_ppl.py --model_name "$MODEL" --method "$METHOD"
 
-        # 2. Fidelity (CosSim / Top-k Match) 評価
+        # 2. 忠実度 (Fidelity) 評価
         echo ">>> Running Fidelity Evaluation..."
-        $PY_BIN eval_pt/eval_fidelity.py --model_name "$model" --method "$method" --seq_len 2048
+        python eval_pt/eval_fidelity.py --model_name "$MODEL" --method "$METHOD"
 
         # 3. Needle In A Haystack (NIAH) 評価
         echo ">>> Running NIAH Evaluation..."
-        $PY_BIN eval_pt/eval_niah.py --model_name "$model" --method "$model" --context_len 8192
+        python eval_pt/eval_niah.py --model_name "$MODEL" --method "$METHOD" --context_len 8192
 
         # 4. LongBench 評価
         echo ">>> Running LongBench Evaluation..."
-        $PY_BIN eval_pt/eval_longbench.py --model_name "$model" --method "$method"
+        python eval_pt/eval_longbench.py --model_name "$MODEL" --method "$METHOD"
 
-        # 5. ZeroSCROLLS 評価 (例: gov_report)
-        echo ">>> Running ZeroSCROLLS Evaluation..."
-        $PY_BIN eval_pt/eval_zeroscrolls.py --model_name "$model" --method "$method" --task "gov_report" --max_samples 10
+        # 5. 圧縮率の測定 (NEW!)
+        echo ">>> Running Compression Rate Measurement..."
+        python eval_pt/eval_compression.py --model_name "$MODEL" --method "$METHOD" --seq_len 8192
 
-        # 6. L-Eval 評価 (例: finance)
-        echo ">>> Running L-Eval Evaluation..."
-        $PY_BIN eval_pt/eval_leval.py --model_name "$model" --method "$method" --task "finance" --max_samples 10
+        # 6. 速度向上の測定 (NEW!)
+        echo ">>> Running Speed Measurement..."
+        python eval_pt/eval_speed.py --model_name "$MODEL" --method "$METHOD" --seq_len 8192 --gen_tokens 32
+
     done
 done
 
-echo -e "\n=================================================="
+echo "=================================================="
 echo " All Comprehensive Benchmarks Completed Successfully!"
 echo " Date: $(date)"
 echo "=================================================="
