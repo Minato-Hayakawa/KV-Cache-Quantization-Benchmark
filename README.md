@@ -7,7 +7,7 @@
 
 A lightweight, standalone C++ micro-benchmark framework for **KV-Cache Quantization Techniques** in Large Language Models (LLMs).
 
-This project compares state-of-the-art rotational, dynamic bit-allocation, rate-distortion-optimal, and hardware-native quantization methods drawn from recent 2026 literature: **TurboQuant**, **RotorQuant**, **RoPE-Aware Bit Allocation**, **HyperQuant**, and **UltraQuant**.
+This project compares state-of-the-art rotational, rate-distortion-optimal, and hardware-native quantization methods drawn from recent 2026 literature: **TurboQuant**, **RotorQuant**, **HyperQuant**, and **UltraQuant**.
 
 ---
 
@@ -17,8 +17,6 @@ This project compares state-of-the-art rotational, dynamic bit-allocation, rate-
 | :--- | :--- | :---: | :---: |
 | **TurboQuant** | Cartesian → polar decomposition (PolarQuant) + QJL 1-bit sign correction | High ($O(d^2)$) | 3-bit / 8-bit |
 | **RotorQuant** | Clifford-algebra rotors (Cl(3,0)) replacing full orthogonal rotation | Low ($O(d)$) | 3-bit / 8-bit |
-| **RoPE-Aware Bit Allocation** | Greedy bit allocation across RoPE's 2D frequency blocks, driven by per-block sensitivity/energy scores | Medium | Mixed (4-bit / 2-bit) |
-| **TurboQuant × RoPE-Aware** | RoPE-Aware allocator layered on top of TurboQuant as the base encoder | Medium–High | Mixed |
 | **HyperQuant** | Unified rate-distortion-optimal pipeline; RHT + lattice quantization ($A_2$/$D_4$/$E_8$) + Rice entropy coding | Medium | 1.7–2 bps |
 | **UltraQuant** | Walsh–Hadamard rotation, QJL removed, native FP4 (E2M1) + UE8M0 block scaling for hardware-direct decode | Low | 4-bit |
 
@@ -56,19 +54,8 @@ Re-implements TurboQuant's core rotation using **Clifford algebra** (geometric a
 
 Reference: [github.com/scrya-com/rotorquant](https://github.com/scrya-com/rotorquant)
 
-### RoPE-Aware Bit Allocation
-Standard quantizers treat a Key vector (e.g. 128-dim) as one flat vector and apply a uniform bit-width to the whole thing. But once RoPE is applied, the attention term $q^\top R_\Delta k$ decomposes into 64 independent 2D rotation ("frequency") blocks — each contributing unevenly to the final attention logit.
-
-- **Sensitivity scoring**: a short calibration pass estimates how much each RoPE frequency block affects the attention score.
-- **Greedy bit allocation**: within a fixed average bit budget (e.g. 3 bits), high-energy blocks get 4–5 bits, low-energy blocks get 1–2 bits.
-- **Block-wise quantization**: each block is quantized according to its assigned bit-width.
-
-**Relationship to TurboQuant**: TurboQuant is a *compressor* (smooths outliers via rotation + residual correction, uniform bit-width across the whole vector, no data dependency). RoPE-Aware is an *allocator* (decides where to spend bits based on RoPE's 2D frequency structure, requires lightweight calibration). The two are complementary — RoPE-Aware is typically layered on top of TurboQuant, and especially helps on long-context and reasoning tasks where a uniform bit-width would otherwise collapse accuracy at the same memory footprint.
-
-Reference: [arXiv:2606.24033](https://arxiv.org/abs/2606.24033)
-
 ### HyperQuant
-A unified quantization pipeline that compresses **both model weights and the KV cache** under a rate-distortion-optimal framework, reaching 1.7–2 bits/parameter (bps) with minimal accuracy loss.
+A unified quantization pipeline that goes beyond localized, KV-cache-only techniques like TurboQuant, compressing **both model weights and the KV cache** under a single rate-distortion-optimal framework, reaching 1.7–2 bits/parameter (bps) with minimal accuracy loss.
 
 - **Lattice (not scalar) quantization**: instead of rounding each dimension independently, HyperQuant uses 2D/4D/8D lattice structures ($A_2$, $D_4$, $E_8$) that pack points more densely in high-dimensional space, reducing distortion at equal bit-width.
 - **Entropy coding**: a random Hadamard transform (RHT) reshapes the distribution into a near-Gaussian form; bits are then stripped using the lattice's geometric constraints and encoded with variable-length Rice coding — landing within ~0.01 bps of the theoretical rate-distortion limit.
@@ -93,26 +80,28 @@ Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 ### Compute resources
 | Platform | Vendor |
 | :--- | :--- |
-| B300 | NVIDIA |
-| fs-mi300x | AMD (CDNA cluster) |
-| qc-pvc | Intel (Ponte Vecchio) |
-| fx700 | Fujitsu |
+| ai-l40s | NVIDIA (L40S) |
 | Fugaku | RIKEN / Fujitsu |
 
+### Models evaluated
+- Meta-Llama 3.1 8B
+- Qwen 2.5 7B
+- Mistral 7B v0.3
+
 ### What we measure
-- **Per-hardware execution speed** for each method above.
-- **Compression ratio** at an 8K context length, against an FP16 baseline of 289 MB, measured at 2-bit, 4-bit, and 8-bit.
-- **Speedup** relative to the FP16 baseline.
+- **Per-hardware execution speed & speedup** — prefill time and token generation speed (tokens/sec) at an 8K context length.
+  → `eval_pt/eval_speed.py`
+- **Compression ratio** at an 8K context length, against an FP16 baseline of 289 MB, measured at 2-bit, 4-bit, and 8-bit — the actual KV-cache memory footprint (in bytes) is extracted and compared to the FP16 baseline.
+  → `eval_pt/eval_compression.py`
 - **Accuracy degradation**, evaluated on:
-  - **LongBench** — long-document summarization, QA, and code completion across many tasks
-  - **Needle in a Haystack (NIAH)** — retrieval accuracy for specific facts buried in long context
-  - **ZeroSCROLLS** — zero-shot long-document understanding
-  - **RULER** — synthetic tasks probing context-length scaling
-  - **L-Eval** — an aggregated long-context evaluation suite
-- **Attention fidelity** at 3-bit (36 layers, 72 KV heads):
-  - Cosine similarity: **0.9945 – 0.9961**
-  - Top-1 token match rate
-  - Top-5 token match rate
+  - **LongBench** — long-document summarization, QA, and code completion across many tasks → `eval_pt/eval_longbench.py`
+  - **ZeroSCROLLS** — zero-shot long-document understanding → `eval_pt/eval_zeroscrolls.py`
+  - **L-Eval** — long-context evaluation, including financial documents → `eval_pt/eval_leval.py`
+  - **Needle in a Haystack (NIAH)** — retrieval accuracy for specific facts buried in long context → `eval_pt/eval_niah.py`
+- **Attention fidelity** — cosine similarity and Top-1/Top-5 token match rate, comparing quantized attention output directly against the original FP16 output.
+  → `eval_pt/eval_fidelity.py`
+- **Perplexity** — how natural/coherent generated text remains after quantization.
+  → `eval_pt/eval_ppl.py`
 
 ---
 
@@ -177,27 +166,30 @@ kvq-bench/
 │   ├── quantizers/
 │   │   ├── base.py
 │   │   ├── turbo_quant.py
-│   │   ├── rope_aware_tq.py   # TurboQuant × RoPE-Aware (hybrid)
 │   │   ├── hyper_quant.py     # RHT + lattice + Rice coding
 │   │   └── ultra_quant.py     # WHT + FP4 direct mapping
 │   ├── custom_cache.py        # DynamicCache interface
 │   └── kernels/                # (optional) Triton/CUDA kernels
 │
-├── eval/                       # 3. Experiment & automated evaluation scripts
-│   ├── eval_ppl.py             # WikiText-2 / C4 perplexity
+├── eval_pt/                    # 3. Experiment & automated evaluation scripts
+│   ├── eval_speed.py           # Prefill time & tokens/sec at 8K context
+│   ├── eval_compression.py     # KV-cache memory footprint vs. FP16 baseline
 │   ├── eval_longbench.py       # LongBench evaluation
+│   ├── eval_zeroscrolls.py     # ZeroSCROLLS zero-shot long-doc understanding
+│   ├── eval_leval.py           # L-Eval (incl. long financial documents)
 │   ├── eval_niah.py            # Needle in a Haystack
-│   └── eval_fidelity.py        # Attention fidelity (cosine, Top-1/5)
+│   ├── eval_fidelity.py        # Attention fidelity (cosine, Top-1/5) vs. FP16
+│   └── eval_ppl.py             # Perplexity
 │
 └── hpc_scripts/                # 4. HPC (Slurm / Fugaku) job scripts
     ├── run_fugaku.sh           # A64FX / Fugaku CPU benchmark
-    └── run_gpu_cluster.sbatch  # Distributed evaluation on H100 / GH200 / CDNA4
+    └── run_l40s_cluster.sbatch # Distributed evaluation on ai-l40s (NVIDIA L40S)
 ```
 
 * **`core_cpp/`** — the standalone C++17 micro-benchmark (encode/decode latency, cosine similarity, attention logit MAE) referenced in the Quick Start above; header-only quantizer implementations plus `bench_main.cpp` as the driver.
 * **`core_pt/`** — Python/PyTorch implementations wired into a `DynamicCache`-style interface for use inside an actual model's generation loop, including optional Triton/CUDA kernels.
-* **`eval/`** — model-level evaluation scripts (perplexity, LongBench, NIAH, and attention fidelity) corresponding to the *Experimental Setup* section above.
-* **`hpc_scripts/`** — job scripts for running the benchmark across the compute resources listed above (Fugaku/A64FX via `run_fugaku.sh`; GPU clusters such as B300/CDNA4 via `run_gpu_cluster.sbatch`).
+* **`eval_pt/`** — model-level evaluation scripts (speed, compression, LongBench, ZeroSCROLLS, L-Eval, NIAH, attention fidelity, perplexity) corresponding to the *Experimental Setup* section above.
+* **`hpc_scripts/`** — job scripts for running the benchmark across the compute resources listed above (Fugaku/A64FX via `run_fugaku.sh`; the ai-l40s GPU cluster via `run_l40s_cluster.sbatch`).
 
 ---
 
@@ -207,7 +199,6 @@ If you find this benchmark useful in your research, please cite the underlying p
 
 * TurboQuant: [arXiv:2504.19874](https://arxiv.org/abs/2504.19874)
 * RotorQuant: [github.com/scrya-com/rotorquant](https://github.com/scrya-com/rotorquant)
-* RoPE-Aware Bit Allocation: [arXiv:2606.24033](https://arxiv.org/abs/2606.24033) — RoPE-Aware Bit Allocation for KV-Cache Quantization (2026)
 * HyperQuant: [arXiv:2606.23406](https://arxiv.org/abs/2606.23406) — HyperQuant: A Rate-Distortion-Optimal Quantization Pipeline (2026)
 * UltraQuant: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474) — UltraQuant: 4-bit KV Caching for Context-Heavy Agents (2026)
 
