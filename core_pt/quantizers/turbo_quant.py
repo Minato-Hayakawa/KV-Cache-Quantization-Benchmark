@@ -1,15 +1,3 @@
-import sys
-import os
-
-# core_pt フォルダへのパスを動的に追加
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../core_pt')))
-
-import torch
-import torch.nn.functional as F
-from datasets import load_dataset
-from tqdm import tqdm
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from custom_cache import QuantizedKVCache  # これで core_pt から正常にインポートできる
 import torch
 from .base import BaseQuantizer
 
