@@ -43,16 +43,18 @@ Reference: [arXiv:2504.19874](https://arxiv.org/abs/2504.19874) · [vLLM Blog �
 ### RotorQuant (Scrya)
 Re-implements TurboQuant's core rotation using **Clifford algebra** (geometric algebra) rotors instead of a full d×d orthogonal random rotation matrix. Vectors are split into 3D groups, and each group is transformed with a 4-parameter rotor via the sandwich product $R v \tilde{R}$.
 
-- Multiply–adds: 16,384 → ~2,064 (7.9× reduction, d=128)
-- Parameters: 16,399 → 372 (44× reduction)
+- Multiply–adds: 16,384 → ~2,064 (7.9× reduction, d=128, per the RotorQuant paper's Table 1)
+- Parameters: 16,399 → 372 (44× reduction, per the RotorQuant paper's Table 1)
 
 | Metric | Value |
 | :--- | :--- |
-| Speed vs. TurboQuant | 10–19× (CUDA), 9–31× (Metal) |
-| Parameter count | 44× fewer (372 vs. 16,399, d=128) |
-| Attention fidelity | Cosine similarity 0.990 (TurboQuant: 0.991) |
-| Triton kernel | 100–650× faster than PyTorch (quant/dequant) |
-| Model validated | Qwen2.5-3B-Instruct |
+| Perplexity (WikiText-2, Llama 3.1 8B Instruct, 10.3× compression) | 6.91 (`iso3`) vs. 7.07 (TurboQuant `turbo3`) — better quality at equal compression |
+| Decode speed vs. TurboQuant | 28% faster (119 vs. 93 tok/s, RTX 5090) |
+| Prefill speed vs. TurboQuant | 5.3× faster (3,822 vs. 722 tok/s, RTX 5090) |
+| Parameter count | 44× fewer (372 vs. 16,399, per the RotorQuant paper's Table 1) |
+| Models validated | Llama 3.1 8B Instruct (headline benchmarks); Qwen2.5-3B (decode-speed and Python/Triton perplexity benchmarks); MiniMax-M2.7 (architecture-compatibility check only, not a full benchmark) |
+
+**Important nuance**: the repository's headline "beats TurboQuant" numbers above actually come from two simpler derivative methods built on the same block-diagonal-rotation idea — **IsoQuant** (4D quaternion rotation) and **PlanarQuant** (2D Givens rotation), both credited to a separate contributor (ParaMind2025) — rather than from the original Clifford-algebra RotorQuant method itself. In the repository's own Python/Triton perplexity comparison on Qwen2.5-3B, plain RotorQuant (PPL 12.22 at 3-bit, 10.03 at 4-bit) actually performs *worse* than both IsoQuant (9.03 at 4-bit) and PlanarQuant (10.12 at 3-bit). The repository labels RotorQuant itself as "Research (Triton)" status, while IsoQuant/PlanarQuant are the "Production (llama.cpp)" variants. Earlier claims of "10–19× CUDA / 9–31× Metal speedups" and a specific cosine-similarity figure for RotorQuant could not be verified against the current repository content and have been removed.
 
 Reference: [github.com/scrya-com/rotorquant](https://github.com/scrya-com/rotorquant)
 
@@ -80,16 +82,18 @@ Targets the systems/hardware bottleneck left by algorithmically elegant methods 
 - **Walsh–Hadamard rotation** spreads Key-vector outliers into a near-Gaussian distribution (as in TurboQuant).
 - **QJL removal**: the 1-bit residual correction is dropped entirely to eliminate its software decode overhead.
 - **Native FP4 (E2M1)**: values map directly onto hardware-supported FP4 grid points (1 sign bit, 2 exponent bits, 1 mantissa bit) instead of a custom codebook.
-- **UE8M0 block scaling**: a single offline-tuned constant ($c \approx 0.156$) scales each 32-channel block, letting FP4 data feed straight into GPU matrix units (MFMA / Tensor Core instructions) with no software lookup.
+- **UE8M0 block scaling**: a single offline-tuned constant ($c = 0.156$, confirmed MSE-optimal in the paper's ablations) scales each 32-channel block, letting FP4 data feed straight into GPU matrix units (MFMA / Tensor Core instructions) with no software lookup.
 
 | Metric | Value |
 | :--- | :--- |
-| vs. FP8 KV baseline (throughput) | Tracks the FP8 throughput ceiling (folding dequant into MFMA) while halving the KV-cache footprint vs. FP8 |
-| Baselines compared | vLLM OSS TurboQuant, BF16 AITER FlashAttention, hardware FP8 KV, Ultra-TQ (own TurboQuant-style variant) |
-| Hardware | AMD Instinct MI355X (CDNA4), TP=2, tested up to 32K/1K context at concurrency 64 |
-| Models validated | MiniMax-M2.5 (throughput); production accuracy matrix incl. Qwen2.5-72B, Qwen3.5-A3B (accuracy, up to 128K context via LCB-128K) |
-| Accuracy impact (production matrix) | Stable on MATH500; competitive on GPQA and LCB-128K; **material regression on AIME25** (−13.3 pp on Qwen3.5-A3B, −10.0 pp on MiniMax-M2.5) — benchmark-dependent rather than uniformly near-lossless. All results use boundary-layer protection (first/last 2 attention layers kept in BF16) |
-| Triton kernel speedup | Not applicable — UltraQuant targets AMD CDNA4 native scaled-MFMA instructions rather than a Triton kernel |
+| Headline: TTFT vs. FP8 KV (agentic, late rounds / all rounds) | 3.47× faster / 2.3× faster |
+| Headline: output throughput vs. FP8 KV (agentic) | 1.63× higher |
+| Throughput vs. BF16 (standard serving, concurrency 64) | 1.38× (vs. FP8 KV's 1.37×, within ~1%), while using half the KV bytes per element of FP8 |
+| Median time-per-output-token vs. BF16 | 1.40× (FP8 KV: 1.37×; Ultra-TQ: 1.58×; vLLM OSS TurboQuant: 5.56×) |
+| UE8M0 scaling constant | $c = 0.156$ — confirmed MSE-optimal; beats an FP8 baseline by +4.4 pp on the paper's GPQA ablation |
+| Hardware | AMD Instinct MI355X (CDNA4), TP=2, native scaled-MFMA instructions |
+| Models validated | MiniMax-M2.5 (throughput/latency); production accuracy matrix: Qwen3.5-A3B, MiniMax-M2.5, Qwen2.5-72B across GPQA-Diamond, LCB-128K, AIME25, MATH500 |
+| Accuracy impact (production matrix) | Stable-to-positive on MATH500 (+0.0 to +0.8 pp); competitive on GPQA-Diamond and LCB-128K; **material regression on AIME25** (−13.3 pp Qwen3.5-A3B, −10.0 pp MiniMax-M2.5, −3.3 pp Qwen2.5-72B) — the authors explicitly describe this as benchmark-dependent rather than uniformly near-lossless. All results use boundary-layer protection (first/last 2 attention layers kept in BF16) |
 
 Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 

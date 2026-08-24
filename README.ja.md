@@ -43,16 +43,18 @@
 ### RotorQuant（Scrya）
 TurboQuantのコアアルゴリズムをClifford代数（幾何代数）のロータで再設計した手法です。TurboQuantが用いるd×dのランダム直交回転行列（d=128で16,384回の乗算加算）を、Clifford代数 Cl(3,0) のロータ $R = \exp(B/2)$ に置き換えます。ベクトルを3次元グループに分割し、各グループに4パラメータのロータでサンドイッチ積 $RvR̃$ を適用します。
 
-- 乗算加算：16,384 → 約2,064回（7.9倍削減）
-- パラメータ数：16,399 → 372（44倍削減）
+- 乗算加算：16,384 → 約2,064回（7.9倍削減、RotorQuant論文Table 1より）
+- パラメータ数：16,399 → 372（44倍削減、RotorQuant論文Table 1より）
 
 | 指標 | 値 |
 | :--- | :--- |
-| vs TurboQuant速度 | CUDA: 10-19倍、Metal: 9-31倍高速 |
-| パラメータ数 | 44倍少ない（372 vs 16,399、d=128） |
-| Attention忠実度 | コサイン類似度 0.990（TurboQuant: 0.991） |
-| Tritonカーネル | PyTorchの100-650倍高速（量子化/逆量子化） |
-| 検証モデル | Qwen2.5-3B-Instruct |
+| Perplexity（WikiText-2、Llama 3.1 8B Instruct、10.3倍圧縮時） | `iso3`: 6.91 vs TurboQuant `turbo3`: 7.07 — 同じ圧縮率でより高品質 |
+| デコード速度 vs TurboQuant | 28%高速（119 vs 93 tok/s、RTX 5090） |
+| プレフィル速度 vs TurboQuant | 5.3倍高速（3,822 vs 722 tok/s、RTX 5090） |
+| パラメータ数 | 44倍少ない（372 vs 16,399、RotorQuant論文Table 1より） |
+| 検証モデル | Llama 3.1 8B Instruct（主要ベンチマーク）、Qwen2.5-3B（デコード速度およびPython/TritonでのPerplexityベンチマーク）、MiniMax-M2.7（アーキテクチャ互換性チェックのみ、フルベンチマークではない） |
+
+**重要な補足**：上記の「TurboQuantを上回る」という主要な結果は、実はRotorQuant本体（Clifford代数）ではなく、同じブロック対角回転のアイデアに基づく2つの派生手法——**IsoQuant**（4次元クォータニオン回転）と**PlanarQuant**（2次元ギブンス回転）——によるものです。この2つは別の貢献者（ParaMind2025）によって開発されました。リポジトリ自身が公開しているQwen2.5-3BでのPython/TritonによるPerplexity比較では、素のRotorQuant（3-bitでPPL 12.22、4-bitでPPL 10.03）はIsoQuant（4-bitでPPL 9.03）やPlanarQuant（3-bitでPPL 10.12）よりもむしろ性能が劣っています。リポジトリ内でもRotorQuant自体は「Research（Triton）」ステータス、IsoQuant/PlanarQuantは「Production（llama.cpp）」ステータスと明確に区別されています。以前記載していた「CUDA: 10-19倍、Metal: 9-31倍」という速度向上や、特定のコサイン類似度の数値については、現行のリポジトリの記載では確認できなかったため削除しました。
 
 参考文献：[github.com/scrya-com/rotorquant](https://github.com/scrya-com/rotorquant)
 
@@ -82,16 +84,18 @@ TurboQuantは「4-bitで高精度」を達成した画期的なアルゴリズ�
 - **Walsh-Hadamard回転**：TurboQuantと同様に、Keyベクトルの外れ値を回転行列によって均一なガウス分布に分散。
 - **QJL（残差補正）の切り捨て**：ソフトでのデコードオーバーヘッドが大きすぎるためあえて排除。
 - **ハードウェアネイティブなFP4 Micro-tensor（E2M1）形式**：独自コードブックの代わりに、最新GPUがハードウェアレベルでネイティブサポートするFP4（E2M1形式：1符号ビット、2指数ビット、1仮数ビット）のグリッド値に直接マッピング。
-- **ブロック単位のスケーリング（UE8M0）**：32チャンネルごとに共通のスケール係数を持たせ、オフラインで最適化した単一の定数 $c$（$c \approx 0.156$）を乗算するシンプルなスケーリングを採用。これによりルックアップテーブルのソフト解読を排除し、GPUの行列演算器（MFMA / Tensor Core命令）にFP4データを直接流し込んで演算できます。
+- **ブロック単位のスケーリング（UE8M0）**：32チャンネルごとに共通のスケール係数を持たせ、オフラインで最適化した単一の定数 $c = 0.156$（論文中のアブレーションでMSE最適であることが確認済み）を乗算するシンプルなスケーリングを採用。これによりルックアップテーブルのソフト解読を排除し、GPUの行列演算器（MFMA / Tensor Core命令）にFP4データを直接流し込んで演算できます。
 
 | 指標 | 値 |
 | :--- | :--- |
-| vs FP8 KVベースライン（スループット） | 逆量子化をMFMAに畳み込むことで、FP8のスループット上限を維持しつつKVキャッシュのメモリ使用量をFP8のさらに半分に削減 |
-| 比較対象ベースライン | vLLM OSS TurboQuant、BF16 AITER FlashAttention、ハードウェアFP8 KV、Ultra-TQ（独自のTurboQuant系バリアント） |
-| ハードウェア | AMD Instinct MI355X（CDNA4）、TP=2、32K/1Kコンテキスト・並列度64まで検証 |
-| 検証モデル | MiniMax-M2.5（スループット計測）／Qwen2.5-72B、Qwen3.5-A3Bを含む本番想定の精度マトリクス（LCB-128Kによる最大128Kコンテキストでの精度） |
-| 精度への影響（本番想定マトリクス） | MATH500では安定、GPQAとLCB-128Kでは競争力あり。一方で**AIME25では顕著な精度低下**（Qwen3.5-A3Bで−13.3ポイント、MiniMax-M2.5で−10.0ポイント）が見られ、一律にほぼロスレスというわけではなくベンチマーク依存の結果。全結果はBoundary-layer protection（最初と最後の各2つのAttentionレイヤーはBF16のまま保持）を適用した状態のもの |
-| Tritonカーネル速度向上 | 該当なし — UltraQuantはTritonではなくAMD CDNA4のネイティブscaled-MFMA命令を対象としています |
+| ヘッドライン：TTFT vs FP8 KV（エージェント型ワークロード、後半ラウンド／全ラウンド） | 3.47倍高速 / 2.3倍高速 |
+| ヘッドライン：出力スループット vs FP8 KV（エージェント型ワークロード） | 1.63倍 |
+| BF16比スループット（標準的なサービング、並列度64） | 1.38倍（FP8 KVの1.37倍とほぼ同等・誤差1%以内）、かつFP8の半分のKVバイト数で実現 |
+| BF16比の中央値TPOT（1トークンあたり出力時間） | 1.40倍（FP8 KV: 1.37倍、Ultra-TQ: 1.58倍、vLLM OSS TurboQuant: 5.56倍） |
+| UE8M0スケーリング定数 | $c = 0.156$ — MSE最適であることを確認済み。論文のGPQAアブレーションではFP8ベースラインを+4.4ポイント上回る |
+| ハードウェア | AMD Instinct MI355X（CDNA4）、TP=2、ネイティブscaled-MFMA命令 |
+| 検証モデル | MiniMax-M2.5（スループット／レイテンシ計測）／Qwen3.5-A3B、MiniMax-M2.5、Qwen2.5-72Bを対象とした本番想定の精度マトリクス（GPQA-Diamond、LCB-128K、AIME25、MATH500） |
+| 精度への影響（本番想定マトリクス） | MATH500では安定〜微増（+0.0〜+0.8ポイント）、GPQA-DiamondとLCB-128Kでは競争力あり。一方で**AIME25では顕著な精度低下**（Qwen3.5-A3Bで−13.3ポイント、MiniMax-M2.5で−10.0ポイント、Qwen2.5-72Bで−3.3ポイント）が見られ、著者ら自身が「一律にほぼロスレスというわけではなくベンチマーク依存」と明言している。全結果はBoundary-layer protection（最初と最後の各2つのAttentionレイヤーはBF16のまま保持）を適用した状態のもの |
 
 参考文献：[arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 
