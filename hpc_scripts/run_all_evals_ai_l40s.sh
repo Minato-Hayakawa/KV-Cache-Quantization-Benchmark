@@ -13,7 +13,7 @@
 cd /hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark
 
 # ログ保存用ディレクトリが存在しない場合に自動作成する安全策
-mkdir -p logs[cite: 1]
+mkdir -p logs
 
 # 環境の有効化（必要に応じてコメントアウトを解除してください）
 # source ~/.bashrc
@@ -47,9 +47,9 @@ for MODEL in "${MODELS[@]}"; do
     echo " Evaluating Model: $MODEL"
     echo "##################################################"
 
-    # ★追加: 理論値ベースの圧縮率を一括計算（GPU不要・高速）
+    # 理論値ベースの圧縮率を一括計算（GPU不要・高速）
     echo ">>> Running Theoretical Compression Rate Calculation (All Methods)..."
-    python theoretical_compression.py --model_name "$MODEL" --seq_len 8192
+    python eval_pt/theoretical_compression.py --model_name "$MODEL" --seq_len 8192
 
     for METHOD in "${METHODS[@]}"; do
         echo "--------------------------------------------------"
@@ -58,26 +58,23 @@ for MODEL in "${MODELS[@]}"; do
 
         # 1. PPL評価
         echo ">>> Running PPL Evaluation..."
-        python eval_pt/eval_ppl.py --model_name "$MODEL" --method "$METHOD"[cite: 1]
+        python eval_pt/eval_ppl.py --model_name "$MODEL" --method "$METHOD"
 
         # 2. 忠実度 (Fidelity) 評価
         echo ">>> Running Fidelity Evaluation..."
-        python eval_pt/eval_fidelity.py --model_name "$MODEL" --method "$METHOD"[cite: 1]
+        python eval_pt/eval_fidelity.py --model_name "$MODEL" --method "$METHOD"
 
         # 3. Needle In A Haystack (NIAH) 評価
         echo ">>> Running NIAH Evaluation..."
-        python eval_pt/eval_niah.py --model_name "$MODEL" --method "$METHOD" --context_len 8192[cite: 1]
+        python eval_pt/eval_niah.py --model_name "$MODEL" --method "$METHOD" --context_len 8192
 
         # 4. LongBench 評価
         echo ">>> Running LongBench Evaluation..."
-        python eval_pt/eval_longbench.py --model_name "$MODEL" --method "$METHOD"[cite: 1]
+        python eval_pt/eval_longbench.py --model_name "$MODEL" --method "$METHOD"
 
-        # 5. [変更] 従来の動的VRAM測定スクリプトは除外し、
-        #     上部で一括実行した理論値（theoretical_compression.py）の結果を使用します。
-
-        # 6. 速度向上の測定（並列化により正常なtok/sが計測されます）
+        # 5. 速度向上の測定
         echo ">>> Running Speed Measurement..."
-        python eval_pt/eval_speed.py --model_name "$MODEL" --method "$METHOD" --seq_len 8192 --gen_tokens 32[cite: 1]
+        python eval_pt/eval_speed.py --model_name "$MODEL" --method "$METHOD" --seq_len 8192 --gen_tokens 32
 
     done
 done
