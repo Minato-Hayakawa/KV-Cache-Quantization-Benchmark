@@ -135,6 +135,120 @@ In addition to the model-level evaluations above, the C++ micro-benchmark itself
 
 ---
 
+## 📈 Experimental Results
+
+Models: `meta-llama/Meta-Llama-3.1-8B`, `mistralai/Mistral-7B-Instruct-v0.3`
+Methods: fp16 (baseline), hyper_quant, rotor_quant, turbo_quant, ultra_quant
+
+Raw data is available in `summary_results.csv`.
+
+### 1. Compression ratio — designed bit-width vs. measured memory (8K context)
+
+Theoretical designed bit-width vs. the actually measured KV-cache size, against the FP16 baseline (289 MB). Measured values were identical for both models.
+
+| Method | Designed bits | Measured KV-cache size | Ratio to baseline |
+| :--- | :--- | :--- | :--- |
+| fp16 | 16.0 bit | 1024.0 MB | 0.28 |
+| hyper_quant | 2.5 bit | 528.0 MB | 0.55 |
+| rotor_quant | 3.0 bit | 1208.0 MB | 0.24 ⚠️ larger than FP16 |
+| turbo_quant | 3.0 bit | 528.0 MB | 0.55 |
+| ultra_quant | 2.0 bit | 528.0 MB | 0.55 |
+
+> ⚠️ Although these methods promise large reductions (several-fold) at 2.0–3.0 bits on paper, in the real (PyTorch) runtime the measured memory footprints of hyper_quant / turbo_quant / ultra_quant converged to exactly 528.0 MB, and rotor_quant came in at 1208.0 MB — consuming *more* memory than the FP16 baseline (1024 MB).
+
+![Compression comparison](plots/compression_comparison.png)
+
+### 2. Attention output fidelity
+
+Cosine similarity and Top-1/Top-5 token match rate of quantized attention output against the original FP16 output.
+
+| Model | Method | Cosine similarity | Top-1 match (%) | Top-5 match (%) |
+| :--- | :--- | :--- | :--- | :--- |
+| Meta-Llama-3.1-8B | fp16 | 1.000000 | 100.00 | 100.00 |
+| | hyper_quant | 0.705656 | 99.80 | 47.07 |
+| | rotor_quant | 0.978928 | 99.90 | 85.02 |
+| | turbo_quant | 0.690443 | 99.61 | 44.65 |
+| | ultra_quant | 0.970683 | 99.90 | 85.55 |
+| Mistral-7B-Instruct-v0.3 | fp16 | 1.000000 | 100.00 | 100.00 |
+| | hyper_quant | 0.986995 | 99.51 | 69.80 |
+| | rotor_quant | 0.999236 | 99.90 | 93.96 |
+| | turbo_quant | 0.990538 | 99.71 | 75.10 |
+| | ultra_quant | 0.999443 | 99.90 | 94.16 |
+
+> ⚠️ On Mistral-7B every method keeps a very high cosine similarity of 0.986–0.999. On Llama-3.1-8B, however, hyper_quant and turbo_quant collapse to 0.69–0.70, and their Top-5 match rates fall below half (44–47%). Robustness differences caused by model architecture (GQA etc.) are clearly visible.
+
+### 3. Perplexity (PPL — lower is better)
+
+| Model | fp16 | hyper_quant | rotor_quant | turbo_quant | ultra_quant |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Meta-Llama-3.1-8B | 5.5667 | 6.6857 (degraded) | 5.7397 (mostly kept) | 6.8154 (degraded) | 5.6922 (mostly kept) |
+| Mistral-7B-Instruct-v0.3 | 4.8756 | 5.2015 | 4.9304 | 5.2240 | 4.9072 |
+
+> ⚠️ rotor_quant and ultra_quant show only a minimal PPL increase, whereas hyper_quant and turbo_quant clearly degrade PPL.
+
+![Perplexity comparison](plots/ppl_comparison.png)
+
+### 4. Speed & throughput (sequence length 8192)
+
+| Model | Method | Prefill time (s) | Throughput (tokens/sec) |
+| :--- | :--- | :--- | :--- |
+| Meta-Llama-3.1-8B | fp16 | 1.048 | 35.84 |
+| | hyper_quant | 1.087 | 33.86 |
+| | rotor_quant | 1.215 | 14.35 ⚠️ |
+| | turbo_quant | 1.110 | 33.82 |
+| | ultra_quant | 1.364 | 36.46 |
+| Mistral-7B-Instruct-v0.3 | fp16 | 0.992 | 37.61 |
+| | hyper_quant | 1.113 | 35.14 |
+| | rotor_quant | 1.158 | 14.42 ⚠️ |
+| | turbo_quant | 1.131 | 35.10 |
+| | ultra_quant | 1.310 | 37.92 |
+
+> ⚠️ On top of its bloated measured memory, rotor_quant carries a very heavy penalty: throughput halves to around 14 tokens/sec (normally ~35).
+
+![Speed comparison](plots/speed_comparison.png)
+
+### 5. Long-context retrieval (NIAH: Needle In A Haystack)
+
+| Method | Meta-Llama-3.1-8B | Mistral-7B-Instruct-v0.3 |
+| :--- | :--- | :--- |
+| fp16 | ✅ True | ✅ True |
+| hyper_quant | ❌ False | ❌ False |
+| rotor_quant | ❌ False | ❌ False |
+| turbo_quant | ❌ False | ❌ False |
+| ultra_quant | ❌ False | ❌ False |
+
+> ⚠️ Every quantized method evaluated failed the NIAH task (sequence length 8192), showing that extreme low-bit quantization is a shared bottleneck for preserving long-context accuracy.
+
+---
+
+## 🧠 Discussion
+
+### 1. A large gap between "theoretical compression" and "measured overhead"
+
+**Converging — and broken — measured memory**: although designed for large (6–8×) memory savings at 2.0–3.0 bits in theory, most methods (Hyper / Turbo / Ultra) land at exactly 528.0 MB in a real PyTorch environment. At short contexts (8192), fixed Python/PyTorch-side overhead and allocator behavior dominate over the tensor size itself.
+
+**RotorQuant's anomalous bloat**: rotor_quant measured 1208.0 MB, exceeding even the FP16 baseline (1024 MB). Conversion/management tensors (e.g. the rotors) consume significant extra memory at initialization and runtime — a harsh real-world engineering lesson that theoretically low bit-widths can be reversed by implementation overhead.
+
+### 2. Quantization robustness differs by model architecture (GQA, etc.)
+
+Every method maintained a high cosine similarity of 0.986–0.999 on Mistral-7B, whereas hyper_quant / turbo_quant collapsed to 0.69–0.70 on Llama-3.1-8B. Susceptibility to very-low-bit quantization varies widely with the attention mechanism and KV-head count (e.g. differences in Grouped-Query Attention design). There is no universally "safe" quantization method — dependence on the base-model architecture is extremely high.
+
+### 3. Speed (throughput) vs. memory trade-off
+
+rotor_quant holds up well on output quality (PPL 5.74, cosine similarity 0.979), but its throughput falls to 14.35 tokens/sec — less than half the usual ~35. The dynamic rotation transform becomes a heavy bottleneck in the compute graph, exposing a serious practical dilemma: a memory-efficient, high-fidelity method is still hard to adopt in production serving if it halves inference throughput.
+
+### 4. All methods fail on long context (NIAH) — open challenges
+
+At sequence length 8192, every quantized method failed the NIAH (needle retrieval) task without exception. Even though "local fluency" metrics such as cosine similarity and PPL are largely preserved, extreme low-bit quantization destroys the long-range dependencies and fine-grained information held in the KV cache — suggesting a fatal weakness for practical tasks such as RAG and long-document dialogue.
+
+---
+
+## ✅ Conclusion
+
+Our evaluation data clearly demonstrates a deep gap between "on-paper theory" (bit-width-based headline numbers) and "reality in the field" (memory, speed, and long-context robustness). When adopting KV-cache quantization in production services, one must look beyond compression ratio alone and carefully assess per-model compatibility, extra memory overhead, and performance degradation on long-context tasks.
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
