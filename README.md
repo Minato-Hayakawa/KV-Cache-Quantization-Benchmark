@@ -84,7 +84,6 @@ Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 
 ### Models evaluated
 - Meta-Llama 3.1 8B
-- Qwen 2.5 7B
 - Mistral 7B v0.3
 
 ### What we measure

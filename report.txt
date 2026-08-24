@@ -60,7 +60,6 @@ Tritonカーネル	PyTorchの100-650倍高速（量子化/逆量子化）
   ・ai-l40s
  ・使用するLLM
   ・Meta-Llama 3.1 8B
-  ・Qwen 2.5 7B
   ・Mistral 7B v0.3
  ・実験内容:
 それぞれのハードでの実行速度 ＆ 速度向上
