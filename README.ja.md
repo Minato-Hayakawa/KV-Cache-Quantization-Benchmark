@@ -176,33 +176,35 @@ python3 scripts/plot_results.py
 
 ```
 kvq-bench/
-├── core_cpp/                  # 1. C++ 低レイヤーマイクロベンチ
+├── core_cpp/                  # 1. C++ low-level micro-benchmark
 │   ├── include/
 │   │   ├── turbo_quant.hpp
-│   │   ├── rotor_quant.hpp    # Rotor (Clifford代数)
-│   │   ├── ultra_quant.hpp    # FP4(E2M1) + WHT
-│   │   └── lattice_quant.hpp  # HyperQuant (E8/D4 Lattice)
+│   │   ├── rotor_quant.hpp    # Rotor (Clifford algebra)
+│   │   ├── ultra_quant.hpp    # FP4 (E2M1) + WHT
+│   │   └── lattice_quant.hpp  # HyperQuant (E8/D4 lattice)
 │   └── bench_main.cpp
 │
-├── core_pt/                   # 2. PyTorch / CUDA カスタムカーネル・キャッシュ
+├── core_pt/                   # 2. PyTorch / CUDA custom kernels & cache
 │   ├── quantizers/
+|   |   ├── __init__.py
 │   │   ├── base.py
+│   │   ├── hyper_quant.py     # RHT + lattice + Rice coding
+|   |   ├── rotor_quant.py
 │   │   ├── turbo_quant.py
-│   │   ├── hyper_quant.py     # RHT + Lattice + Rice Code
-│   │   └── ultra_quant.py     # WHT + FP4 direct map
-│   ├── custom_cache.py        # DynamicCache インターフェース
-│   └── kernels/                # (任意) Triton/CUDA カーネル
+│   │   └── ultra_quant.py     # WHT + FP4 direct mapping
+│   └── kernels/                # (optional) Triton/CUDA kernels
 │
-├── eval_pt/                    # 3. 実験・自動評価スクリプト
-│   ├── eval_speed.py           # 8Kコンテキストでのプレフィル時間 & トークン毎秒
-│   ├── eval_compression.py     # KVキャッシュのメモリサイズ vs FP16ベースライン
-│   ├── eval_longbench.py       # LongBench 評価
-│   ├── eval_niah.py            # Needle In A Haystack
-│   ├── eval_fidelity.py        # Attention 忠実度 (Cosine, Top-1/5) vs FP16
+├── eval_pt/                    # 3. Experiment & automated evaluation scripts
+│   ├── custom_cache.py        # DynamicCache interface
+│   ├── eval_speed.py           # Prefill time & tokens/sec at 8K context
+│   ├── eval_compression.py     # KV-cache memory footprint vs. FP16 baseline
+│   ├── eval_longbench.py       # LongBench evaluation
+│   ├── eval_niah.py            # Needle in a Haystack
+│   ├── eval_fidelity.py        # Attention fidelity (cosine, Top-1/5) vs. FP16
 │   └── eval_ppl.py             # Perplexity
 │
-└── hpc_scripts/                # 4. スパコン (Slurm) ジョブスクリプト
-    └── run_l40s_cluster.sbatch # ai-l40s (NVIDIA L40S) 向け分散評価
+└── hpc_scripts/                # 4. HPC (Slurm) job scripts
+    └── run_all_evals_ai_l40s.sh # Distributed evaluation on ai-l40s (NVIDIA L40S)
 ```
 
 * **`core_cpp/`**：上記クイックスタートで紹介しているスタンドアロンのC++17マイクロベンチマーク本体（エンコード/デコードレイテンシ、コサイン類似度、Attention Logit MAEを計測）。ヘッダオンリーの各量子化手法実装と、実行エントリポイントの`bench_main.cpp`から構成されます。

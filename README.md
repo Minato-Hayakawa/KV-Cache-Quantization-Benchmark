@@ -184,14 +184,16 @@ kvq-bench/
 │
 ├── core_pt/                   # 2. PyTorch / CUDA custom kernels & cache
 │   ├── quantizers/
+|   |   ├── __init__.py
 │   │   ├── base.py
-│   │   ├── turbo_quant.py
 │   │   ├── hyper_quant.py     # RHT + lattice + Rice coding
+|   |   ├── rotor_quant.py
+│   │   ├── turbo_quant.py
 │   │   └── ultra_quant.py     # WHT + FP4 direct mapping
-│   ├── custom_cache.py        # DynamicCache interface
 │   └── kernels/                # (optional) Triton/CUDA kernels
 │
 ├── eval_pt/                    # 3. Experiment & automated evaluation scripts
+│   ├── custom_cache.py        # DynamicCache interface
 │   ├── eval_speed.py           # Prefill time & tokens/sec at 8K context
 │   ├── eval_compression.py     # KV-cache memory footprint vs. FP16 baseline
 │   ├── eval_longbench.py       # LongBench evaluation
@@ -200,7 +202,7 @@ kvq-bench/
 │   └── eval_ppl.py             # Perplexity
 │
 └── hpc_scripts/                # 4. HPC (Slurm) job scripts
-    └── run_l40s_cluster.sbatch # Distributed evaluation on ai-l40s (NVIDIA L40S)
+    └── run_all_evals_ai_l40s.sh # Distributed evaluation on ai-l40s (NVIDIA L40S)
 ```
 
 * **`core_cpp/`** — the standalone C++17 micro-benchmark (encode/decode latency, cosine similarity, attention logit MAE) referenced in the Quick Start above; header-only quantizer implementations plus `bench_main.cpp` as the driver.
