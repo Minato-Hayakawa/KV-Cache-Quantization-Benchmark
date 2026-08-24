@@ -146,13 +146,15 @@ Raw data is available in `summary_results.csv`.
 
 Theoretical designed bit-width vs. the actually measured KV-cache size, against the FP16 baseline (289 MB). Measured values were identical for both models.
 
-| Method | Designed bits | Measured KV-cache size | Ratio to baseline |
-| :--- | :--- | :--- | :--- |
-| fp16 | 16.0 bit | 1024.0 MB | 0.28 |
-| hyper_quant | 2.5 bit | 528.0 MB | 0.55 |
-| rotor_quant | 3.0 bit | 1208.0 MB | 0.24 ⚠️ larger than FP16 |
-| turbo_quant | 3.0 bit | 528.0 MB | 0.55 |
-| ultra_quant | 2.0 bit | 528.0 MB | 0.55 |
+| Method | Designed bits | Theoretical KV size | Theoretical compression (vs FP16) | Measured KV-cache size | Ratio to baseline |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| fp16 | 16.0 bit | 1024.0 MB | 1.00× | 1024.0 MB | 0.28 |
+| hyper_quant | 2.5 bit | 160.0 MB | 6.40× | 528.0 MB | 0.55 |
+| rotor_quant | 3.0 bit | 192.0 MB | 5.33× | 1208.0 MB | 0.24 ⚠️ larger than FP16 |
+| turbo_quant | 3.0 bit | 192.0 MB | 5.33× | 528.0 MB | 0.55 |
+| ultra_quant | 2.0 bit | 128.0 MB | 8.00× | 528.0 MB | 0.55 |
+
+*The theoretical KV size and compression ratio are taken from the `calculation_type = theoretical` records in `summary_results.csv` — ideal bit-width-only values (16 bit ÷ designed bits) that exclude implementation overhead such as codebooks, rotation matrices, and metadata.*
 
 > ⚠️ Although these methods promise large reductions (several-fold) at 2.0–3.0 bits on paper, in the real (PyTorch) runtime the measured memory footprints of hyper_quant / turbo_quant / ultra_quant converged to exactly 528.0 MB, and rotor_quant came in at 1208.0 MB — consuming *more* memory than the FP16 baseline (1024 MB).
 
