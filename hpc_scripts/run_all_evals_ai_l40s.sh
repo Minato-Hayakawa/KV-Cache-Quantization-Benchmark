@@ -27,7 +27,6 @@ echo "=================================================="
 # 評価するモデルのリスト
 MODELS=(
     "meta-llama/Meta-Llama-3.1-8B"
-    "Qwen/Qwen2.5-7B-Instruct"
     "mistralai/Mistral-7B-Instruct-v0.3"
 )
 
