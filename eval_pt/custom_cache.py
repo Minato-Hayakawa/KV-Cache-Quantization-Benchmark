@@ -99,7 +99,11 @@ class QuantizedKVCache(DynamicCache):
                 self.key_cache.append(q_key)
                 self.value_cache.append(q_value)
 
-        return self
+        # 【重要】すべての量子化手法において、更新後に (key_states, value_states) のタプルを返す
+        if isinstance(q_key, dict) and hasattr(self.quantizer, "decompress"):
+            return self.quantizer.decompress(q_key), self.quantizer.decompress(q_value)
+        else:
+            return key_states, value_states
 
     def __getitem__(self, layer_idx: int):
         if self.method == "fp16" or self.quantizer is None or not hasattr(self, "key_cache") or len(self.key_cache) <= layer_idx:
