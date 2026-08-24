@@ -17,7 +17,7 @@ This project compares state-of-the-art rotational, rate-distortion-optimal, and 
 | :--- | :--- | :---: | :---: |
 | **TurboQuant** | Cartesian → polar decomposition (PolarQuant) + QJL 1-bit sign correction | High ($O(d^2)$) | 3-bit / 8-bit |
 | **RotorQuant** | Clifford-algebra rotors (Cl(3,0)) replacing full orthogonal rotation | Low ($O(d)$) | 3-bit / 8-bit |
-| **HyperQuant** | Unified rate-distortion-optimal pipeline; RHT + lattice quantization ($A_2$/$D_4$/$E_8$) + Rice entropy coding | Medium | 1.7–2 bps |
+| **HyperQuant** | Unified rate-distortion-optimal pipeline; RHT + lattice quantization ($A_2$ /$D_4$ / $E_8$ ) + Rice entropy coding | Medium | 1.7–2 bps |
 | **UltraQuant** | Walsh–Hadamard rotation, QJL removed, native FP4 (E2M1) + UE8M0 block scaling for hardware-direct decode | Low | 4-bit |
 
 ---
