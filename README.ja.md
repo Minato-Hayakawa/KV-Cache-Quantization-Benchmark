@@ -110,7 +110,6 @@ TurboQuantは「4-bitで高精度」を達成した画期的なアルゴリズ�
 
 ### 使用するLLM
 - Meta-Llama 3.1 8B
-- Qwen 2.5 7B
 - Mistral 7B v0.3
 
 ### 実験内容
