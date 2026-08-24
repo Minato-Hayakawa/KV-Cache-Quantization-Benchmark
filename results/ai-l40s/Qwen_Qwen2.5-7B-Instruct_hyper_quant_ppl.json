@@ -1,7 +1,0 @@
-{
-    "model_name": "Qwen/Qwen2.5-7B-Instruct",
-    "method": "hyper_quant",
-    "stride": 512,
-    "seq_len": 2048,
-    "perplexity": 14435.6142578125
-}

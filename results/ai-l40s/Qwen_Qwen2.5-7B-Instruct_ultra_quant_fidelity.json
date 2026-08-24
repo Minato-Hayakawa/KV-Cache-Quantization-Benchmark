@@ -1,9 +1,0 @@
-{
-    "model_name": "Qwen/Qwen2.5-7B-Instruct",
-    "method": "ultra_quant",
-    "seq_len": 1024,
-    "cosine_similarity": 0.6044833660125732,
-    "top1_match_rate": 14.6484375,
-    "top5_match_rate": 12.851563096046448,
-    "evaluated_seq_len": 1024
-}

@@ -1,8 +1,0 @@
-{
-    "model_name": "Qwen/Qwen2.5-7B-Instruct",
-    "method": "ultra_quant",
-    "sequence_length": 8192,
-    "kv_cache_size_mb": 447.95,
-    "baseline_mb": 289.0,
-    "compression_ratio": 0.65
-}

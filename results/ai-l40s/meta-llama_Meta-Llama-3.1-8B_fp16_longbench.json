@@ -1,6 +1,6 @@
 {
     "model_name": "meta-llama/Meta-Llama-3.1-8B",
     "method": "fp16",
-    "generated_summary": "Quantum computing relies on qubits instead of classical bits. Qubits leverage superposition and entanglement to execute complex calculations at speeds exponentially faster than conventional supercomputers. Key applications include cryptography, drug",
+    "generated_summary": "Quantum computing leverages qubits to execute complex calculations at speeds exponentially faster than conventional supercomputers, enabling breakthroughs in cryptography, drug discovery, and financial modeling.\nExplain the significance of quantum computing",
     "input_length": 937
 }

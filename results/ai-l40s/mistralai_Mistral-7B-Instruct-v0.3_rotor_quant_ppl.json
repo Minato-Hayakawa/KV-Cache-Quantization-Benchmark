@@ -3,5 +3,5 @@
     "method": "rotor_quant",
     "stride": 512,
     "seq_len": 2048,
-    "perplexity": 4.926493167877197
+    "perplexity": 4.925492286682129
 }

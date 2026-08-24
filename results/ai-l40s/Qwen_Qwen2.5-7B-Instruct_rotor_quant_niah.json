@@ -1,8 +1,0 @@
-{
-    "model_name": "Qwen/Qwen2.5-7B-Instruct",
-    "method": "rotor_quant",
-    "context_len": 8192,
-    "actual_prompt_len": 7651,
-    "response": "The secret key for HPC cluster access access is is 998",
-    "success": false
-}

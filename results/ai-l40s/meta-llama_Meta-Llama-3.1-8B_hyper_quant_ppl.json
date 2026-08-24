@@ -3,5 +3,5 @@
     "method": "hyper_quant",
     "stride": 512,
     "seq_len": 2048,
-    "perplexity": 7.325479507446289
+    "perplexity": 6.685699939727783
 }

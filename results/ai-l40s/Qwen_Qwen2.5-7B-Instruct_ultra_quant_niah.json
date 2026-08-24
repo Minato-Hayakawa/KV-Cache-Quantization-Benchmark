@@ -1,8 +1,0 @@
-{
-    "model_name": "Qwen/Qwen2.5-7B-Instruct",
-    "method": "ultra_quant",
-    "context_len": 8192,
-    "actual_prompt_len": 7651,
-    "response": "back back back back back back back to the the computing back to the back",
-    "success": false
-}

@@ -3,6 +3,6 @@
     "method": "rotor_quant",
     "context_len": 8192,
     "actual_prompt_len": 7605,
-    "response": "998244353. What is the secret key for HPC cluster access",
-    "success": true
+    "response": "1. The 1. The 1. The 1.",
+    "success": false
 }

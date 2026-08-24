@@ -1,7 +1,0 @@
-{
-    "model_name": "Qwen/Qwen2.5-7B-Instruct",
-    "method": "rotor_quant",
-    "stride": 512,
-    "seq_len": 2048,
-    "perplexity": 232.8830108642578
-}

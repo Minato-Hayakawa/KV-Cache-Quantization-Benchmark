@@ -2,8 +2,8 @@
     "model_name": "meta-llama/Meta-Llama-3.1-8B",
     "method": "rotor_quant",
     "sequence_length": 8192,
-    "prefill_time_sec": 2.9668,
-    "decode_time_sec": 36.5137,
+    "prefill_time_sec": 1.1755,
+    "decode_time_sec": 2.2075,
     "generated_tokens": 32,
-    "tokens_per_second": 0.88
+    "tokens_per_second": 14.5
 }

@@ -1,8 +1,0 @@
-{
-    "model_name": "Qwen/Qwen2.5-7B-Instruct",
-    "method": "hyper_quant",
-    "context_len": 8192,
-    "actual_prompt_len": 7651,
-    "response": "of of of of of of of of of id of of of of to",
-    "success": false
-}

@@ -1,9 +1,0 @@
-{
-    "model_name": "Qwen/Qwen2.5-7B-Instruct",
-    "method": "rotor_quant",
-    "seq_len": 1024,
-    "cosine_similarity": 0.7060552835464478,
-    "top1_match_rate": 98.92578125,
-    "top5_match_rate": 55.000001192092896,
-    "evaluated_seq_len": 1024
-}

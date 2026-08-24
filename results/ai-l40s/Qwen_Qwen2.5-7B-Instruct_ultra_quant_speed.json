@@ -1,9 +1,0 @@
-{
-    "model_name": "Qwen/Qwen2.5-7B-Instruct",
-    "method": "ultra_quant",
-    "sequence_length": 8191,
-    "prefill_time_sec": 1.7246,
-    "decode_time_sec": 1.0047,
-    "generated_tokens": 32,
-    "tokens_per_second": 31.85
-}
