@@ -28,20 +28,18 @@ class HyperQuantizer(BaseQuantizer):
         scaled = tensor / scale
         rounded = torch.round(scaled)
 
-        # 4次元ごとに分割
         shape = rounded.shape
         reshaped = rounded.view(-1, 4)
         scaled_4 = scaled.view(-1, 4)
         
         sums = reshaped.sum(dim=-1)
 
-        # 和が奇数の箇所を検知して補正
+        # 和が奇数の箇所を検知して補正 (完全テンソル演算)
         odd_mask = (sums % 2 != 0)
         if odd_mask.any():
             diffs = (scaled_4 - reshaped).abs()
-            max_idx = diffs.argmax(dim=-1)  # (N,)
+            max_idx = diffs.argmax(dim=-1)
             
-            # ループを使わず、PyTorchのインデクシングで一括処理
             row_indices = torch.where(odd_mask)[0]
             col_indices = max_idx[row_indices]
             
@@ -52,38 +50,17 @@ class HyperQuantizer(BaseQuantizer):
 
         return reshaped.view(shape) * scale
 
-    def compress_and_decompress(self, tensor: torch.Tensor) -> torch.Tensor:
-        orig_dtype = tensor.dtype
-        tensor_f32 = tensor.to(torch.float32)
-
-        # 1. RHT (ランダム・アダマール変換)
-        H = self.hadamard_matrix.to(tensor.device)
-        transformed = torch.matmul(tensor_f32, H)
-
-        # 2. 格子量子化
-        qmax = (2 ** (self.num_bits - 1)) - 1
-        scale = transformed.abs().max(dim=-1, keepdim=True).values / qmax
-        scale = torch.where(scale == 0, torch.ones_like(scale), scale)
-
-        dequantized = self._project_d4_lattice(transformed, scale)
-
-        # 3. 逆 RHT
-        recovered = torch.matmul(dequantized, H.T)
-        return recovered.to(orig_dtype)
     def compress(self, tensor: torch.Tensor) -> dict:
         orig_dtype = tensor.dtype
         tensor_f32 = tensor.to(torch.float32)
 
-        # 1. RHT (ランダム・アダマール変換)
         H = self.hadamard_matrix.to(tensor.device)
         transformed = torch.matmul(tensor_f32, H)
 
-        # 2. 格子量子化
         qmax = (2 ** (self.num_bits - 1)) - 1
         scale = transformed.abs().max(dim=-1, keepdim=True).values / qmax
         scale = torch.where(scale == 0, torch.ones_like(scale), scale)
 
-        # _project_d4_lattice の中で丸められたものを int8 にキャストして保存
         scaled = transformed / scale
         rounded = torch.round(scaled).to(torch.int8)
 
@@ -98,12 +75,23 @@ class HyperQuantizer(BaseQuantizer):
         scale = compressed_data["scale"]
         orig_dtype = compressed_data["dtype"]
         
-        # D4格子の近似復元 ＋ 逆 RHT
         dequantized = quantized * scale
-        # 必要に応じて厳密なD4射影を通すか、そのままスケーリング復元
         H = self.hadamard_matrix.to(dequantized.device)
         recovered = torch.matmul(dequantized, H.T)
         return recovered.to(orig_dtype)
 
     def compress_and_decompress(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self.decompress(self.compress(tensor))
+        orig_dtype = tensor.dtype
+        tensor_f32 = tensor.to(torch.float32)
+
+        H = self.hadamard_matrix.to(tensor.device)
+        transformed = torch.matmul(tensor_f32, H)
+
+        qmax = (2 ** (self.num_bits - 1)) - 1
+        scale = transformed.abs().max(dim=-1, keepdim=True).values / qmax
+        scale = torch.where(scale == 0, torch.ones_like(scale), scale)
+
+        dequantized = self._project_d4_lattice(transformed, scale)
+
+        recovered = torch.matmul(dequantized, H.T)
+        return recovered.to(orig_dtype)

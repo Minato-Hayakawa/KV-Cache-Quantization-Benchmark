@@ -12,7 +12,10 @@
 # 作業ディレクトリの設定
 cd /hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark
 
-# 環境の有効化（必要に応じて調整してください）
+# ログ保存用ディレクトリが存在しない場合に自動作成する安全策
+mkdir -p logs
+
+# 環境の有効化（必要に応じてコメントアウトを解除してください）
 # source ~/.bashrc
 # conda activate your_env_name
 
@@ -30,7 +33,7 @@ MODELS=(
     "mistralai/Mistral-7B-Instruct-v0.3"
 )
 
-# 評価する手法のリスト
+# 評価する手法のリスト（RotorQuantの並列化対応済み）
 METHODS=(
     "fp16"
     "turbo_quant"
@@ -65,11 +68,11 @@ for MODEL in "${MODELS[@]}"; do
         echo ">>> Running LongBench Evaluation..."
         python eval_pt/eval_longbench.py --model_name "$MODEL" --method "$METHOD"
 
-        # 5. 圧縮率の測定 (NEW!)
+        # 5. 圧縮率の測定
         echo ">>> Running Compression Rate Measurement..."
         python eval_pt/eval_compression.py --model_name "$MODEL" --method "$METHOD" --seq_len 8192
 
-        # 6. 速度向上の測定 (NEW!)
+        # 6. 速度向上の測定（並列化により正常なtok/sが計測されます）
         echo ">>> Running Speed Measurement..."
         python eval_pt/eval_speed.py --model_name "$MODEL" --method "$METHOD" --seq_len 8192 --gen_tokens 32
 
