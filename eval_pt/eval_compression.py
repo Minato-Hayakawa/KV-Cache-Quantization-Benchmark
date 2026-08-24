@@ -3,7 +3,7 @@ import json
 import os
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from custom_cache import QuantizedKVCache
+from custom_cache import QuantizedKVCache  # ファイル名を custom_cache_2 にしている場合は適宜変更してください
 
 def get_optimal_device():
     if torch.cuda.is_available():
@@ -12,6 +12,22 @@ def get_optimal_device():
         return "xpu"
     else:
         return "cpu"
+
+def count_tensor_bytes(obj):
+    """
+    テンソル、辞書、リストなどネストした構造の中から
+    すべてのPyTorchテンソルのメモリサイズ（バイト数）を再帰的に計算する関数
+    """
+    total = 0
+    if isinstance(obj, torch.Tensor):
+        total += obj.element_size() * obj.nelement()
+    elif isinstance(obj, dict):
+        for v in obj.values():
+            total += count_tensor_bytes(v)
+    elif isinstance(obj, (list, tuple)):
+        for item in obj:
+            total += count_tensor_bytes(item)
+    return total
 
 def measure_kv_cache_memory(model_name, method, seq_len=8192):
     print(f"=== Measuring Compression Rate | Model: {model_name} | Method: {method} | SeqLen: {seq_len} ===")
@@ -27,7 +43,7 @@ def measure_kv_cache_memory(model_name, method, seq_len=8192):
         model_name, torch_dtype=torch_dtype, device_map=device
     ).eval()
 
-    # ダミーの長文コンテキスト（約8K相当のトークンを想定したテキスト）を生成
+    # ダミーの長文コンテキストを生成
     dummy_text = "The quick brown fox jumps over the lazy dog. " * (seq_len // 10)
     inputs = tokenizer(dummy_text, return_tensors="pt", max_length=seq_len, truncation=True).to(device)
 
@@ -35,9 +51,8 @@ def measure_kv_cache_memory(model_name, method, seq_len=8192):
     if device == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
         torch.cuda.empty_cache()
-        baseline_mem = torch.cuda.memory_allocated(device)
 
-    # KVキャッシュのインスタンス準備（カスタムキャッシュまたは標準）
+    # KVキャッシュのインスタンス準備
     cache = QuantizedKVCache(method=method) if method != "fp16" else None
 
     # フォワードパスを実行してKVキャッシュを生成させる
@@ -48,25 +63,25 @@ def measure_kv_cache_memory(model_name, method, seq_len=8192):
             use_cache=True
         )
 
-    # 生成された KV カッシュ（past_key_values）の実際のメモリサイズ（バイト数）を計算
+    # 生成された KV キャッシュ（past_key_values）の実際のメモリサイズ（バイト数）を計算
     kv_cache = outputs.past_key_values
     total_kv_bytes = 0
 
     if kv_cache is not None:
-        # Hugging Faceのモデル構造によってタプルの形式が異なる場合の安全な走査
-        for layer_cache in kv_cache:
-            if isinstance(layer_cache, (tuple, list)):
-                for tensor in layer_cache:
-                    if isinstance(tensor, torch.Tensor):
-                        total_kv_bytes += tensor.element_size() * tensor.nelement()
-            elif isinstance(layer_cache, torch.Tensor):
-                total_kv_bytes += layer_cache.element_size() * layer_cache.nelement()
+        # カスタムキャッシュの key_cache / value_cache から正確な圧縮後サイズを算出
+        if hasattr(kv_cache, "key_cache") and kv_cache.key_cache:
+            for layer_key, layer_val in zip(kv_cache.key_cache, kv_cache.value_cache):
+                total_kv_bytes += count_tensor_bytes(layer_key)
+                total_kv_bytes += count_tensor_bytes(layer_val)
+        else:
+            # フォールバック
+            for layer_cache in kv_cache:
+                total_kv_bytes += count_tensor_bytes(layer_cache)
 
     total_kv_mb = total_kv_bytes / (1024 * 1024)
 
-    # FP16ベースライン（ご提示の289MBなど）に対する圧縮率を計算
-    # ※fp16の場合は実測値、それ以外は量子化による削減率
-    baseline_reference_mb = 289.0 # ご提示のベースライン値
+    # FP16ベースラインに対する圧縮率を計算
+    baseline_reference_mb = 289.0 
     compression_ratio = baseline_reference_mb / total_kv_mb if total_kv_mb > 0 else 0.0
 
     result = {

@@ -28,6 +28,12 @@ class QuantizedKVCache(DynamicCache):
         self.bits_per_band = bits_per_band or [4, 2]
         self.quantizer = None  
 
+        # 万が一親クラスに属性がない場合の保険として明示的に初期化
+        if not hasattr(self, "key_cache"):
+            self.key_cache = []
+        if not hasattr(self, "value_cache"):
+            self.value_cache = []
+
     def _lazy_init_quantizer(self, device, head_dim):
         if self.quantizer is not None or self.method == "fp16": 
             return
@@ -62,6 +68,12 @@ class QuantizedKVCache(DynamicCache):
         if self.method == "fp16" or self.quantizer is None:
             return super().update(key_states, value_states, layer_idx, cache_kwargs)
 
+        # 属性リストの存在を担保
+        if not hasattr(self, "key_cache"):
+            self.key_cache = []
+        if not hasattr(self, "value_cache"):
+            self.value_cache = []
+
         # 圧縮
         q_key = self.quantizer.compress(key_states)
         q_value = self.quantizer.compress(value_states)
@@ -90,7 +102,7 @@ class QuantizedKVCache(DynamicCache):
         return self
 
     def __getitem__(self, layer_idx: int):
-        if self.method == "fp16" or self.quantizer is None or len(self.key_cache) <= layer_idx:
+        if self.method == "fp16" or self.quantizer is None or not hasattr(self, "key_cache") or len(self.key_cache) <= layer_idx:
             return super().__getitem__(layer_idx)
 
         q_key = self.key_cache[layer_idx]
