@@ -1,0 +1,52 @@
+[
+    {
+        "model_name": "meta-llama/Meta-Llama-3.1-8B",
+        "method": "fp16",
+        "designed_bits": 16.0,
+        "sequence_length": 8192,
+        "kv_cache_size_mb": 1024.0,
+        "baseline_mb": 1024.0,
+        "compression_ratio": 1.0,
+        "calculation_type": "theoretical"
+    },
+    {
+        "model_name": "meta-llama/Meta-Llama-3.1-8B",
+        "method": "turbo_quant",
+        "designed_bits": 3.0,
+        "sequence_length": 8192,
+        "kv_cache_size_mb": 192.0,
+        "baseline_mb": 1024.0,
+        "compression_ratio": 5.33,
+        "calculation_type": "theoretical"
+    },
+    {
+        "model_name": "meta-llama/Meta-Llama-3.1-8B",
+        "method": "rotor_quant",
+        "designed_bits": 3.0,
+        "sequence_length": 8192,
+        "kv_cache_size_mb": 192.0,
+        "baseline_mb": 1024.0,
+        "compression_ratio": 5.33,
+        "calculation_type": "theoretical"
+    },
+    {
+        "model_name": "meta-llama/Meta-Llama-3.1-8B",
+        "method": "hyper_quant",
+        "designed_bits": 2.5,
+        "sequence_length": 8192,
+        "kv_cache_size_mb": 160.0,
+        "baseline_mb": 1024.0,
+        "compression_ratio": 6.4,
+        "calculation_type": "theoretical"
+    },
+    {
+        "model_name": "meta-llama/Meta-Llama-3.1-8B",
+        "method": "ultra_quant",
+        "designed_bits": 2.0,
+        "sequence_length": 8192,
+        "kv_cache_size_mb": 128.0,
+        "baseline_mb": 1024.0,
+        "compression_ratio": 8.0,
+        "calculation_type": "theoretical"
+    }
+]

@@ -1,0 +1,10 @@
+{
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "method": "hyper_quant",
+    "designed_bits": 2.5,
+    "sequence_length": 8192,
+    "kv_cache_size_mb": 160.0,
+    "baseline_mb": 1024.0,
+    "compression_ratio": 6.4,
+    "calculation_type": "theoretical"
+}

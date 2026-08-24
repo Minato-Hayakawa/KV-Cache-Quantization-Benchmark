@@ -1,0 +1,10 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "turbo_quant",
+    "designed_bits": 3.0,
+    "sequence_length": 8192,
+    "kv_cache_size_mb": 192.0,
+    "baseline_mb": 1024.0,
+    "compression_ratio": 5.33,
+    "calculation_type": "theoretical"
+}

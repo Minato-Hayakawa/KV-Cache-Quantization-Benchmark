@@ -2,8 +2,8 @@
     "model_name": "meta-llama/Meta-Llama-3.1-8B",
     "method": "turbo_quant",
     "seq_len": 1024,
-    "cosine_similarity": 0.709473729133606,
-    "top1_match_rate": 99.51171875,
-    "top5_match_rate": 48.359376192092896,
+    "cosine_similarity": 0.6904431581497192,
+    "top1_match_rate": 99.609375,
+    "top5_match_rate": 44.648438692092896,
     "evaluated_seq_len": 1024
 }

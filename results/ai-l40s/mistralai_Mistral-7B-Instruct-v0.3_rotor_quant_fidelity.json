@@ -2,8 +2,8 @@
     "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
     "method": "rotor_quant",
     "seq_len": 1024,
-    "cosine_similarity": 0.9993690252304077,
-    "top1_match_rate": 99.8046875,
-    "top5_match_rate": 94.12108659744263,
+    "cosine_similarity": 0.9992357492446899,
+    "top1_match_rate": 99.90234375,
+    "top5_match_rate": 93.9648449420929,
     "evaluated_seq_len": 1024
 }
