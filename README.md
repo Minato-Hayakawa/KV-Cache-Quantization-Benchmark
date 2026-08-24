@@ -36,7 +36,9 @@ A two-stage compression scheme:
 | Accuracy loss | ~Zero (validated on LongBench, RULER, etc.) |
 | Models validated | Gemma, Mistral |
 
-Reference: [arXiv:2504.19874](https://arxiv.org/abs/2504.19874)
+**Independent validation**: A comprehensive third-party study by the vLLM team (May 2026) benchmarked TurboQuant on production-scale models (Llama-3.3-70B-Instruct, Qwen3-30B-A3B, MiniMax-M2.7) across long-context retrieval (MRCR) and reasoning benchmarks (AIME25, GPQA, MATH500, LiveCodeBench-v6). The results were more mixed than the original paper: FP8 KV-cache quantization matched BF16 throughput at 2× capacity with negligible accuracy loss, while TurboQuant's `k8v4` variant offered only marginal gains over FP8 at a 40–52% throughput cost. The `4bit-nc` variant was judged the most practical TurboQuant option — useful under memory pressure — while the more aggressive `k3v4-nc` / `3bit-nc` variants showed meaningful accuracy drops (up to ~20 points) on hard reasoning and coding tasks, making FP8 KV-cache the recommended default in production.
+
+Reference: [arXiv:2504.19874](https://arxiv.org/abs/2504.19874) · [vLLM Blog — A First Comprehensive Study of TurboQuant](https://vllm.ai/blog/2026-05-11-turboquant)
 
 ### RotorQuant (Scrya)
 Re-implements TurboQuant's core rotation using **Clifford algebra** (geometric algebra) rotors instead of a full d×d orthogonal random rotation matrix. Vectors are split into 3D groups, and each group is transformed with a 4-parameter rotor via the sandwich product $R v \tilde{R}$.
@@ -61,6 +63,15 @@ A unified quantization pipeline that goes beyond localized, KV-cache-only techni
 - **Entropy coding**: a random Hadamard transform (RHT) reshapes the distribution into a near-Gaussian form; bits are then stripped using the lattice's geometric constraints and encoded with variable-length Rice coding — landing within ~0.01 bps of the theoretical rate-distortion limit.
 - **Scope**: applies to LLM weights, KV caches, and even Diffusion Transformers (e.g. a 19B-parameter text-to-video model, LTX-2) — not just KV caches.
 
+| Metric | Value |
+| :--- | :--- |
+| vs. TurboQuant / OCTOPUS (KV path) | Outperforms both down to 1.7 bits/scalar (bps) |
+| vs. HIGGS (weight path) | Outperforms at every operating point from 3–5 bps |
+| Compression (H100, 4 bps, near-lossless) | ~3.9× weights, ~3.79× KV cache |
+| Rate-distortion gap | Within ~0.01 bps of the theoretical limit |
+| Models validated | Llama-3.1-8B (KV-only path, bf16 weights); LTX-2 (19B-parameter DiT video model, no observable per-frame artifacts) |
+| Triton/CUDA kernel speedup | *Not reported in the publicly available paper text* |
+
 Reference: [arXiv:2606.23406](https://arxiv.org/abs/2606.23406)
 
 ### UltraQuant: 4-bit KV Caching for Context-Heavy Agents
@@ -70,6 +81,15 @@ Targets the systems/hardware bottleneck left by algorithmically elegant methods 
 - **QJL removal**: the 1-bit residual correction is dropped entirely to eliminate its software decode overhead.
 - **Native FP4 (E2M1)**: values map directly onto hardware-supported FP4 grid points (1 sign bit, 2 exponent bits, 1 mantissa bit) instead of a custom codebook.
 - **UE8M0 block scaling**: a single offline-tuned constant ($c \approx 0.156$) scales each 32-channel block, letting FP4 data feed straight into GPU matrix units (MFMA / Tensor Core instructions) with no software lookup.
+
+| Metric | Value |
+| :--- | :--- |
+| vs. FP8 KV baseline (throughput) | Tracks the FP8 throughput ceiling (folding dequant into MFMA) while halving the KV-cache footprint vs. FP8 |
+| Baselines compared | vLLM OSS TurboQuant, BF16 AITER FlashAttention, hardware FP8 KV, Ultra-TQ (own TurboQuant-style variant) |
+| Hardware | AMD Instinct MI355X (CDNA4), TP=2, tested up to 32K/1K context at concurrency 64 |
+| Models validated | MiniMax-M2.5 (throughput); production accuracy matrix incl. Qwen2.5-72B, Qwen3.5-A3B (accuracy, up to 128K context via LCB-128K) |
+| Accuracy impact (production matrix) | Stable on MATH500; competitive on GPQA and LCB-128K; **material regression on AIME25** (−13.3 pp on Qwen3.5-A3B, −10.0 pp on MiniMax-M2.5) — benchmark-dependent rather than uniformly near-lossless. All results use boundary-layer protection (first/last 2 attention layers kept in BF16) |
+| Triton kernel speedup | Not applicable — UltraQuant targets AMD CDNA4 native scaled-MFMA instructions rather than a Triton kernel |
 
 Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 
@@ -84,6 +104,7 @@ Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 
 ### Models evaluated
 - Meta-Llama 3.1 8B
+- Qwen 2.5 7B
 - Mistral 7B v0.3
 
 ### What we measure
