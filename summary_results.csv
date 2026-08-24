@@ -1,65 +1,72 @@
-model_name,method,sequence_length,kv_cache_size_mb,baseline_mb,compression_ratio,file_name,benchmark,seq_len,cosine_similarity,top1_match_rate,top5_match_rate,evaluated_seq_len,generated_summary,input_length,context_len,actual_prompt_len,response,success,stride,perplexity,prefill_time_sec,decode_time_sec,generated_tokens,tokens_per_second
-meta-llama/Meta-Llama-3.1-8B,fp16,8192.0,1024.0,289.0,0.28,meta-llama_Meta-Llama-3.1-8B_fp16_compression.json,compression,,,,,,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_fidelity.json,fidelity,1024.0,1.0,100.0,100.0,1024.0,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_longbench.json,longbench,,,,,,"Quantum computing leverages qubits to execute complex calculations at speeds exponentially faster than conventional supercomputers, enabling breakthroughs in cryptography, drug discovery, and financial modeling.
-Explain the significance of quantum computing",937.0,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_niah.json,niah,,,,,,,,8192.0,7605.0,998244353. What is the secret key for HPC cluster access,True,,,,,,
-meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.56669282913208,,,,
-meta-llama/Meta-Llama-3.1-8B,fp16,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_fp16_speed.json,speed,,,,,,,,,,,,,,1.0163,0.8873,32.0,36.07
-meta-llama/Meta-Llama-3.1-8B,hyper_quant,8192.0,528.0,289.0,0.55,meta-llama_Meta-Llama-3.1-8B_hyper_quant_compression.json,compression,,,,,,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_fidelity.json,fidelity,1024.0,0.705655574798584,99.8046875,47.0703125,1024.0,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_longbench.json,longbench,,,,,,"Quantum Department of the old, a new data was not only as, but you can also to the same than 1 (2017 (1. 0. 4. 3.",937.0,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_niah.json,niah,,,,,,,,8192.0,7605.0,"1, and the most of the most of the most of the most",False,,,,,,
-meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,6.685699939727783,,,,
-meta-llama/Meta-Llama-3.1-8B,hyper_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_speed.json,speed,,,,,,,,,,,,,,1.0787,0.9428,32.0,33.94
-meta-llama/Meta-Llama-3.1-8B,rotor_quant,8192.0,1208.0,289.0,0.24,meta-llama_Meta-Llama-3.1-8B_rotor_quant_compression.json,compression,,,,,,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_fidelity.json,fidelity,1024.0,0.9856327772140503,99.8046875,87.32421398162842,1024.0,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_longbench.json,longbench,,,,,,"Quantum Review of the problem (Question:
-        if it has a low, 0-8. The 2}(\beta\), the 3, and and it was not a good that",937.0,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_niah.json,niah,,,,,,,,8192.0,7605.0,1. The 1. The 1. The 1.,False,,,,,,
-meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.734076023101807,,,,
-meta-llama/Meta-Llama-3.1-8B,rotor_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_speed.json,speed,,,,,,,,,,,,,,1.1755,2.2075,32.0,14.5
-meta-llama/Meta-Llama-3.1-8B,turbo_quant,8192.0,528.0,289.0,0.55,meta-llama_Meta-Llama-3.1-8B_turbo_quant_compression.json,compression,,,,,,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_fidelity.json,fidelity,1024.0,0.709473729133606,99.51171875,48.359376192092896,1024.0,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_longbench.json,longbench,,,,,,"Quantum System.Drawing.Point(3 2) and 2013. The problem, 0. I’m not as a couple of the following: 1. It was used.
-The order to",937.0,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_niah.json,niah,,,,,,,,8192.0,7605.0,The 1. 1. 1. 1. 1,False,,,,,,
-meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,6.788241386413574,,,,
-meta-llama/Meta-Llama-3.1-8B,turbo_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_speed.json,speed,,,,,,,,,,,,,,1.1113,0.947,32.0,33.79
-meta-llama/Meta-Llama-3.1-8B,ultra_quant,8192.0,528.0,289.0,0.55,meta-llama_Meta-Llama-3.1-8B_ultra_quant_compression.json,compression,,,,,,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_fidelity.json,fidelity,1024.0,0.970683217048645,99.90234375,85.546875,1024.0,,,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_longbench.json,longbench,,,,,,"Quantum Department of the original and the problem of the same for the 2. 1} \h)
-def be very common in 1. 1. 5. If you can be",937.0,,,,,,,,,,
-meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_niah.json,niah,,,,,,,,8192.0,7605.0,1. The 1. The 1. The 1.,False,,,,,,
-meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.6921772956848145,,,,
-meta-llama/Meta-Llama-3.1-8B,ultra_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_speed.json,speed,,,,,,,,,,,,,,1.3683,0.882,32.0,36.28
-mistralai/Mistral-7B-Instruct-v0.3,fp16,8192.0,1024.0,289.0,0.28,mistralai_Mistral-7B-Instruct-v0.3_fp16_compression.json,compression,,,,,,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_fidelity.json,fidelity,1024.0,1.0,100.0,100.0,1024.0,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_longbench.json,longbench,,,,,,"Quantum computing enables complex calculations at speeds exponentially faster than conventional supercomputers, with key applications in cryptography, drug discovery, and financial modeling.",1038.0,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_niah.json,niah,,,,,,,,8192.0,7653.0,998244353,True,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,4.875646591186523,,,,
-mistralai/Mistral-7B-Instruct-v0.3,fp16,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_speed.json,speed,,,,,,,,,,,,,,0.9868,0.8509,32.0,37.61
-mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,8192.0,528.0,289.0,0.55,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_compression.json,compression,,,,,,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_fidelity.json,fidelity,1024.0,0.9869949817657471,99.51171875,69.80469226837158,1024.0,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_longbench.json,longbench,,,,,,"Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q",1038.0,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_niah.json,niah,,,,,,,,8192.0,7653.0,,False,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.201521396636963,,,,
-mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_speed.json,speed,,,,,,,,,,,,,,1.0666,0.9088,32.0,35.21
-mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,8192.0,1208.0,289.0,0.24,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_compression.json,compression,,,,,,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_fidelity.json,fidelity,1024.0,0.9993690252304077,99.8046875,94.12108659744263,1024.0,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_longbench.json,longbench,,,,,,"Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q",1038.0,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_niah.json,niah,,,,,,,,8192.0,7653.0,,False,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,4.925492286682129,,,,
-mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_speed.json,speed,,,,,,,,,,,,,,1.145,2.2271,32.0,14.37
-mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,8192.0,528.0,289.0,0.55,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_compression.json,compression,,,,,,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_fidelity.json,fidelity,1024.0,0.9871208667755127,99.8046875,72.55859375,1024.0,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_longbench.json,longbench,,,,,,"Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q",1038.0,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_niah.json,niah,,,,,,,,8192.0,7653.0,,False,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.223108768463135,,,,
-mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_speed.json,speed,,,,,,,,,,,,,,1.0937,0.913,32.0,35.05
-mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,8192.0,528.0,289.0,0.55,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_compression.json,compression,,,,,,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_fidelity.json,fidelity,1024.0,0.9994429349899292,99.90234375,94.1601574420929,1024.0,,,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_longbench.json,longbench,,,,,,"Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q",1038.0,,,,,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_niah.json,niah,,,,,,,,8192.0,7653.0,,False,,,,,,
-mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,4.907246112823486,,,,
-mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_speed.json,speed,,,,,,,,,,,,,,1.3108,0.8479,32.0,37.74
+model_name,method,sequence_length,kv_cache_size_mb,baseline_mb,compression_ratio,file_name,benchmark,seq_len,cosine_similarity,top1_match_rate,top5_match_rate,evaluated_seq_len,generated_summary,input_length,context_len,actual_prompt_len,response,success,stride,perplexity,prefill_time_sec,decode_time_sec,generated_tokens,tokens_per_second,designed_bits,calculation_type
+meta-llama/Meta-Llama-3.1-8B,fp16,8192.0,1024.0,289.0,0.28,meta-llama_Meta-Llama-3.1-8B_fp16_compression.json,compression,,,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_fidelity.json,fidelity,1024.0,1.0,100.0,100.0,1024.0,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_longbench.json,longbench,,,,,,"Quantum computing is a technology that leverages the principles of quantum mechanics to perform calculations at speeds exponentially faster than conventional supercomputers, enabling applications in cryptography, drug discovery, and financial modeling.",937.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_niah.json,niah,,,,,,,,8192.0,7605.0,998244353. What is the secret key for HPC cluster access,True,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,,,,,meta-llama_Meta-Llama-3.1-8B_fp16_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.56669282913208,,,,,,
+meta-llama/Meta-Llama-3.1-8B,fp16,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_fp16_speed.json,speed,,,,,,,,,,,,,,1.0482,0.8928,32.0,35.84,,
+meta-llama/Meta-Llama-3.1-8B,fp16,8192.0,1024.0,1024.0,1.0,meta-llama_Meta-Llama-3.1-8B_fp16_theoretical.json,,,,,,,,,,,,,,,,,,,16.0,theoretical
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,8192.0,528.0,289.0,0.55,meta-llama_Meta-Llama-3.1-8B_hyper_quant_compression.json,compression,,,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_fidelity.json,fidelity,1024.0,0.705655574798584,99.8046875,47.0703125,1024.0,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_longbench.json,longbench,,,,,,"if the most well, and the end of the number of the entire new problems, and it's a new problem. 1. A.",937.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_niah.json,niah,,,,,,,,8192.0,7605.0,"1, and the most of the most of the most of the most",False,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,6.685699939727783,,,,,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_hyper_quant_speed.json,speed,,,,,,,,,,,,,,1.0867,0.945,32.0,33.86,,
+meta-llama/Meta-Llama-3.1-8B,hyper_quant,8192.0,160.0,1024.0,6.4,meta-llama_Meta-Llama-3.1-8B_hyper_quant_theoretical.json,,,,,,,,,,,,,,,,,,,2.5,theoretical
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,8192.0,1208.0,289.0,0.24,meta-llama_Meta-Llama-3.1-8B_rotor_quant_compression.json,compression,,,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_fidelity.json,fidelity,1024.0,0.978927731513977,99.90234375,85.01952886581421,1024.0,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_longbench.json,longbench,,,,,,"Quantum Administration, and 2019, and the same, and we can be to you want to the following a problem of the world of the American
+def make a lot of the best for a",937.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_niah.json,niah,,,,,,,,8192.0,7605.0,1. The 1. The 1. The 1.,False,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.7396721839904785,,,,,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_rotor_quant_speed.json,speed,,,,,,,,,,,,,,1.2154,2.2293,32.0,14.35,,
+meta-llama/Meta-Llama-3.1-8B,rotor_quant,8192.0,192.0,1024.0,5.33,meta-llama_Meta-Llama-3.1-8B_rotor_quant_theoretical.json,,,,,,,,,,,,,,,,,,,3.0,theoretical
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,8192.0,528.0,289.0,0.55,meta-llama_Meta-Llama-3.1-8B_turbo_quant_compression.json,compression,,,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_fidelity.json,fidelity,1024.0,0.6904431581497192,99.609375,44.648438692092896,1024.0,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_longbench.json,longbench,,,,,,"Quantum, and a single and it in the function that is a lot of the same or a way, and and and a single, but not much to a slow and 0. 1.",937.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_niah.json,niah,,,,,,,,8192.0,7605.0,"The 1, 1, 1, 1, 1",False,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,6.815441131591797,,,,,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_turbo_quant_speed.json,speed,,,,,,,,,,,,,,1.1102,0.9461,32.0,33.82,,
+meta-llama/Meta-Llama-3.1-8B,turbo_quant,8192.0,192.0,1024.0,5.33,meta-llama_Meta-Llama-3.1-8B_turbo_quant_theoretical.json,,,,,,,,,,,,,,,,,,,3.0,theoretical
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,8192.0,528.0,289.0,0.55,meta-llama_Meta-Llama-3.1-8B_ultra_quant_compression.json,compression,,,,,,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_fidelity.json,fidelity,1024.0,0.970683217048645,99.90234375,85.546875,1024.0,,,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_longbench.json,longbench,,,,,,"Quantum Information and you need to the other other years ago, and 6 3, 2. 1. The C. I had made that he was given by the following a small and",937.0,,,,,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_niah.json,niah,,,,,,,,8192.0,7605.0,1. The 1. The 1. The 1.,False,,,,,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.6921772956848145,,,,,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,8192.0,,,,meta-llama_Meta-Llama-3.1-8B_ultra_quant_speed.json,speed,,,,,,,,,,,,,,1.3639,0.8777,32.0,36.46,,
+meta-llama/Meta-Llama-3.1-8B,ultra_quant,8192.0,128.0,1024.0,8.0,meta-llama_Meta-Llama-3.1-8B_ultra_quant_theoretical.json,,,,,,,,,,,,,,,,,,,2.0,theoretical
+mistralai/Mistral-7B-Instruct-v0.3,fp16,8192.0,1024.0,289.0,0.28,mistralai_Mistral-7B-Instruct-v0.3_fp16_compression.json,compression,,,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_fidelity.json,fidelity,1024.0,1.0,100.0,100.0,1024.0,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_longbench.json,longbench,,,,,,"Quantum computing enables complex calculations at speeds exponentially faster than conventional supercomputers, with key applications in cryptography, drug discovery, and financial modeling.",1038.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_niah.json,niah,,,,,,,,8192.0,7653.0,998244353,True,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,4.875646591186523,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_fp16_speed.json,speed,,,,,,,,,,,,,,0.9921,0.8509,32.0,37.61,,
+mistralai/Mistral-7B-Instruct-v0.3,fp16,8192.0,1024.0,1024.0,1.0,mistralai_Mistral-7B-Instruct-v0.3_fp16_theoretical.json,,,,,,,,,,,,,,,,,,,16.0,theoretical
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,8192.0,528.0,289.0,0.55,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_compression.json,compression,,,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_fidelity.json,fidelity,1024.0,0.9869949817657471,99.51171875,69.80469226837158,1024.0,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_longbench.json,longbench,,,,,,"Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q",1038.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_niah.json,niah,,,,,,,,8192.0,7653.0,,False,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.201521396636963,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_speed.json,speed,,,,,,,,,,,,,,1.113,0.9106,32.0,35.14,,
+mistralai/Mistral-7B-Instruct-v0.3,hyper_quant,8192.0,160.0,1024.0,6.4,mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_theoretical.json,,,,,,,,,,,,,,,,,,,2.5,theoretical
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,8192.0,1208.0,289.0,0.24,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_compression.json,compression,,,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_fidelity.json,fidelity,1024.0,0.9992357492446899,99.90234375,93.9648449420929,1024.0,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_longbench.json,longbench,,,,,,"Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q",1038.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_niah.json,niah,,,,,,,,8192.0,7653.0,,False,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,4.930351257324219,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_speed.json,speed,,,,,,,,,,,,,,1.1575,2.2195,32.0,14.42,,
+mistralai/Mistral-7B-Instruct-v0.3,rotor_quant,8192.0,192.0,1024.0,5.33,mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_theoretical.json,,,,,,,,,,,,,,,,,,,3.0,theoretical
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,8192.0,528.0,289.0,0.55,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_compression.json,compression,,,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_fidelity.json,fidelity,1024.0,0.9905380606651306,99.70703125,75.09765625,1024.0,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_longbench.json,longbench,,,,,,"Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q",1038.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_niah.json,niah,,,,,,,,8192.0,7653.0,,False,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,5.22395133972168,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_speed.json,speed,,,,,,,,,,,,,,1.1313,0.9116,32.0,35.1,,
+mistralai/Mistral-7B-Instruct-v0.3,turbo_quant,8192.0,192.0,1024.0,5.33,mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_theoretical.json,,,,,,,,,,,,,,,,,,,3.0,theoretical
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,8192.0,528.0,289.0,0.55,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_compression.json,compression,,,,,,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_fidelity.json,fidelity,1024.0,0.9994429349899292,99.90234375,94.1601574420929,1024.0,,,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_longbench.json,longbench,,,,,,"Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q",1038.0,,,,,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_niah.json,niah,,,,,,,,8192.0,7653.0,,False,,,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_ppl.json,ppl,2048.0,,,,,,,,,,,512.0,4.907246112823486,,,,,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,8192.0,,,,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_speed.json,speed,,,,,,,,,,,,,,1.31,0.844,32.0,37.92,,
+mistralai/Mistral-7B-Instruct-v0.3,ultra_quant,8192.0,128.0,1024.0,8.0,mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_theoretical.json,,,,,,,,,,,,,,,,,,,2.0,theoretical
