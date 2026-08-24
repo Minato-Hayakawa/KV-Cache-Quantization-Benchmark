@@ -108,9 +108,8 @@ class QuantizedKVCache(DynamicCache):
         q_key = self.key_cache[layer_idx]
         q_value = self.value_cache[layer_idx]
 
+# 最後に key_states と value_states のタプルを返すように修正
         if isinstance(q_key, dict):
-            key_states = self.quantizer.decompress(q_key)
-            value_states = self.quantizer.decompress(q_value)
-            return key_states, value_states
+            return self.quantizer.decompress(q_key), self.quantizer.decompress(q_value)
         else:
             return q_key, q_value
