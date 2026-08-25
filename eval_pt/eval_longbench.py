@@ -1,35 +1,91 @@
 import argparse
 import json
 import os
+import string
 import torch
+from collections import Counter
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from custom_cache import QuantizedKVCache
 
+"""
+LongBench 正式タスク（Qasper）による QA-F1 評価。
+
+旧版の問題点:
+  - 固定の擬似プロンプトを 1 本だけ生成させて「要約文を表示」するだけで、
+    スコアリングが存在しなかった（スカラ指標ではなかった）。
+  - GPU でも float16 を使っており、Llama 3.1 の長文でオーバーフローし得た。
+
+本バージョン:
+  - THUDM/LongBench の qasper（論文読解 QA）から先頭 N サンプルを取り、
+    公式スタイルの QA-F1 で採点した平均値を報告する。
+  - dtype は他の評価スクリプトと揃えて CUDA では bfloat16。
+  - 「簡易ベンチマーク」として小さなサンプル数（デフォルト 10）に限定し、
+    結果は方向性の観察として扱う（統計的厳密性は範囲外）。
+"""
+
+
+# --- LongBench 公式スタイルの QA-F1 スコアラ ---
+def normalize_answer(s: str) -> str:
+    def white_space_fix(text):
+        return " ".join(text.split())
+
+    def remove_punc(text):
+        exclude = set(string.punctuation)
+        return "".join(ch for ch in text if ch not in exclude)
+
+    def lower(text):
+        return text.lower()
+
+    return white_space_fix(remove_punc(lower(s)))
+
+
+def qa_f1_score(prediction: str, ground_truth: str) -> float:
+    prediction_tokens = normalize_answer(prediction).split()
+    ground_truth_tokens = normalize_answer(ground_truth).split()
+    common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
+    num_same = sum(common.values())
+    if num_same == 0:
+        return 0.0
+    precision = num_same / len(prediction_tokens)
+    recall = num_same / len(ground_truth_tokens)
+    return 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+
 
 def get_optimal_device():
-    """実行環境に合わせた最適なデバイスを自動判定"""
     if torch.cuda.is_available():
-        return "cuda"  # NVIDIA および AMD (fs-mi300x)
+        return "cuda"
     elif hasattr(torch, "xpu") and torch.xpu.is_available():
-        return "xpu"   # Intel GPU (qc-pvc)
+        return "xpu"
     else:
-        return "cpu"   # 富岳等 (fx700)
+        return "cpu"
 
 
-def run_longbench_sample(
+def truncate_prompt_left(tokenizer, prompt, max_ctx_tokens, device):
+    """長すぎるコンテキストは先頭側を切り捨てて質問部分を残す"""
+    ids = tokenizer(prompt, return_tensors="pt").input_ids
+    if ids.size(1) > max_ctx_tokens:
+        ids = ids[:, -max_ctx_tokens:]
+    return ids.to(device)
+
+
+def run_longbench(
     model_id="meta-llama/Meta-Llama-3.1-8B",
-    method="rope_aware_tq",
+    method="turbo_quant",
+    num_samples=10,
+    max_ctx_tokens=6144,
+    max_new_tokens=32,
     device=None,
 ):
     if device is None:
         device = get_optimal_device()
 
-    print(f"=== LongBench Quick Eval | Model: {model_id} | Method: {method} | Device: {device} ===")
+    print(f"=== LongBench (Qasper QA-F1) | Model: {model_id} | Method: {method} | Device: {device} ===")
 
-    # CPU環境（富岳など）の場合は、安定性を考慮して float32 を使用
-    torch_dtype = torch.float32 if device == "cpu" else torch.float16
+    torch_dtype = torch.float32 if device == "cpu" else torch.bfloat16
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
     model = (
         AutoModelForCausalLM.from_pretrained(
             model_id, torch_dtype=torch_dtype, device_map=device
@@ -37,62 +93,89 @@ def run_longbench_sample(
         .eval()
     )
 
-    # 模擬タスク: 長文要約
-    context = "Quantum computing relies on qubits instead of classical bits. Qubits leverage superposition and entanglement to execute complex calculations at speeds exponentially faster than conventional supercomputers. Key applications include cryptography, drug discovery, and financial modeling. " * 20
-    instruction = "\nSummarize the core benefits of quantum computing in one concise sentence:"
+    from datasets import load_dataset
+    try:
+        dataset = load_dataset("THUDM/LongBench", "qasper", split="test")
+    except Exception:
+        # 新しいスキーマで失敗した場合は trust_remote_code を試す
+        dataset = load_dataset("THUDM/LongBench", "qasper", split="test", trust_remote_code=True)
 
-    prompt = context + instruction
-    inputs = tokenizer(
-        prompt, return_tensors="pt", max_length=4096, truncation=True
-    ).to(device)
+    num_samples = min(num_samples, len(dataset))
 
-    cache = QuantizedKVCache(method=method)
+    scores = []
+    sample_records = []
+    for i in range(num_samples):
+        sample = dataset[i]
+        context = sample["context"]
+        question = sample["question"]
+        answers = sample["answers"]  # 参照回答（複数）
 
-    with torch.no_grad():
-        output = model.generate(
-            **inputs, past_key_values=cache, max_new_tokens=40, use_cache=True
-        )
+        prompt = context + f"\n\nQuestion: {question}\nAnswer:"
+        input_ids = truncate_prompt_left(tokenizer, prompt, max_ctx_tokens, device)
 
-    generated_text = tokenizer.decode(
-        output[0][inputs.input_ids.shape[1] :], skip_special_tokens=True
-    ).strip()
-    
-    print(f"Generated Summary: {generated_text}\n")
+        cache = QuantizedKVCache(method=method)
+        with torch.no_grad():
+            output = model.generate(
+                input_ids=input_ids,
+                past_key_values=cache,
+                max_new_tokens=max_new_tokens,
+                do_sample=False,
+                use_cache=True,
+            )
+
+        pred = tokenizer.decode(
+            output[0][input_ids.shape[1]:], skip_special_tokens=True
+        ).strip()
+
+        score = max((qa_f1_score(pred, ans) for ans in answers), default=0.0)
+        scores.append(score)
+        sample_records.append({
+            "index": i,
+            "question": question[:200],
+            "prediction": pred[:500],
+            "references": answers[:3],
+            "qa_f1": score,
+        })
+        print(f"  [{i}] F1={score:.3f} | pred: {pred[:80]!r}")
+
+    mean_f1 = sum(scores) / len(scores) if scores else 0.0
+    print(f"\n=== LongBench Qasper mean QA-F1 over {len(scores)} samples: {mean_f1:.4f} ===\n")
 
     return {
-        "generated_summary": generated_text,
-        "input_length": inputs.input_ids.shape[1]
+        "task": "qasper",
+        "num_samples": len(scores),
+        "max_ctx_tokens": max_ctx_tokens,
+        "longbench_qasper_f1": mean_f1,
+        "samples": sample_records,
     }
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Evaluate LongBench Quick Sample for KV Cache Quantization")
-    parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3.1-8B", help="Hugging Face model ID")
-    parser.add_argument("--method", type=str, default="rope_aware_tq", help="Quantization method")
+    parser = argparse.ArgumentParser(description="Evaluate LongBench (Qasper QA-F1) for KV Cache Quantization")
+    parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3.1-8B")
+    parser.add_argument("--method", type=str, default="turbo_quant")
+    parser.add_argument("--num_samples", type=int, default=10)
+    parser.add_argument("--max_ctx_tokens", type=int, default=6144)
     args = parser.parse_args()
 
     target_device = get_optimal_device()
     print(f"Detected Active Device: {target_device}\n")
 
-    metrics = run_longbench_sample(
+    metrics = run_longbench(
         model_id=args.model_name,
         method=args.method,
-        device=target_device
+        num_samples=args.num_samples,
+        max_ctx_tokens=args.max_ctx_tokens,
+        device=target_device,
     )
-    
-    print(f"Final Result [{args.model_name} | {args.method}]: {metrics}")
 
-    # === 他の評価スクリプトと統一された出力先・命名規則による JSON 保存処理 ===
     results_data = {
         "model_name": args.model_name,
         "method": args.method,
         **metrics
     }
 
-    # 出力先ディレクトリの自動作成
     os.makedirs("results/ai-l40s", exist_ok=True)
-
-    # モデル名に含まれるスラッシュをアンダースコアに置換
     safe_model_name = args.model_name.replace("/", "_")
     output_filename = f"results/ai-l40s/{safe_model_name}_{args.method}_longbench.json"
 

@@ -1,72 +1,59 @@
 import argparse
 import json
 import os
+import random
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from custom_cache import QuantizedKVCache
 
+"""
+Needle In A Haystack（複数深度・複数試行の成功率評価）。
+
+旧版の問題点:
+  - 1 サンプル・1 深度（50%）だけで True/False を判定していたため統計的に検定力がなく、
+    さらに当時のキャッシュバグ（decode が全履歴を参照しない）で全手法 False になった。
+
+本バージョン:
+  - 深度 {10%, 30%, 50%, 70%, 90%} × trials_per_depth 回で成功率 (success rate) を報告する。
+  - 各試行で異なる秘密鍵を埋め込み、exact match（応答に鍵が含まれるか）で採点する。
+"""
+
 
 def get_optimal_device():
-    """実行環境に合わせた最適なデバイスを自動判定"""
     if torch.cuda.is_available():
-        return "cuda"  # NVIDIA および AMD (fs-mi300x)
+        return "cuda"
     elif hasattr(torch, "xpu") and torch.xpu.is_available():
-        return "xpu"   # Intel GPU (qc-pvc)
+        return "xpu"
     else:
-        return "cpu"   # CPU
+        return "cpu"
 
 
-def run_niah(
-    model_id="meta-llama/Meta-Llama-3.1-8B",
-    method="rope_aware_tq",
-    context_len=8192,
-    device=None,
-):
-    if device is None:
-        device = get_optimal_device()
-
-    print(
-        f"=== Needle In A Haystack | Model: {model_id} | Context: {context_len} | Method: {method} | Device: {device} ==="
-    )
-
-    # 【重要】Llama 3.1 の長文オーバーフローを防ぐため GPU では bfloat16 を使用
-    torch_dtype = torch.float32 if device == "cpu" else torch.bfloat16
-
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-
-    model = (
-        AutoModelForCausalLM.from_pretrained(
-            model_id, torch_dtype=torch_dtype, device_map=device
-        )
-        .eval()
-    )
-
-    needle = " The secret key for HPC cluster access is 998244353. "
+def build_prompt(tokenizer, context_len, depth, secret_key, seed):
+    """haystack 中の depth 位置に秘密鍵文を挿入したプロンプトを作る"""
+    rng = random.Random(seed)
     haystack_base = "The history of modern computing dates back to the mid-20th century. "
-
     tokens_per_phrase = len(tokenizer.encode(haystack_base, add_special_tokens=False))
     repeat_count = max(1, (context_len - 100) // tokens_per_phrase)
 
-    # ランダム位置（Depth: 50% 付近）に Needle を挿入
-    insert_pos = repeat_count // 2
+    insert_pos = min(repeat_count - 1, max(0, int(repeat_count * depth)))
+    needle = f" The secret key for HPC cluster access is {secret_key}. "
+
     prompt = (
         (haystack_base * insert_pos)
         + needle
         + (haystack_base * (repeat_count - insert_pos))
     )
     prompt += "\nWhat is the secret key for HPC cluster access? Answer:"
+    _ = rng  # seed は将来の拡張用に固定しておく
+    return prompt
 
+
+def run_single_trial(model, tokenizer, prompt, cache, max_new_tokens, device):
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
-    actual_prompt_len = inputs.input_ids.size(1)
-    print(f"Actual Prompt Token Length: {actual_prompt_len}")
+    actual_len = inputs.input_ids.size(1)
 
-    cache = QuantizedKVCache(method=method)
-
-    # --- Prefill ステップ（プロンプト処理と KV キャッシュ構築） ---
     with torch.no_grad():
-        position_ids = torch.arange(0, actual_prompt_len, dtype=torch.long, device=device).unsqueeze(0)
+        position_ids = torch.arange(0, actual_len, dtype=torch.long, device=device).unsqueeze(0)
         outputs = model(
             input_ids=inputs.input_ids,
             position_ids=position_ids,
@@ -74,13 +61,9 @@ def run_niah(
             use_cache=True,
         )
 
-    # 最初の生成トークン（Greedy: argmax）
     next_token = outputs.logits[:, -1, :].argmax(dim=-1, keepdim=True)
-    generated_tokens = [next_token.item()]
-
-    # --- Auto-regressive Decode ステップ（1トークンずつ生成） ---
-    max_new_tokens = 15
-    curr_pos = actual_prompt_len
+    generated = [next_token.item()]
+    curr_pos = actual_len
 
     for _ in range(max_new_tokens - 1):
         if next_token.item() == tokenizer.eos_token_id:
@@ -94,28 +77,85 @@ def run_niah(
                 use_cache=True,
             )
             next_token = outputs.logits[:, -1, :].argmax(dim=-1, keepdim=True)
-            generated_tokens.append(next_token.item())
+            generated.append(next_token.item())
             curr_pos += 1
 
-    response = tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
-    success = "998244353" in response
+    return tokenizer.decode(generated, skip_special_tokens=True).strip()
 
-    print(f"Output   : {response}")
-    print(f"Success  : {success}\n")
-    
+
+def run_niah(
+    model_id="meta-llama/Meta-Llama-3.1-8B",
+    method="turbo_quant",
+    context_len=8192,
+    depths=(0.1, 0.3, 0.5, 0.7, 0.9),
+    trials_per_depth=1,
+    max_new_tokens=16,
+    seed=0,
+    device=None,
+):
+    if device is None:
+        device = get_optimal_device()
+
+    print(
+        f"=== Needle In A Haystack | Model: {model_id} | Context: {context_len} | "
+        f"Method: {method} | Device: {device} ==="
+    )
+
+    torch_dtype = torch.float32 if device == "cpu" else torch.bfloat16
+
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    model = (
+        AutoModelForCausalLM.from_pretrained(
+            model_id, torch_dtype=torch_dtype, device_map=device
+        )
+        .eval()
+    )
+
+    trials = []
+    successes = 0
+    rng = random.Random(seed)
+
+    for depth in depths:
+        for trial in range(trials_per_depth):
+            # 試行ごとに異なる鍵（各試行で推論に依存する値を使う）
+            secret_key = rng.randint(100000000, 999999999)
+            prompt = build_prompt(tokenizer, context_len, depth, secret_key, seed + trial)
+            cache = QuantizedKVCache(method=method)
+
+            response = run_single_trial(model, tokenizer, prompt, cache, max_new_tokens, device)
+            ok = str(secret_key) in response
+            successes += int(ok)
+            trials.append({
+                "depth": depth,
+                "trial": trial,
+                "secret_key": secret_key,
+                "response": response,
+                "success": ok,
+            })
+            print(f"  depth={depth:.0%} trial={trial} key={secret_key} success={ok}")
+
+    n = len(trials)
+    success_rate = successes / n if n > 0 else 0.0
+    print(f"\n=== NIAH success rate: {successes}/{n} = {success_rate*100:.1f}% ===\n")
     return {
         "context_len": context_len,
-        "actual_prompt_len": actual_prompt_len,
-        "response": response,
-        "success": success
+        "depths": list(depths),
+        "trials_per_depth": trials_per_depth,
+        "n_trials": n,
+        "n_success": successes,
+        "niah_success_rate": success_rate,
+        "trials": trials,
     }
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Evaluate Needle In A Haystack (NIAH) for KV Cache Quantization")
-    parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3.1-8B", help="Hugging Face model ID")
-    parser.add_argument("--method", type=str, default="rope_aware_tq", help="Quantization method")
-    parser.add_argument("--context_len", type=int, default=8192, help="Context length for NIAH")
+    parser = argparse.ArgumentParser(description="Evaluate NIAH (multi-depth success rate) for KV Cache Quantization")
+    parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3.1-8B")
+    parser.add_argument("--method", type=str, default="turbo_quant")
+    parser.add_argument("--context_len", type=int, default=8192)
+    parser.add_argument("--trials_per_depth", type=int, default=1)
     args = parser.parse_args()
 
     target_device = get_optimal_device()
@@ -125,22 +165,17 @@ if __name__ == "__main__":
         model_id=args.model_name,
         method=args.method,
         context_len=args.context_len,
-        device=target_device
+        trials_per_depth=args.trials_per_depth,
+        device=target_device,
     )
-    
-    print(f"Final Result [{args.model_name} | {args.method}]: {metrics}")
 
-    # === 他の評価スクリプトと統一された出力先・命名規則による JSON 保存処理 ===
     results_data = {
         "model_name": args.model_name,
         "method": args.method,
         **metrics
     }
 
-    # 出力先ディレクトリの自動作成
     os.makedirs("results/ai-l40s", exist_ok=True)
-
-    # モデル名に含まれるスラッシュをアンダースコアに置換
     safe_model_name = args.model_name.replace("/", "_")
     output_filename = f"results/ai-l40s/{safe_model_name}_{args.method}_niah.json"
 

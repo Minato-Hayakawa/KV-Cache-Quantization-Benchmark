@@ -5,24 +5,45 @@
 
 **English** | [日本語](README.ja.md)
 
-A lightweight, standalone C++ micro-benchmark framework for **KV-Cache Quantization Techniques** in Large Language Models (LLMs).
+A lightweight benchmark framework for **KV-Cache Quantization Techniques** in Large Language Models (LLMs).
 
-This project compares state-of-the-art rotational, rate-distortion-optimal, and hardware-native quantization methods drawn from recent 2026 literature: **TurboQuant**, **RotorQuant**, **HyperQuant**, and **UltraQuant**.
+It contains simplified PyTorch re-implementations **inspired by** four recent methods — **TurboQuant**, **RotorQuant**, **HyperQuant**, and **UltraQuant** — plus a standalone C++ micro-benchmark kernel suite.
 
----
-
-## 🌟 Methods Compared
-
-| Method | Key Concept | Rotation Overhead | Target Bit-width |
-| :--- | :--- | :---: | :---: |
-| **TurboQuant** | Cartesian → polar decomposition (PolarQuant) + QJL 1-bit sign correction | High ($O(d^2)$) | 3-bit / 8-bit |
-| **RotorQuant** | Clifford-algebra rotors (Cl(3,0)) replacing full orthogonal rotation | Low ($O(d)$) | 3-bit / 8-bit |
-| **HyperQuant** | Unified rate-distortion-optimal pipeline; RHT + lattice quantization ($A_2$ /$D_4$ / $E_8$ ) + Rice entropy coding | Medium | 1.7–2 bps |
-| **UltraQuant** | Walsh–Hadamard rotation, QJL removed, native FP4 (E2M1) + UE8M0 block scaling for hardware-direct decode | Low | 4-bit |
+> ⚠️ **Scope disclaimer**: the algorithms here are *simplified re-implementations*, not faithful reproductions of the papers (see [Scope & Limitations](#-scope--limitations)). Numbers in *Related Work* are **from the original papers**, not this repository's results.
 
 ---
 
-## 📚 Related Work
+## 🌟 Methods (simplified re-implementations)
+
+| Method | Paper's idea | This repo implements | Paper's claimed bit-width | This impl's `designed_bits` |
+| :--- | :--- | :--- | :---: | :---: |
+| **TurboQuant** | Polar decomposition + QJL | Random orthogonal rotation + per-token abs-max uniform quantization | 3-bit / 8-bit | 3.0 |
+| **RotorQuant** | Clifford-algebra rotors | Cl(3,0) 3D-block rotor rotation + per-3D-block scaling (random fixed rotors, no calibration) | 3-bit / 8-bit | 3.0 |
+| **HyperQuant** | RHT + lattice + Rice coding | Orthogonal Hadamard + **D4 lattice projection** (Rice entropy coding **not** implemented) | 1.7–2 bps | 3.0 |
+| **UltraQuant** | FP4 hardware-direct decode | Walsh–Hadamard + FP4 (E2M1) grid mapping, per-token scale | 4-bit | 4.0 |
+
+`designed_bits` is **derived from each implementation's quantization levels** (auto-computed, not hand-set). Sub-4-bit claims *as rates* (bps) require entropy coding, which is out of scope here — so despite the HyperQuant paper operating at 1.7–2 bps, this implementation can only achieve 3 bit/scalar.
+
+---
+
+## 🔭 Scope & Limitations
+
+What this benchmark **can** claim (after the 2026-08 fixes):
+
+- **Functional / simulated-quantization quality evaluation** — quantize→dequantize math is applied as designed, and quality metrics (PPL, logit/KV fidelity, NIAH success rate, LongBench QA-F1) reflect the implementations' actual precision loss.
+- **Throughput of the quantization layer itself** — i.e., the overhead the quantizer adds on top of fp16 attention.
+
+What it **cannot** claim (by design):
+
+- **Decode speedups from quantization** — attention always runs on dequantized full-precision tensors; no fused kernel means no memory-bandwidth benefit. Speed numbers are overhead measurements only.
+- **Measured memory savings matching designed bit-widths** — stored tensors are int8 (no bit-packing), so actual stored bytes do not reflect `designed_bits`. Memory is reported as an **analytical footprint** (data at designed bits + modeled metadata), not a VRAM measurement.
+- **Paper-faithful reproduction** — PolarQuant/QJL (TurboQuant), rotor calibration (RotorQuant), Rice coding (HyperQuant), UE8M0 block scaling & MFMA integration (UltraQuant) are not implemented.
+- **Pre-RoPE (KIVI-style) quantization** — this cache receives post-RoPE keys; pre-RoPE schemes require model-surgery outside this framework.
+- **Strong statistical claims** — small sample sizes by design; results are directional observations.
+
+---
+
+## 📚 Related Work (paper numbers — independent of this repo)
 
 ### TurboQuant (Google Research, ICLR 2026)
 A two-stage compression scheme:
@@ -107,27 +128,30 @@ Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 | ai-l40s | NVIDIA (L40S) |
 
 ### Models evaluated
-- Meta-Llama 3.1 8B
-- Mistral 7B v0.3
+- Meta-Llama 3.1 8B (`meta-llama/Meta-Llama-3.1-8B`)
+- Mistral 7B v0.3 (`mistralai/Mistral-7B-Instruct-v0.3`)
 
-### What we measure
-- **Per-hardware execution speed & speedup** — prefill time and token generation speed (tokens/sec) at an 8K context length.
-  → `eval_pt/eval_speed.py`
-- **Compression ratio** at an 8K context length, against an FP16 baseline of 289 MB, measured at 2-bit, 4-bit, and 8-bit — the actual KV-cache memory footprint (in bytes) is extracted and compared to the FP16 baseline.
-  → `eval_pt/eval_compression.py`
-- **Accuracy degradation**, evaluated on:
-  - **LongBench** — long-document summarization, QA, and code completion across many tasks → `eval_pt/eval_longbench.py`
-  - **Needle in a Haystack (NIAH)** — retrieval accuracy for specific facts buried in long context → `eval_pt/eval_niah.py`
-- **Attention fidelity** — cosine similarity and Top-1/Top-5 token match rate, comparing quantized attention output directly against the original FP16 output.
-  → `eval_pt/eval_fidelity.py`
-- **Perplexity** — how natural/coherent generated text remains after quantization.
-  → `eval_pt/eval_ppl.py`
+### 0. Sanity gate (regression test) — `eval_pt/sanity_check.py`
+Runs **first**, and the whole evaluation aborts if it fails:
+1. **`passthrough`** (an identity "quantizer" that stores raw tensors) must reproduce fp16 generation **token-for-token** — this validates the cache plumbing (accumulation, concatenation, full-history return) in isolation from quantization error. This test would have caught the historical decode bug immediately.
+2. **7-bit high-bit-width** quantizers must produce near-lossless generation — validates quantizer round-trip math.
+
+### Quality metrics (functional / simulated quantization)
+- **Perplexity** — WikiText-2, window 2048 / stride 512 → `eval_pt/eval_ppl.py`
+- **Logit fidelity** — cosine similarity, Top-1 match, Top-5 **overlap** rate of *final logits* against the fp16 run (seq 1024) → `eval_pt/eval_fidelity.py`
+- **KV fidelity** — cosine similarity and relative L2 error of the cached K/V vectors themselves vs fp16 (isolates quantization error from model nonlinearity) → same script
+- **NIAH (Needle In A Haystack)** — success **rate** over depths {10/30/50/70/90%} × 1 trial at 8K context, greedy 16-token decode, exact key match → `eval_pt/eval_niah.py`
+- **LongBench** — real LongBench **Qasper** QA task, first 10 samples, official-style token F1, context truncated to 6144 from the left → `eval_pt/eval_longbench.py`
+
+### Systems metrics (carefully framed)
+- **Analytical KV footprint** — per-method `designed_bits` (derived from the implementation), data bytes at that bit-width, plus implementation-faithful metadata (per-token / per-3D-block scales stored as fp32) → `eval_pt/theoretical_compression.py` (GPU-free) and `eval_pt/eval_compression.py` (adds actual stored bytes of the int8 simulation).
+- **Speed** — prefill time and decode tokens/sec, median of 3 runs after 1 warmup, 8K context, 32 generated tokens. **Interpretation: quantization-overhead-inclusive speed only; no speedup claims.** → `eval_pt/eval_speed.py`
 
 ---
 
-## 📊 Benchmark Metrics (micro-benchmark)
+## 📊 Benchmark Metrics (C++ micro-benchmark)
 
-In addition to the model-level evaluations above, the C++ micro-benchmark itself reports:
+The standalone C++ micro-benchmark reports:
 
 1. **Encode & Decode Latency (µs)** — measured per key-vector using high-resolution hardware timers.
 2. **Cosine Similarity** — directional accuracy of reconstructed KV vectors against the FP32 baseline.
@@ -138,33 +162,43 @@ In addition to the model-level evaluations above, the C++ micro-benchmark itself
 ## 📈 Experimental Results
 
 Models: `meta-llama/Meta-Llama-3.1-8B`, `mistralai/Mistral-7B-Instruct-v0.3`
-Methods: fp16 (baseline), hyper_quant, rotor_quant, turbo_quant, ultra_quant
+Methods: fp16 (baseline), turbo_quant, rotor_quant, hyper_quant, ultra_quant
 
-Raw data is available in `summary_results.csv`.
+> 🗂️ **Validity map**: the compression/speed/NIAH/LongBench numbers from earlier runs were **invalidated** (see [Fix History & Retractions](#%EF%B8%8F-fix-history--retractions)). The tables below show either results unaffected by those bugs, or analytically-derived values.
 
-### 1. Compression ratio — designed bit-width vs. measured memory (8K context)
+### 1. KV cache footprint — analytical (8K context, derived values)
 
-Theoretical designed bit-width vs. the actually measured KV-cache size, against the FP16 baseline (289 MB). Measured values were identical for both models.
+Both models share the same KV geometry (32 layers × 8 KV heads × 128 head_dim ⇒ 1,024 MB at fp16 @ 8,192 tokens), so a single table applies to both. Bit-widths are derived from the implementations; metadata is modeled from each implementation's actual scale storage (fp32).
 
-| Method | Designed bits | Theoretical KV size | Theoretical compression (vs FP16) | Measured KV-cache size | Ratio to baseline |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| fp16 | 16.0 bit | 1024.0 MB | 1.00× | 1024.0 MB | 0.28 |
-| hyper_quant | 2.5 bit | 160.0 MB | 6.40× | 528.0 MB | 0.55 |
-| rotor_quant | 3.0 bit | 192.0 MB | 5.33× | 1208.0 MB | 0.24 ⚠️ larger than FP16 |
-| turbo_quant | 3.0 bit | 192.0 MB | 5.33× | 528.0 MB | 0.55 |
-| ultra_quant | 2.0 bit | 128.0 MB | 8.00× | 528.0 MB | 0.55 |
+| Method | designed_bits | Data (MB) | Metadata (MB) | **Designed footprint (MB)** | Compression vs fp16 |
+| :--- | :---: | ---: | ---: | ---: | ---: |
+| fp16 | 16.0 | 1024.0 | 0.0 | 1024.0 | 1.00× |
+| turbo_quant | 3.0 | 192.0 | 16.0 | 208.0 | **4.92×** |
+| hyper_quant | 3.0 | 192.0 | 16.0 | 208.0 | **4.92×** |
+| rotor_quant | 3.0 | 192.0 | 704.0 | 896.0 | **1.14×** |
+| ultra_quant | 4.0 | 256.0 | 16.0 | 272.0 | **3.76×** |
 
-*The theoretical KV size and compression ratio are taken from the `calculation_type = theoretical` records in `summary_results.csv` — ideal bit-width-only values (16 bit ÷ designed bits) that exclude implementation overhead such as codebooks, rotation matrices, and metadata.*
+- hyper_quant shows the same designed footprint as turbo_quant because **Rice entropy coding is not implemented** — without it, the paper's 1.7–2 bps rates are unreachable here.
+- rotor_quant's **per-3D-block fp32 scales** make its metadata (704 MB) larger than its 3-bit data (192 MB) — an implementation-structure insight: fine-grained scaling destroys the headline compression.
 
-> ⚠️ Although these methods promise large reductions (several-fold) at 2.0–3.0 bits on paper, in the real (PyTorch) runtime the measured memory footprints of hyper_quant / turbo_quant / ultra_quant converged to exactly 528.0 MB, and rotor_quant came in at 1208.0 MB — consuming *more* memory than the FP16 baseline (1024 MB).
+For reference, the simulation's *actual stored bytes* (int8 + fp32 scales, no packing — measured deterministically on the older runs, and equally valid for the fixed code) are: fp16 1,024 MB; turbo/hyper/ultra 528 MB; rotor 1,208 MB. Identical across bit-widths **by construction** (everything is stored as int8), which is exactly why bit-width claims must come from the analytical table above, not from stored bytes.
 
 ![Compression comparison](plots/compression_comparison.png)
 
-### 2. Attention output fidelity
+### 2. Quality — PPL and logit fidelity (pre-fix numbers, still valid)
 
-Cosine similarity and Top-1/Top-5 token match rate of quantized attention output against the original FP16 output.
+These evaluations are single-forward (prefill-style) runs and were **not affected** by the decode cache bug, so the earlier measurements remain usable. Two caveats from the fixes: fidelity is measured in **final-logit space** (not attention outputs), and Top-5 is an **overlap rate**, not a hit rate.
 
-| Model | Method | Cosine similarity | Top-1 match (%) | Top-5 match (%) |
+**Perplexity (WikiText-2, window 2048 / stride 512 — lower is better)**
+
+| Model | fp16 | hyper_quant | rotor_quant | turbo_quant | ultra_quant |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Meta-Llama-3.1-8B | 5.5667 | 6.6857 (degraded) | 5.7397 (mostly kept) | 6.8154 (degraded) | 5.6922 (mostly kept) |
+| Mistral-7B-Instruct-v0.3 | 4.8756 | 5.2015 | 4.9304 | 5.2240 | 4.9072 |
+
+**Logit fidelity (seq 1024) — vs fp16 logits**
+
+| Model | Method | Logit cosine | Logit Top-1 (%) | Logit Top-5 overlap (%) |
 | :--- | :--- | :--- | :--- | :--- |
 | Meta-Llama-3.1-8B | fp16 | 1.000000 | 100.00 | 100.00 |
 | | hyper_quant | 0.705656 | 99.80 | 47.07 |
@@ -177,77 +211,51 @@ Cosine similarity and Top-1/Top-5 token match rate of quantized attention output
 | | turbo_quant | 0.990538 | 99.71 | 75.10 |
 | | ultra_quant | 0.999443 | 99.90 | 94.16 |
 
-> ⚠️ On Mistral-7B every method keeps a very high cosine similarity of 0.986–0.999. On Llama-3.1-8B, however, hyper_quant and turbo_quant collapse to 0.69–0.70, and their Top-5 match rates fall below half (44–47%). Robustness differences caused by model architecture (GQA etc.) are clearly visible.
-
-### 3. Perplexity (PPL — lower is better)
-
-| Model | fp16 | hyper_quant | rotor_quant | turbo_quant | ultra_quant |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| Meta-Llama-3.1-8B | 5.5667 | 6.6857 (degraded) | 5.7397 (mostly kept) | 6.8154 (degraded) | 5.6922 (mostly kept) |
-| Mistral-7B-Instruct-v0.3 | 4.8756 | 5.2015 | 4.9304 | 5.2240 | 4.9072 |
-
-> ⚠️ rotor_quant and ultra_quant show only a minimal PPL increase, whereas hyper_quant and turbo_quant clearly degrade PPL.
-
 ![Perplexity comparison](plots/ppl_comparison.png)
 
-### 4. Speed & throughput (sequence length 8192)
+> Observation: on Mistral-7B every method holds high logit fidelity, while on Llama-3.1-8B the 3-bit per-token-scaled methods (hyper/turbo) degrade much more (0.69–0.70 cos). rotor/ultra stay high — consistent with their finer scaling (per-3D-block / 4-bit grid). Susceptibility clearly depends on the base model.
 
-| Model | Method | Prefill time (s) | Throughput (tokens/sec) |
-| :--- | :--- | :--- | :--- |
-| Meta-Llama-3.1-8B | fp16 | 1.048 | 35.84 |
-| | hyper_quant | 1.087 | 33.86 |
-| | rotor_quant | 1.215 | 14.35 ⚠️ |
-| | turbo_quant | 1.110 | 33.82 |
-| | ultra_quant | 1.364 | 36.46 |
-| Mistral-7B-Instruct-v0.3 | fp16 | 0.992 | 37.61 |
-| | hyper_quant | 1.113 | 35.14 |
-| | rotor_quant | 1.158 | 14.42 ⚠️ |
-| | turbo_quant | 1.131 | 35.10 |
-| | ultra_quant | 1.310 | 37.92 |
+### 3. Results pending re-run after the fixes
 
-> ⚠️ On top of its bloated measured memory, rotor_quant carries a very heavy penalty: throughput halves to around 14 tokens/sec (normally ~35).
+The following were fully invalidated by the cache bug and are **re-measured** with the fixed harness (see `hpc_scripts/run_all_evals_ai_l40s.sh`):
 
-![Speed comparison](plots/speed_comparison.png)
-
-### 5. Long-context retrieval (NIAH: Needle In A Haystack)
-
-| Method | Meta-Llama-3.1-8B | Mistral-7B-Instruct-v0.3 |
-| :--- | :--- | :--- |
-| fp16 | ✅ True | ✅ True |
-| hyper_quant | ❌ False | ❌ False |
-| rotor_quant | ❌ False | ❌ False |
-| turbo_quant | ❌ False | ❌ False |
-| ultra_quant | ❌ False | ❌ False |
-
-> ⚠️ Every quantized method evaluated failed the NIAH task (sequence length 8192), showing that extreme low-bit quantization is a shared bottleneck for preserving long-context accuracy.
+- **NIAH** → multi-depth success rate (0–100%), replacing the old single-sample True/False. ❗ The old "all methods False" conclusion is **retracted** — it was caused by the harness, not the quantizers.
+- **LongBench** → Qasper QA-F1 average over 10 samples, replacing the old un-scored summary print-out.
+- **Speed** → median prefill/decode times, interpreted strictly as quantization-layer overhead. ❗ The old speed table (incl. ultra_quant beating fp16) is **retracted** — decode comparisons were not apples-to-apples.
 
 ---
 
 ## 🧠 Discussion
 
-### 1. A large gap between "theoretical compression" and "measured overhead"
+### 1. Compression must be discussed at designed bits + metadata, not stored bytes
 
-**Converging — and broken — measured memory**: although designed for large (6–8×) memory savings at 2.0–3.0 bits in theory, most methods (Hyper / Turbo / Ultra) land at exactly 528.0 MB in a real PyTorch environment. At short contexts (8192), fixed Python/PyTorch-side overhead and allocator behavior dominate over the tensor size itself.
+Because the simulation stores everything as int8 + fp32 scales, all methods previously "measured" 528 MB regardless of bit-width — a tautology of the storage format, not a finding. The analytical view is the honest one: turbo/hyper ≈ 4.9×, ultra ≈ 3.8×, and rotor collapses to ≈ 1.1× because per-3D-block fp32 scales outgrow the 3-bit payload. Real hardware numbers would further require true bit-packing.
 
-**RotorQuant's anomalous bloat**: rotor_quant measured 1208.0 MB, exceeding even the FP16 baseline (1024 MB). Conversion/management tensors (e.g. the rotors) consume significant extra memory at initialization and runtime — a harsh real-world engineering lesson that theoretically low bit-widths can be reversed by implementation overhead.
+### 2. Quantization robustness differs by base model (GQA etc.)
 
-### 2. Quantization robustness differs by model architecture (GQA, etc.)
+The surviving quality metrics (PPL, logit fidelity) consistently show Llama-3.1-8B suffering more than Mistral-7B under the 3-bit per-token methods — architecture-dependent robustness is real, and there is no universally "safe" method among these simplified implementations.
 
-Every method maintained a high cosine similarity of 0.986–0.999 on Mistral-7B, whereas hyper_quant / turbo_quant collapsed to 0.69–0.70 on Llama-3.1-8B. Susceptibility to very-low-bit quantization varies widely with the attention mechanism and KV-head count (e.g. differences in Grouped-Query Attention design). There is no universally "safe" quantization method — dependence on the base-model architecture is extremely high.
+### 3. What this benchmark deliberately does not claim
 
-### 3. Speed (throughput) vs. memory trade-off
-
-rotor_quant holds up well on output quality (PPL 5.74, cosine similarity 0.979), but its throughput falls to 14.35 tokens/sec — less than half the usual ~35. The dynamic rotation transform becomes a heavy bottleneck in the compute graph, exposing a serious practical dilemma: a memory-efficient, high-fidelity method is still hard to adopt in production serving if it halves inference throughput.
-
-### 4. All methods fail on long context (NIAH) — open challenges
-
-At sequence length 8192, every quantized method failed the NIAH (needle retrieval) task without exception. Even though "local fluency" metrics such as cosine similarity and PPL are largely preserved, extreme low-bit quantization destroys the long-range dependencies and fine-grained information held in the KV cache — suggesting a fatal weakness for practical tasks such as RAG and long-document dialogue.
+No decode-speedup claims (no fused kernels), no production memory claims (analytical footprint only), no paper-reproduction claims (simplified algorithms), and no strong statistical claims (small samples). The framework's value is in **functional quality comparison under simulated quantization**, which requires the cache plumbing to be exactly correct — hence the `sanity_check.py` gate.
 
 ---
 
 ## ✅ Conclusion
 
-Our evaluation data clearly demonstrates a deep gap between "on-paper theory" (bit-width-based headline numbers) and "reality in the field" (memory, speed, and long-context robustness). When adopting KV-cache quantization in production services, one must look beyond compression ratio alone and carefully assess per-model compatibility, extra memory overhead, and performance degradation on long-context tasks.
+Re-defined goal of this benchmark: *a functional, mathematically honest comparison of simplified KV-cache quantizers in quality terms (PPL, fidelity, retrieval, QA), with memory expressed as an analytical footprint and speed recorded as quantization overhead — with no claims beyond what a kernel-free simulation can support.*
+
+---
+
+## ♻️ Fix History & Retractions (2026-08)
+
+Previous results contained serious harness bugs. Documented for transparency:
+
+1. **Cache `update()` returned only the latest chunk** (dequantized), not full history — so during decode every quantized method attended to only the newest token. → *Invalidates*: NIAH table ("all False"), LongBench outputs (degenerate text), speed table (decode was not comparable; ultra beating fp16). **These conclusions are retracted.**
+2. **RotorQuant concatenation condition** matched only dicts containing a `"quantized"` key; rotor uses `"quantized_main"`, so its decode history was broken even beyond bug 1.
+3. **Compression baseline 289 MB was a hardcoded constant** in an older script version, and the reported "ratio" was `289/measured` (inverted semantics) — replaced by stored-bytes + analytical footprint.
+4. **`designed_bits` were hand-set** (ultra=2.0 etc.) instead of derived — now auto-derived from each quantizer's levels (ultra=4.0).
+5. Additional fixes: D4 lattice now actually applied in HyperQuant's store path (it was dead code), quantizers are seed-fixed (previously non-deterministic across runs), fidelity metrics correctly labeled as logit-space, NIAH/LongBench upgraded to scored protocols.
 
 ---
 
@@ -298,33 +306,30 @@ kvq-bench/
 │   │   └── lattice_quant.hpp  # HyperQuant (E8/D4 lattice)
 │   └── bench_main.cpp
 │
-├── core_pt/                   # 2. PyTorch / CUDA custom kernels & cache
+├── core_pt/                   # 2. PyTorch simplified quantizers (simulated quantization)
 │   ├── quantizers/
-|   |   ├── __init__.py
-│   │   ├── base.py
-│   │   ├── hyper_quant.py     # RHT + lattice + Rice coding
-|   |   ├── rotor_quant.py
-│   │   ├── turbo_quant.py
-│   │   └── ultra_quant.py     # WHT + FP4 direct mapping
-│   └── kernels/                # (optional) Triton/CUDA kernels
+│   │   ├── __init__.py
+│   │   ├── base.py            # base class (designed_bits attribute)
+│   │   ├── turbo_quant.py     # rotation + uniform (simplified)
+│   │   ├── rotor_quant.py     # 3D-block rotors (simplified)
+│   │   ├── hyper_quant.py     # Hadamard + D4 lattice (no Rice coding)
+│   │   └── ultra_quant.py     # WHT + FP4 (E2M1) grid
+│   └── kernels/               # (optional) Triton/CUDA kernels
 │
-├── eval_pt/                    # 3. Experiment & automated evaluation scripts
-│   ├── custom_cache.py        # DynamicCache interface
-│   ├── eval_speed.py           # Prefill time & tokens/sec at 8K context
-│   ├── eval_compression.py     # KV-cache memory footprint vs. FP16 baseline
-│   ├── eval_longbench.py       # LongBench evaluation
-│   ├── eval_niah.py            # Needle in a Haystack
-│   ├── eval_fidelity.py        # Attention fidelity (cosine, Top-1/5) vs. FP16
-│   └── eval_ppl.py             # Perplexity
+├── eval_pt/                    # 3. Model-level evaluation (Hugging Face)
+│   ├── custom_cache.py        # QuantizedKVCache (+ passthrough for sanity)
+│   ├── sanity_check.py        # ★ regression gate: aborts eval if plumbing breaks
+│   ├── eval_ppl.py            # Perplexity (WikiText-2, 2048/512)
+│   ├── eval_fidelity.py       # Logit + KV fidelity
+│   ├── eval_niah.py           # Needle in a Haystack (multi-depth success rate)
+│   ├── eval_longbench.py      # LongBench Qasper QA-F1
+│   ├── eval_speed.py          # prefill/decode speed, median (overhead only)
+│   ├── eval_compression.py    # stored bytes + analytical footprint
+│   └── theoretical_compression.py  # GPU-free analytical footprint
 │
 └── hpc_scripts/                # 4. HPC (Slurm) job scripts
-    └── run_all_evals_ai_l40s.sh # Distributed evaluation on ai-l40s (NVIDIA L40S)
+    └── run_all_evals_ai_l40s.sh  # sanity → footprint → ppl → fidelity → niah → longbench → speed
 ```
-
-* **`core_cpp/`** — the standalone C++17 micro-benchmark (encode/decode latency, cosine similarity, attention logit MAE) referenced in the Quick Start above; header-only quantizer implementations plus `bench_main.cpp` as the driver.
-* **`core_pt/`** — Python/PyTorch implementations wired into a `DynamicCache`-style interface for use inside an actual model's generation loop, including optional Triton/CUDA kernels.
-* **`eval_pt/`** — model-level evaluation scripts (speed, compression, LongBench, NIAH, attention fidelity, perplexity) corresponding to the *Experimental Setup* section above.
-* **`hpc_scripts/`** — job script for running the benchmark on the ai-l40s GPU cluster via `run_l40s_cluster.sbatch`.
 
 ---
 

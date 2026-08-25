@@ -5,24 +5,45 @@
 
 [English](README.md) | **日本語**
 
-大規模言語モデル（LLM）の **KVキャッシュ量子化技術** を比較するための、軽量でスタンドアロンなC++マイクロベンチマークフレームワークです。
+大規模言語モデル（LLM）の **KVキャッシュ量子化技術** を比較するためのベンチマークフレームワークです。
 
-2026年の最新文献に基づく、回転行列を用いる手法・レート歪み最適化手法・ハードウェアネイティブ手法などを比較します：**TurboQuant**、**RotorQuant**、**HyperQuant**、**UltraQuant**。
+**TurboQuant**・**RotorQuant**・**HyperQuant**・**UltraQuant** の4手法に着想を得た **簡易PyTorch再実装** と、スタンドアロンのC++マイクロベンチマークを含みます。
 
----
-
-## 🌟 比較対象の手法
-
-| 手法 | 主なアイデア | 回転オーバーヘッド | 対象ビット幅 |
-| :--- | :--- | :---: | :---: |
-| **TurboQuant** | デカルト座標→極座標変換（PolarQuant）＋ QJLによる1ビット符号補正 | 高（$O(d^2)$） | 3-bit / 8-bit |
-| **RotorQuant** | Clifford代数（Cl(3,0)）のロータでフル直交回転を置き換え | 低（$O(d)$） | 3-bit / 8-bit |
-| **HyperQuant** | RHT＋格子量子化（$A_2$/$D_4$/$E_8$）＋Riceエントロピー符号化による統一パイプライン | 中 | 1.7〜2 bps |
-| **UltraQuant** | Walsh-Hadamard回転、QJL除去、ネイティブFP4（E2M1）＋UE8M0ブロックスケーリング | 低 | 4-bit |
+> ⚠️ **適用範囲の注意**：本リポジトリのアルゴリズムは*簡易再実装*であり、論文の忠実な再現ではありません（[Scope & Limitations](#-scope--limitations-適用範囲と限界)参照）。Related Work の数値は**各論文のもの**で、本リポジトリの実験結果ではありません。
 
 ---
 
-## 📚 Related Work（関連研究）
+## 🌟 比較対象の手法（簡易再実装）
+
+| 手法 | 論文のアイデア | 本実装の範囲 | 論文のビット幅 | 本実装の `designed_bits` |
+| :--- | :--- | :--- | :---: | :---: |
+| **TurboQuant** | 極座標分解＋QJL | ランダム直交回転＋per-token abs-max 一様量子化 | 3-bit / 8-bit | 3.0 |
+| **RotorQuant** | Clifford代数ロータ | Cl(3,0) の3Dブロック回転＋3Dブロック毎スケール（ロータはランダム固定・キャリブレーション無し） | 3-bit / 8-bit | 3.0 |
+| **HyperQuant** | RHT＋格子量子化＋Rice符号化 | 直交Hadamard＋**D4格子射影**（Rice符号化は未実装） | 1.7〜2 bps | 3.0 |
+| **UltraQuant** | FP4ハードウェア直結デコード | Walsh-Hadamard＋FP4(E2M1)グリッド、per-tokenスケール | 4-bit | 4.0 |
+
+`designed_bits` は各実装の量子化レベル数から**自動導出**した論理ビット幅です（手書き定数ではない）。エントロピー符号化が無い限り bps としての 4bit 未満の主張はできないため、HyperQuant 論文のような 1.7〜2 bps は本実装では達成し得ません（3 bit/scalar）。
+
+---
+
+## 🔭 Scope & Limitations（適用範囲と限界）
+
+このベンチマークが**主張できること**（2026-08 修正後）:
+
+- **機能評価（シミュレーション量子化としての品質評価）**：quantize→dequantize を設計通りに適用し、PPL・logit/KV忠実度・NIAH成功率・LongBench QA-F1 などの品質指標で実装の精度劣化を測る。
+- **量子化処理自体のオーバーヘッド**：fp16 attention に対して量子化器が乗せる追加コストの測定。
+
+**主張できないこと**（設計上の制約）:
+
+- **量子化によるデコード高速化**：attention は常にデコードされた高精度テンソルで実行され、fused kernel が無いためメモリ帯域削減の恩恵は受けない。速度数値はオーバーヘッド測定に過ぎない。
+- **実測での設計ビット相当のメモリ削減**：保存形式は int8（パッキング無し）のため実占有は designed_bits を反映しない。メモリは**解析的 footprint**（設計ビットのデータ＋実装メタデータのモデル化）として報告する。
+- **論文の忠実な再現**：PolarQuant/QJL（TurboQuant）、ロータ最適化（RotorQuant）、Rice符号化（HyperQuant）、UE8M0ブロックスケール・MFMA直結（UltraQuant）は未実装。
+- **RoPE前量子化（KIVI系）**：本キャッシュは post-RoPE の K を受け取る。RoPE前スキームはモデル改造が必要で枠組み外。
+- **統計的に強い主張**：サンプル数は小規模。結果は傾向の観察として扱う。
+
+---
+
+## 📚 Related Work（論文の数値です。本リポジトリの実験結果ではありません）
 
 ### TurboQuant（Google Research、ICLR 2026）
 2段階の圧縮を行う手法です：
@@ -109,27 +130,28 @@ TurboQuantは「4-bitで高精度」を達成した画期的なアルゴリズ�
 | ai-l40s | NVIDIA（L40S） |
 
 ### 使用するLLM
-- Meta-Llama 3.1 8B
-- Mistral 7B v0.3
+- Meta-Llama 3.1 8B（`meta-llama/Meta-Llama-3.1-8B`）
+- Mistral 7B v0.3（`mistralai/Mistral-7B-Instruct-v0.3`）
 
-### 実験内容
-- **各ハードウェアでの実行速度＆速度向上**：8Kコンテキストでのプレフィル時間やトークン生成速度（トークン毎秒）を計測。
-  → `eval_pt/eval_speed.py`
-- **圧縮率**：8Kコンテキストにおいて、FP16ベースライン（289MB）を基準に、2ビット・4ビット・8ビットで検証。実際のKVキャッシュのメモリサイズをバイト単位で抽出し、FP16ベースラインに対する圧縮率を算出。
-  → `eval_pt/eval_compression.py`
-- **精度劣化＆各種タスク評価**：
-  - **LongBench**：多タスク評価 → `eval_pt/eval_longbench.py`
-  - **Needle In A Haystack（NIAH）**：長文中の特定情報検索精度 → `eval_pt/eval_niah.py`
-- **注意機構の忠実度**（コサイン類似度、Top-1/Top-5トークン一致率）：オリジナルのFP16と量子化後のアテンション出力を直接比較。
-  → `eval_pt/eval_fidelity.py`
-- **Perplexity**（文章の自然さ・難解度）：
-  → `eval_pt/eval_ppl.py`
+### 0. Sanity gate（回帰テスト） — `eval_pt/sanity_check.py`
+評価の最初に実行し、失敗したら全体を中止します：
+1. **passthrough**（量子化を行わない疑似量子化器）が fp16 と**トークン完全一致**すること → キャッシュ配管（蓄積・連結・全履歴返却）の正当性を量子化誤差から分離して検証。過去の decode キャッシュバグはこのテストで即検出できたはずのものです。
+2. **7bit の高ビット幅**でほぼロスレスな生成になること → 量子化往復の数式検証。
+
+### 品質指標（機能評価 = シミュレーション量子化）
+- **Perplexity**：WikiText-2、window 2048 / stride 512 → `eval_pt/eval_ppl.py`
+- **Logit 忠実度**：最終 logits のコサイン類似度・Top-1一致率・Top-5**重なり率**（seq 1024） → `eval_pt/eval_fidelity.py`
+- **KV 忠実度**：キャッシュの K/V ベクトル自体のコサイン類似度・相対L2誤差（量子化誤差そのものを直接測定） → 同上
+- **NIAH**：深度 {10/30/50/70/90%} × 1 試行の**成功率**（8Kコンテキスト、greedy 16トークン、鍵の完全一致） → `eval_pt/eval_niah.py`
+- **LongBench**：正式 LongBench の **Qasper** QAタスク、先頭10サンプル、公式形式のトークンF1、左側6144トークン切り捨て → `eval_pt/eval_longbench.py`
+
+### システム指標（主張の範囲を限定した扱い）
+- **解析的 KV footprint**：各実装の `designed_bits` からデータ部を計算し、実装仕様のメタデータ（per-token / 3Dブロック毎の fp32 スケール等）を加算 → `eval_pt/theoretical_compression.py`（GPU不要）と `eval_pt/eval_compression.py`（保存占有の実測も併記）
+- **速度**：prefill時間・decode tokens/sec、ウォームアップ後3回の中央値（8Kコンテキスト、32トークン生成）。**解釈は量子化オーバーヘッド込みの速度のみであり、高速化は主張しない** → `eval_pt/eval_speed.py`
 
 ---
 
-## 📊 ベンチマーク指標（マイクロベンチマーク）
-
-上記のモデルレベルの評価に加えて、C++マイクロベンチマーク自体は以下を計測します：
+## 📊 ベンチマーク指標（C++マイクロベンチマーク）
 
 1. **エンコード＆デコードレイテンシ（µs）**：高分解能ハードウェアタイマーを用いてキー・ベクトルごとに測定。
 2. **コサイン類似度**：FP32ベースラインに対する再構成KVベクトルの方向精度。
@@ -140,33 +162,41 @@ TurboQuantは「4-bitで高精度」を達成した画期的なアルゴリズ�
 ## 📈 実験結果
 
 対象モデル：`meta-llama/Meta-Llama-3.1-8B`、`mistralai/Mistral-7B-Instruct-v0.3`
-比較手法：fp16（ベースライン）、hyper_quant、rotor_quant、turbo_quant、ultra_quant
+比較手法：fp16（ベースライン）、turbo_quant、rotor_quant、hyper_quant、ultra_quant
 
-生データは `summary_results.csv` を参照してください。
+> 🗂️ **有効性マップ**：過去の圧縮率・速度・NIAH・LongBench の数値はバグ由来で**無効**です（[修正履歴と撤回](#-修正履歴と撤回2026-08)参照）。以下の表は、バグの影響を受けなかった結果か、解析的に導出可能な値のみを掲載しています。
 
-### 1. 圧縮率・メモリ実測値（8Kコンテキスト）
+### 1. KVキャッシュ footprint（解析的、8Kコンテキスト、導出値）
 
-理論上の設計ビット数と、実測されたKVキャッシュサイズ、およびベースライン（289 MB）に対する比率の対比です。実測値は両モデルで同一でした。
+両モデルはKV形状が共通（32層 × 8 KVヘッド × 128 head_dim → fp16 では 1,024 MB @ 8,192トークン）のため、表は一本で共通です。ビット幅は実装から導出、メタデータは実装のスケール保存形式（fp32）からモデル化しています。
 
-| 手法 | 設計ビット数 | 理論KVサイズ | 理論圧縮率（FP16比） | 実測KVキャッシュサイズ | ベースライン比率 |
+| 手法 | designed_bits | データ部 (MB) | メタデータ (MB) | **designed footprint (MB)** | fp16 比圧縮率 |
+| :--- | :---: | ---: | ---: | ---: | ---: |
+| fp16 | 16.0 | 1024.0 | 0.0 | 1024.0 | 1.00倍 |
+| turbo_quant | 3.0 | 192.0 | 16.0 | 208.0 | **4.92倍** |
+| hyper_quant | 3.0 | 192.0 | 16.0 | 208.0 | **4.92倍** |
+| rotor_quant | 3.0 | 192.0 | 704.0 | 896.0 | **1.14倍** |
+| ultra_quant | 4.0 | 256.0 | 16.0 | 272.0 | **3.76倍** |
+
+- hyper_quant が turbo_quant と同じ footprint なのは **Rice符号化を実装していない** ため。符号化無しでは論文の 1.7〜2 bps は届きません。
+- rotor_quant は **3Dブロック毎の fp32 スケール** がデータ本体（3bit）を上回り、ヘッドライン圧縮がほぼ消えます — これは本実装の構造的な洞察です（細粒度スケーリングはメタデータで圧縮を食いつぶす）。
+
+参考：シミュレーションの**実際の保存占有**（int8＋fp32スケール、パッキング無し、旧実行での決定的計測）は fp16=1,024 MB、turbo/hyper/ultra=528 MB、rotor=1,208 MB。ビット幅に関わらず全手法が同じ値になるのは**保存形式の自明な帰結**であり、この値から設計ビットの優劣を議論することはできません（↑の解析的表を使うのが正しい扱い）。
+
+### 2. 品質指標 — PPL と logit 忠実度（修正前の値、有効性は保持）
+
+これらは単発 forward（prefill相当）の評価であり**decode キャッシュバグの影響を受けていない**ため、旧測定値をそのまま使用できます。修正による注意点2つ：忠実度は**最終 logits 空間**の測定（アテンション出力ではない）、Top-5 は**重なり率**です。
+
+**Perplexity（WikiText-2、window 2048 / stride 512、低いほど良い）**
+
+| モデル | fp16 | hyper_quant | rotor_quant | turbo_quant | ultra_quant |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| fp16 | 16.0 bit | 1024.0 MB | 1.00倍 | 1024.0 MB | 0.28 |
-| hyper_quant | 2.5 bit | 160.0 MB | 6.40倍 | 528.0 MB | 0.55 |
-| rotor_quant | 3.0 bit | 192.0 MB | 5.33倍 | 1208.0 MB | 0.24 ⚠️ FP16より増大 |
-| turbo_quant | 3.0 bit | 192.0 MB | 5.33倍 | 528.0 MB | 0.55 |
-| ultra_quant | 2.0 bit | 128.0 MB | 8.00倍 | 528.0 MB | 0.55 |
+| Meta-Llama-3.1-8B | 5.5667 | 6.6857（悪化） | 5.7397（ほぼ維持） | 6.8154（悪化） | 5.6922（ほぼ維持） |
+| Mistral-7B-Instruct-v0.3 | 4.8756 | 5.2015 | 4.9304 | 5.2240 | 4.9072 |
 
-※ 理論KVサイズ・理論圧縮率は `summary_results.csv` の `calculation_type = theoretical` に記録されているデータで、「16 bit ÷ 設計ビット数」のビット幅のみに基づく理想値です。コードブック・回転行列・メタデータ等の実装オーバーヘッドは含みません。
+**Logit 忠実度（seq 1024、fp16 logits との比較）**
 
-> ⚠️ 理論上は2.0〜3.0 bitで大幅な軽量化（数倍の圧縮）が謳われているものの、実際の実行環境（PyTorch等）では hyper_quant / turbo_quant / ultra_quant の実測メモリ増加量は一律 528.0 MB に収束しました。さらに rotor_quant は 1208.0 MB となり、ベースラインのFP16（1024 MB）を上回るメモリを消費しています。
-
-![圧縮率の比較](plots/compression_comparison.png)
-
-### 2. アテンション出力の忠実度（Fidelity）
-
-FP16の出力に対するコサイン類似度およびTop-1/Top-5トークン一致率です。
-
-| モデル | 手法 | コサイン類似度 | Top-1一致率 (%) | Top-5一致率 (%) |
+| モデル | 手法 | Logit コサイン | Logit Top-1 (%) | Logit Top-5 重なり率 (%) |
 | :--- | :--- | :--- | :--- | :--- |
 | Meta-Llama-3.1-8B | fp16 | 1.000000 | 100.00 | 100.00 |
 | | hyper_quant | 0.705656 | 99.80 | 47.07 |
@@ -179,77 +209,51 @@ FP16の出力に対するコサイン類似度およびTop-1/Top-5トークン�
 | | turbo_quant | 0.990538 | 99.71 | 75.10 |
 | | ultra_quant | 0.999443 | 99.90 | 94.16 |
 
-> ⚠️ Mistral-7B では、どの手法でもコサイン類似度が 0.986〜0.999 と非常に高いです。しかし Llama-3.1-8B では、hyper_quant と turbo_quant のコサイン類似度が 0.69〜0.70 まで急落し、Top-5一致率も半分以下（44〜47%）に落ち込んでいます。モデル構造（GQAなど）による耐性の違いが如実に現れています。
-
-### 3. Perplexity（PPL：低いほど良好）
-
-| モデル | fp16 | hyper_quant | rotor_quant | turbo_quant | ultra_quant |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| Meta-Llama-3.1-8B | 5.5667 | 6.6857（悪化） | 5.7397（ほぼ維持） | 6.8154（悪化） | 5.6922（ほぼ維持） |
-| Mistral-7B-Instruct-v0.3 | 4.8756 | 5.2015 | 4.9304 | 5.2240 | 4.9072 |
-
-> ⚠️ rotor_quant と ultra_quant はPPLの増加が極めて小さく優秀ですが、hyper_quant と turbo_quant は明確にPPLが悪化しています。
-
 ![PPLの比較](plots/ppl_comparison.png)
 
-### 4. 処理速度・スループット（シーケンス長 8192）
+> 観察：Mistral-7B では全手法が高い logit 忠実度を維持する一方、Llama-3.1-8B では 3bit・per-tokenスケールの手法（hyper/turbo）の劣化が大きい（cos 0.69〜0.70）。rotor/ultra は細粒度スケール（3Dブロック / 4bitグリッド）ゆえに高い — ベースモデル依存の耐性差が如実に出ています。
 
-| モデル | 手法 | プレフィル時間 (秒) | スループット (tokens/sec) |
-| :--- | :--- | :--- | :--- |
-| Meta-Llama-3.1-8B | fp16 | 1.048 | 35.84 |
-| | hyper_quant | 1.087 | 33.86 |
-| | rotor_quant | 1.215 | 14.35 ⚠️ |
-| | turbo_quant | 1.110 | 33.82 |
-| | ultra_quant | 1.364 | 36.46 |
-| Mistral-7B-Instruct-v0.3 | fp16 | 0.992 | 37.61 |
-| | hyper_quant | 1.113 | 35.14 |
-| | rotor_quant | 1.158 | 14.42 ⚠️ |
-| | turbo_quant | 1.131 | 35.10 |
-| | ultra_quant | 1.310 | 37.92 |
+### 3. 修正後に再計測する項目
 
-> ⚠️ rotor_quant は、メモリ実測値の肥大化に加えて、スループットが 14 tokens/sec 付近まで半減（通常は35前後）するという非常に重いペナルティを抱えています。
+以下はキャッシュバグで完全に無効化されていたため、修正済みハーネスで**再計測**します（`hpc_scripts/run_all_evals_ai_l40s.sh`）：
 
-![速度の比較](plots/speed_comparison.png)
-
-### 5. 長文検索タスク（NIAH: Needle In A Haystack）
-
-| 手法 | Meta-Llama-3.1-8B | Mistral-7B-Instruct-v0.3 |
-| :--- | :--- | :--- |
-| fp16 | ✅ True（正解） | ✅ True（正解） |
-| hyper_quant | ❌ False | ❌ False |
-| rotor_quant | ❌ False | ❌ False |
-| turbo_quant | ❌ False | ❌ False |
-| ultra_quant | ❌ False | ❌ False |
-
-> ⚠️ 今回検証したすべての量子化手法において、長文中の特定情報を探すNIAHタスク（シーケンス長8192）では一様に失敗（破綻）しており、極低ビット量子化が長文コンテキストの正確性を保つ上で共通のボトルネックになっていることが示されました。
+- **NIAH** → 複数深度の成功率（0〜100%）に変更。旧の単一サンプル True/False 表は廃止。❗ 旧結論「全手法 False」は**撤回** — 原因は手法ではなくハーネスのバグでした。
+- **LongBench** → Qasper QA-F1（10サンプル平均）に変更。旧版はスコアなしの要約表示のみだった。
+- **速度** → 中央値ベースの prefill/decode 時間。解釈は量子化オーバーヘッドに限定。❗ 旧速度表（ultra_quant が fp16 を上回る等）は**撤回** — decode 比較が不公平だった。
 
 ---
 
 ## 🧠 考察
 
-### 1. 「理論上の高圧縮」と「実測のオーバーヘッド」の大きな乖離
+### 1. 圧縮率は保存バイトではなく設計ビット＋メタデータで議論すべき
 
-**実測メモリの収束と破綻**：理論上は2.0〜3.0 bitで大幅な省メモリ化（6〜8倍）が設計されていたものの、実際のPyTorch環境では、多くの手法（Hyper / Turbo / Ultra）が一律 528.0 MB に着地しました。これは、短いコンテキスト（8192）においてはテンソル以外のPython/PyTorch側の固定オーバーヘッドやアロケータの挙動が支配的になるためです。
-
-**RotorQuantの特異な重量化**：rotor_quant の実測メモリは 1208.0 MB となり、ベースラインのFP16（1024 MB）すら超える結果となりました。これは回転行列（ロータ）などの変換・管理用テンソルが初期化時や実行時に追加のメモリを大きく消費しているためであり、「理論上のビット数が小さくても、実装のオーバーヘッドによって逆転現象が起きる」という実システム開発の厳しい教訓を示しています。
+シミュレーションが全手法 int8 保存なので、旧実測はビット幅問わず一律 528 MB に収束しました — これは発見ではなく保存形式の同語反復です。解析的 footprint で見ると turbo/hyper ≈ 4.9倍、ultra ≈ 3.8倍、rotor は 3Dブロック毎スケールが本体を上回り ≈ 1.1倍に失速。実環境の数値にはさらにビットパッキングが必要です。
 
 ### 2. モデル構造（GQA等）による量子化耐性の違い
 
-Mistral-7B ではどの手法でもコサイン類似度が 0.986〜0.999 と高水準を維持したのに対し、Llama-3.1-8B では hyper_quant / turbo_quant のコサイン類似度が 0.69〜0.70 まで急落しました。両モデルのアテンション機構やKVヘッドの数（Grouped-Query Attentionの設計差異など）に対する低ビット量子化の「当たりやすさ」には大きな開きがあり、万能な「安全な量子化手法」は存在せず、ベースモデルのアーキテクチャ依存性が極めて高いことが分かります。
+有効な品質指標（PPL・logit忠実度）に限っても、Llama-3.1-8B は Mistral-7B より 3bit per-token手法での劣化が大きい傾向が一貫して見えます。アーキテクチャ依存の耐性差は実在し、本実装の範囲では万能な手法はありません。
 
-### 3. 速度（スループット）とメモリのトレードオフ
+### 3. このベンチマークが意図的に主張しないもの
 
-rotor_quant はPerplexityや類似度などの出力品質面では健闘（PPL 5.74、類似度 0.979）したものの、スループットが 14.35 tokens/sec と、通常（35前後）の半分以下に落ち込んでいます。動的な回転変換処理が計算グラフ上で重いボトルネックになっており、「省メモリ・高精度であっても、推論スループットが半減する手法は、実用的なサービング環境では採用しづらい」という実務上の重大なジレンマを浮き彫りにしています。
-
-### 4. 長文コンテキスト（NIAH）における全滅と今後の課題
-
-シーケンス長 8192 のNIAH（要点検索）タスクにおいて、検証したすべての量子化手法が例外なく失敗しました。コサイン類似度やPPLといった「局所的・一般的なテキストの滑らかさ」はある程度保たれていても、極低ビット量子化によってKVキャッシュの長距離依存性や微小な情報保持力が失われているため、RAGや長文対話などの実用タスクにおいては致命的な弱点になることを示唆しています。
+デコード高速化（fused kernel 無し）、実運用メモリ（解析的 footprint のみ）、論文再現（簡易実装）、強い統計主張（小サンプル）。本フレームワークの価値は**シミュレーション量子化下での品質比較**であり、そのためにはキャッシュ配管が正確であることが前提です — `sanity_check.py` ゲートはその担保です。
 
 ---
 
 ## ✅ 総括
 
-今回の検証データは、「論文上の理論値（ビット数ベースの机上の空論）」と「実環境でのメモリ・速度・長文耐性のリアル」の間には深い溝があることを如実に証明しています。KVキャッシュ量子化を実サービスに導入する際は、単なる圧縮率だけでなく、モデルごとの相性、追加メモリのオーバーヘッド、そして長文タスクでの性能劣化を慎重に見極める必要があります。
+このベンチマークの再定義されたゴール：**簡易KVキャッシュ量子化器を、品質指標（PPL・忠実度・検索・QA）では機能的に数学的に正しく比較し、メモリは解析的 footprint、速度は量子化オーバーヘッドとして記録する — カーネル無しのシミュレーションが支持できる範囲を超える主張はしない。**
+
+---
+
+## ♻️ 修正履歴と撤回（2026-08）
+
+過去の結果には評価ハーネスの重大なバグがありました。透明性のため記録します：
+
+1. **キャッシュの `update()` がデコード後の「最新チャンクだけ」を返していた**（全履歴ではない） → decode 中の量子化版は最新1トークンのみに attention する状態になっていた。→ *無効化*：NIAH表（全False）、LongBench生出力（崩壊テキスト）、速度表（decode比較が不成立。ultra が fp16 を上回ったのもこのため）。**これらの結論は撤回します。**
+2. **RotorQuant の連結条件**が `"quantized"` キーを持つ dict のみを対象としており、rotor の `"quantized_main"` にはマッチせず、decode 履歴がさらに壊れていた。
+3. **圧縮率のベースライン 289 MB は旧スクリプト版のハードコード定数**で、報告された「比率」は `289/measured`（意味が逆）でした。→ 保存占有 + 解析的 footprint 方式に置き換え。
+4. **`designed_bits` が手書き定数**（ultra=2.0 等）だった → 各量子化器のレベル数から自動導出に変更（ultra=4.0）。
+5. その他の修正：HyperQuant の D4格子射影が保存経路で未適用（死にコード）だったのを実際に適用、量子化器の乱数を seed 固定（従来は run 毎に変化していた）、fidelity 指標を logit 空間として正しく命名、NIAH/LongBench をスコア付きプロトコルに刷新。
 
 ---
 
@@ -300,33 +304,30 @@ kvq-bench/
 │   │   └── lattice_quant.hpp  # HyperQuant (E8/D4 lattice)
 │   └── bench_main.cpp
 │
-├── core_pt/                   # 2. PyTorch / CUDA custom kernels & cache
+├── core_pt/                   # 2. PyTorch 簡易量子化器（シミュレーション量子化）
 │   ├── quantizers/
-|   |   ├── __init__.py
-│   │   ├── base.py
-│   │   ├── hyper_quant.py     # RHT + lattice + Rice coding
-|   |   ├── rotor_quant.py
-│   │   ├── turbo_quant.py
-│   │   └── ultra_quant.py     # WHT + FP4 direct mapping
-│   └── kernels/                # (optional) Triton/CUDA kernels
+│   │   ├── __init__.py
+│   │   ├── base.py            # 基底クラス（designed_bits 属性）
+│   │   ├── turbo_quant.py     # 回転＋一様量子化（簡易版）
+│   │   ├── rotor_quant.py     # 3Dブロックロータ（簡易版）
+│   │   ├── hyper_quant.py     # Hadamard＋D4格子（Rice符号化無し）
+│   │   └── ultra_quant.py     # WHT＋FP4(E2M1)グリッド
+│   └── kernels/               # (optional) Triton/CUDA kernels
 │
-├── eval_pt/                    # 3. Experiment & automated evaluation scripts
-│   ├── custom_cache.py        # DynamicCache interface
-│   ├── eval_speed.py           # Prefill time & tokens/sec at 8K context
-│   ├── eval_compression.py     # KV-cache memory footprint vs. FP16 baseline
-│   ├── eval_longbench.py       # LongBench evaluation
-│   ├── eval_niah.py            # Needle in a Haystack
-│   ├── eval_fidelity.py        # Attention fidelity (cosine, Top-1/5) vs. FP16
-│   └── eval_ppl.py             # Perplexity
+├── eval_pt/                    # 3. モデルレベル評価（Hugging Face）
+│   ├── custom_cache.py        # QuantizedKVCache（+ sanity 用 passthrough）
+│   ├── sanity_check.py        # ★ 回帰ゲート：配管が壊れたら評価中止
+│   ├── eval_ppl.py            # Perplexity（WikiText-2, 2048/512）
+│   ├── eval_fidelity.py       # Logit + KV 忠実度
+│   ├── eval_niah.py           # NIAH（複数深度の成功率）
+│   ├── eval_longbench.py      # LongBench Qasper QA-F1
+│   ├── eval_speed.py          # 速度・中央値（オーバーヘッドの解釈）
+│   ├── eval_compression.py    # 保存占有 + 解析的 footprint
+│   └── theoretical_compression.py  # GPU不要の解析的 footprint
 │
-└── hpc_scripts/                # 4. HPC (Slurm) job scripts
-    └── run_all_evals_ai_l40s.sh # Distributed evaluation on ai-l40s (NVIDIA L40S)
+└── hpc_scripts/                # 4. HPC (Slurm) ジョブスクリプト
+    └── run_all_evals_ai_l40s.sh  # sanity → footprint → ppl → fidelity → niah → longbench → speed
 ```
-
-* **`core_cpp/`**：上記クイックスタートで紹介しているスタンドアロンのC++17マイクロベンチマーク本体（エンコード/デコードレイテンシ、コサイン類似度、Attention Logit MAEを計測）。ヘッダオンリーの各量子化手法実装と、実行エントリポイントの`bench_main.cpp`から構成されます。
-* **`core_pt/`**：実際のモデルの生成ループ内で使えるよう`DynamicCache`風インターフェースに組み込んだPython/PyTorch実装。任意のTriton/CUDAカーネルも含みます。
-* **`eval_pt/`**：上記「実験方法」セクションに対応する、モデルレベルの自動評価スクリプト群（速度、圧縮率、LongBench、NIAH、Attention忠実度、Perplexity）。
-* **`hpc_scripts/`**：ai-l40s GPUクラスタでベンチマークを実行するためのジョブスクリプト（`run_l40s_cluster.sbatch`）。
 
 ---
 
