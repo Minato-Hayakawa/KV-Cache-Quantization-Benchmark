@@ -107,7 +107,8 @@ def run_longbench(
     for i in range(num_samples):
         sample = dataset[i]
         context = sample["context"]
-        question = sample["question"]
+        # LongBench のスキーマ: 質問文は "input" フィールド("question" キーは存在しない)
+        question = sample["input"]
         answers = sample["answers"]  # 参照回答（複数）
 
         prompt = context + f"\n\nQuestion: {question}\nAnswer:"

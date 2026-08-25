@@ -1,6 +1,6 @@
 torch>=2.0.0
 transformers>=4.38.0
-datasets>=2.14.0
+datasets>=2.14.0,<4.0.0
 tqdm>=4.64.0
 packaging>=21.0
 accelerate>=0.26.0
