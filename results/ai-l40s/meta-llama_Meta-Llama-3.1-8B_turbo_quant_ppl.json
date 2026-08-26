@@ -3,5 +3,5 @@
     "method": "turbo_quant",
     "stride": 512,
     "seq_len": 2048,
-    "perplexity": 6.815441131591797
+    "perplexity": 6.817469120025635
 }

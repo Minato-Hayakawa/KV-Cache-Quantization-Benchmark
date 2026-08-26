@@ -2,8 +2,21 @@
     "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
     "method": "rotor_quant",
     "sequence_length": 8192,
-    "prefill_time_sec": 1.1575,
-    "decode_time_sec": 2.2195,
+    "prefill_time_sec": 1.3771,
+    "decode_time_sec": 2.2435,
     "generated_tokens": 32,
-    "tokens_per_second": 14.42
+    "tokens_per_second": 14.26,
+    "warmup_runs": 1,
+    "measure_runs": 3,
+    "all_prefill_runs": [
+        1.3774,
+        1.3771,
+        1.377
+    ],
+    "all_decode_runs": [
+        2.2441,
+        2.2435,
+        2.2399
+    ],
+    "note": "中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。"
 }

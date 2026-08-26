@@ -2,8 +2,11 @@
     "model_name": "meta-llama/Meta-Llama-3.1-8B",
     "method": "rotor_quant",
     "seq_len": 1024,
-    "cosine_similarity": 0.978927731513977,
-    "top1_match_rate": 99.90234375,
-    "top5_match_rate": 85.01952886581421,
-    "evaluated_seq_len": 1024
+    "logit_cosine_similarity": 0.9758503437042236,
+    "logit_top1_match_rate": 99.8046875,
+    "logit_top5_overlap_rate": 84.04296636581421,
+    "kv_cosine_similarity": 0.9474992966279387,
+    "kv_relative_mse": 0.28860374563373625,
+    "evaluated_seq_len": 1024,
+    "note": "logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度"
 }

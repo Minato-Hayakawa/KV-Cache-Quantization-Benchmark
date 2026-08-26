@@ -1,19 +1,0 @@
-usage: eval_ppl.py [-h] [--model_name MODEL_NAME] [--method METHOD]
-                   [--stride STRIDE]
-eval_ppl.py: error: unrecognized arguments: --seq_len 2048
-usage: eval_ppl.py [-h] [--model_name MODEL_NAME] [--method METHOD]
-                   [--stride STRIDE]
-eval_ppl.py: error: unrecognized arguments: --seq_len 2048
-usage: eval_ppl.py [-h] [--model_name MODEL_NAME] [--method METHOD]
-                   [--stride STRIDE]
-eval_ppl.py: error: unrecognized arguments: --seq_len 2048
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:03<00:10,  3.59s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:07<00:07,  3.63s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:10<00:03,  3.60s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:11<00:00,  2.53s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:11<00:00,  2.93s/it]
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.80s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.91s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.88s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.02s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.33s/it]
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.83s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.92s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.89s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.02s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.34s/it]
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.80s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.88s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.86s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.01s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.32s/it]
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:08,  2.81s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.91s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:08<00:02,  2.88s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.02s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:09<00:00,  2.34s/it]

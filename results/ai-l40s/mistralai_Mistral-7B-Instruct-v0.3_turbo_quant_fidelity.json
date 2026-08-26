@@ -2,8 +2,11 @@
     "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
     "method": "turbo_quant",
     "seq_len": 1024,
-    "cosine_similarity": 0.9905380606651306,
-    "top1_match_rate": 99.70703125,
-    "top5_match_rate": 75.09765625,
-    "evaluated_seq_len": 1024
+    "logit_cosine_similarity": 0.9856066107749939,
+    "logit_top1_match_rate": 99.90234375,
+    "logit_top5_overlap_rate": 66.2890613079071,
+    "kv_cosine_similarity": 0.8709714207798243,
+    "kv_relative_mse": 0.4841256723739207,
+    "evaluated_seq_len": 1024,
+    "note": "logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度"
 }

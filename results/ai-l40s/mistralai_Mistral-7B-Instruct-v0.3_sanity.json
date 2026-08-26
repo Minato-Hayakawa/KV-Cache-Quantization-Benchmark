@@ -1,0 +1,82 @@
+{
+    "overall_pass": true,
+    "results": {
+        "passthrough": {
+            "generated_ids": [
+                23423,
+                1151,
+                22031,
+                23367,
+                2059,
+                2963,
+                4408,
+                1072,
+                1704,
+                1370,
+                1812,
+                29491,
+                2
+            ],
+            "identical_to_fp16": true,
+            "token_match_rate": 1.0,
+            "criterion": "identical_to_fp16 == True"
+        },
+        "turbo_quant_7bit": {
+            "generated_ids": [
+                23423,
+                1151,
+                22031,
+                23367,
+                2059,
+                2963,
+                4408,
+                1072,
+                1704,
+                1370,
+                1812,
+                29491,
+                2
+            ],
+            "token_match_rate_vs_fp16": 1.0,
+            "criterion": "token_match_rate >= 0.5 (near-lossless at 7bit)"
+        },
+        "rotor_quant_7bit": {
+            "generated_ids": [
+                23423,
+                1151,
+                22031,
+                23367,
+                2059,
+                2963,
+                4408,
+                1072,
+                1704,
+                1370,
+                1812,
+                29491,
+                2
+            ],
+            "token_match_rate_vs_fp16": 1.0,
+            "criterion": "token_match_rate >= 0.5 (near-lossless at 7bit)"
+        },
+        "hyper_quant_7bit": {
+            "generated_ids": [
+                23423,
+                1151,
+                22031,
+                23367,
+                2059,
+                2963,
+                4408,
+                1072,
+                1704,
+                1370,
+                1812,
+                29491,
+                2
+            ],
+            "token_match_rate_vs_fp16": 1.0,
+            "criterion": "token_match_rate >= 0.5 (near-lossless at 7bit)"
+        }
+    }
+}

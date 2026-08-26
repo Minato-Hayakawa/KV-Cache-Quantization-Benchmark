@@ -1,0 +1,588 @@
+==================================================
+ Starting KV Cache Quantization Benchmark
+ Working Directory: /hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark
+ Node: ai-l40s-00.cloud.r-ccs.riken.jp
+ Date: Wed Aug 26 05:42:45 AM JST 2026
+ Partition: ai-l40s
+==================================================
+##################################################
+ Model: meta-llama/Meta-Llama-3.1-8B
+##################################################
+>>> Running Sanity Check (passthrough + 7bit high-bit)...
+=== Sanity Check | Model: meta-llama/Meta-Llama-3.1-8B | Device: cuda ===
+[fp16]      generated: [7445, 3571, 323, 1218, 526, 1001, 13, 128001]
+[passthrough] generated: [7445, 3571, 323, 1218, 526, 1001, 13, 128001]
+[passthrough] identical: True (match 100.0%)
+[turbo_quant 7bit] generated: [7445, 3571, 323, 1218, 526, 1001, 13, 128001]
+[turbo_quant 7bit] match rate: 100.0%
+[rotor_quant 7bit] generated: [7445, 3571, 323, 1218, 526, 1001, 13, 128001]
+[rotor_quant 7bit] match rate: 100.0%
+[hyper_quant 7bit] generated: [7445, 3571, 323, 1218, 526, 1001, 13, 578, 3925, 315, 6617, 25213, 13003, 1203, 311, 279]
+[hyper_quant 7bit] match rate: 87.5%
+
+=== Sanity Check Overall: PASS ===
+Sanity check results saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_sanity.json
+>>> Running Analytical Footprint Calculation...
+=== Calculating Analytical Footprints | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 8192 ===
+Method: fp16         | Bits: 16.0 | Data:  1024.00 MB | Meta:     0.00 MB | Total:  1024.00 MB | Compression:  1.00x
+Method: turbo_quant  | Bits:  3.0 | Data:   192.00 MB | Meta:    16.00 MB | Total:   208.00 MB | Compression:  4.92x
+Method: rotor_quant  | Bits:  3.0 | Data:   192.00 MB | Meta:   704.00 MB | Total:   896.00 MB | Compression:  1.14x
+Method: hyper_quant  | Bits:  3.0 | Data:   192.00 MB | Meta:    16.00 MB | Total:   208.00 MB | Compression:  4.92x
+Method: ultra_quant  | Bits:  4.0 | Data:   256.00 MB | Meta:    16.00 MB | Total:   272.00 MB | Compression:  3.76x
+
+All analytical footprint results successfully saved to results/ai-l40s/
+--------------------------------------------------
+ Method: fp16 | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: meta-llama/Meta-Llama-3.1-8B | Method: fp16 | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'fp16', 'sequence_length': 8192, 'designed_bits': 16.0, 'stored_mb': 1024.0, 'designed_data_mb': 1024.0, 'designed_meta_mb': 0.0, 'designed_footprint_mb': 1024.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_compression.json
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: fp16 | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[fp16] Perplexity: 5.5667
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | fp16]: 5.56669282913208
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: fp16 | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 1.00000
+Logit Top-1 match    : 100.00%
+Logit Top-5 overlap  : 100.00%
+KV cos-sim           : 1.00000
+KV relative L2 error : 0.00000
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | fp16]: {'logit_cosine_similarity': 1.0, 'logit_top1_match_rate': 100.0, 'logit_top5_overlap_rate': 100.0, 'kv_cosine_similarity': 1.0, 'kv_relative_mse': 0.0, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: fp16 | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=30% trial=0 key=913847339 success=True
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=True
+  depth=90% trial=0 key=378009742 success=True
+
+=== NIAH success rate: 5/5 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: fp16 | Device: cuda ===
+The repository for THUDM/LongBench contains custom code which must be executed to correctly load the dataset. You can inspect the repository content at https://hf.co/datasets/THUDM/LongBench.
+You can avoid this prompt in future by passing the argument `trust_remote_code=True`.
+
+Do you wish to run the custom code? [y/N]   [0] F1=0.316 | pred: 'The ground truth for fake news is established by a single person. The person is '
+  [1] F1=0.421 | pred: 'The GhostVLAD approach is a pooling strategy that was originally proposed for fa'
+  [2] F1=0.324 | pred: 'The authors claim that their model outperforms the state of the art results by 6'
+  [3] F1=0.381 | pred: 'The authors propose to use context tweets as additional features. Context tweets'
+  [4] F1=0.667 | pred: 'They looked at the following pages: FoxNews, CNN, ESPN, New York Times, Time mag'
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: fp16 | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'fp16', 'sequence_length': 8192, 'prefill_time_sec': 0.8548, 'decode_time_sec': 0.852, 'generated_tokens': 32, 'tokens_per_second': 37.56, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [0.8512, 0.8609, 0.8548], 'all_decode_runs': [0.852, 0.8519, 0.853], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_speed.json
+--------------------------------------------------
+ Method: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: meta-llama/Meta-Llama-3.1-8B | Method: turbo_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'turbo_quant', 'sequence_length': 8192, 'designed_bits': 3.0, 'stored_mb': 528.0, 'designed_data_mb': 192.0, 'designed_meta_mb': 16.0, 'designed_footprint_mb': 208.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_compression.json
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: turbo_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[turbo_quant] Perplexity: 6.8175
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | turbo_quant]: 6.817469120025635
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.70708
+Logit Top-1 match    : 99.90%
+Logit Top-5 overlap  : 49.53%
+KV cos-sim           : 0.77575
+KV relative L2 error : 0.61756
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | turbo_quant]: {'logit_cosine_similarity': 0.707082211971283, 'logit_top1_match_rate': 99.90234375, 'logit_top5_overlap_rate': 49.531251192092896, 'kv_cosine_similarity': 0.7757485322654247, 'kv_relative_mse': 0.6175618432462215, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: turbo_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=30% trial=0 key=913847339 success=True
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=True
+  depth=90% trial=0 key=378009742 success=True
+
+=== NIAH success rate: 5/5 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: turbo_quant | Device: cuda ===
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: turbo_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'turbo_quant', 'sequence_length': 8192, 'prefill_time_sec': 0.8842, 'decode_time_sec': 1.0058, 'generated_tokens': 32, 'tokens_per_second': 31.82, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [0.8824, 0.8923, 0.8842], 'all_decode_runs': [1.0061, 1.0058, 1.0046], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_speed.json
+--------------------------------------------------
+ Method: rotor_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: meta-llama/Meta-Llama-3.1-8B | Method: rotor_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'rotor_quant', 'sequence_length': 8192, 'designed_bits': 3.0, 'stored_mb': 1208.0, 'designed_data_mb': 192.0, 'designed_meta_mb': 704.0, 'designed_footprint_mb': 896.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_compression.json
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: rotor_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[rotor_quant] Perplexity: 5.7484
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | rotor_quant]: 5.748374938964844
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: rotor_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.97585
+Logit Top-1 match    : 99.80%
+Logit Top-5 overlap  : 84.04%
+KV cos-sim           : 0.94750
+KV relative L2 error : 0.28860
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | rotor_quant]: {'logit_cosine_similarity': 0.9758503437042236, 'logit_top1_match_rate': 99.8046875, 'logit_top5_overlap_rate': 84.04296636581421, 'kv_cosine_similarity': 0.9474992966279387, 'kv_relative_mse': 0.28860374563373625, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: rotor_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=30% trial=0 key=913847339 success=True
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=True
+  depth=90% trial=0 key=378009742 success=True
+
+=== NIAH success rate: 5/5 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: rotor_quant | Device: cuda ===
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: rotor_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'rotor_quant', 'sequence_length': 8192, 'prefill_time_sec': 0.9618, 'decode_time_sec': 2.2603, 'generated_tokens': 32, 'tokens_per_second': 14.16, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [0.9618, 0.9566, 0.965], 'all_decode_runs': [2.2626, 2.2603, 2.2569], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_speed.json
+--------------------------------------------------
+ Method: hyper_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: meta-llama/Meta-Llama-3.1-8B | Method: hyper_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'hyper_quant', 'sequence_length': 8192, 'designed_bits': 3.0, 'stored_mb': 528.0, 'designed_data_mb': 192.0, 'designed_meta_mb': 16.0, 'designed_footprint_mb': 208.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_compression.json
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: hyper_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[hyper_quant] Perplexity: 7.3255
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | hyper_quant]: 7.325479507446289
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: hyper_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.68505
+Logit Top-1 match    : 99.71%
+Logit Top-5 overlap  : 40.78%
+KV cos-sim           : 0.75362
+KV relative L2 error : 0.65615
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | hyper_quant]: {'logit_cosine_similarity': 0.685052752494812, 'logit_top1_match_rate': 99.70703125, 'logit_top5_overlap_rate': 40.78124761581421, 'kv_cosine_similarity': 0.7536198757588863, 'kv_relative_mse': 0.65615468705073, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: hyper_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=30% trial=0 key=913847339 success=True
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=True
+  depth=90% trial=0 key=378009742 success=True
+
+=== NIAH success rate: 5/5 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: hyper_quant | Device: cuda ===
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: hyper_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'hyper_quant', 'sequence_length': 8192, 'prefill_time_sec': 0.9311, 'decode_time_sec': 1.5892, 'generated_tokens': 32, 'tokens_per_second': 20.14, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [0.9311, 0.9315, 0.9218], 'all_decode_runs': [1.5892, 1.5888, 1.5896], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_speed.json
+--------------------------------------------------
+ Method: ultra_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: meta-llama/Meta-Llama-3.1-8B | Method: ultra_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'ultra_quant', 'sequence_length': 8192, 'designed_bits': 4.0, 'stored_mb': 528.0, 'designed_data_mb': 256.0, 'designed_meta_mb': 16.0, 'designed_footprint_mb': 272.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_compression.json
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: ultra_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[ultra_quant] Perplexity: 5.6922
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | ultra_quant]: 5.6921772956848145
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: ultra_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.97068
+Logit Top-1 match    : 99.90%
+Logit Top-5 overlap  : 85.55%
+KV cos-sim           : 0.94075
+KV relative L2 error : 0.30327
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | ultra_quant]: {'logit_cosine_similarity': 0.970683217048645, 'logit_top1_match_rate': 99.90234375, 'logit_top5_overlap_rate': 85.546875, 'kv_cosine_similarity': 0.9407463679090142, 'kv_relative_mse': 0.3032733977306634, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: ultra_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=30% trial=0 key=913847339 success=True
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=True
+  depth=90% trial=0 key=378009742 success=True
+
+=== NIAH success rate: 5/5 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: ultra_quant | Device: cuda ===
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: ultra_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'ultra_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.1384, 'decode_time_sec': 1.0221, 'generated_tokens': 32, 'tokens_per_second': 31.31, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [1.1384, 1.1323, 1.1396], 'all_decode_runs': [1.0221, 1.0223, 1.0218], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_speed.json
+##################################################
+ Model: mistralai/Mistral-7B-Instruct-v0.3
+##################################################
+>>> Running Sanity Check (passthrough + 7bit high-bit)...
+=== Sanity Check | Model: mistralai/Mistral-7B-Instruct-v0.3 | Device: cuda ===
+[fp16]      generated: [23423, 1151, 22031, 23367, 2059, 2963, 4408, 1072, 1704, 1370, 1812, 29491, 2]
+[passthrough] generated: [23423, 1151, 22031, 23367, 2059, 2963, 4408, 1072, 1704, 1370, 1812, 29491, 2]
+[passthrough] identical: True (match 100.0%)
+[turbo_quant 7bit] generated: [23423, 1151, 22031, 23367, 2059, 2963, 4408, 1072, 1704, 1370, 1812, 29491, 2]
+[turbo_quant 7bit] match rate: 100.0%
+[rotor_quant 7bit] generated: [23423, 1151, 22031, 23367, 2059, 2963, 4408, 1072, 1704, 1370, 1812, 29491, 2]
+[rotor_quant 7bit] match rate: 100.0%
+[hyper_quant 7bit] generated: [23423, 1151, 22031, 23367, 2059, 2963, 4408, 1072, 1704, 1370, 1812, 29491, 2]
+[hyper_quant 7bit] match rate: 100.0%
+
+=== Sanity Check Overall: PASS ===
+Sanity check results saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_sanity.json
+>>> Running Analytical Footprint Calculation...
+=== Calculating Analytical Footprints | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 8192 ===
+--------------------------------------------------
+ Method: fp16 | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: fp16 | SeqLen: 8192 ===
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: fp16 | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[fp16] Perplexity: 4.8756
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | fp16]: 4.875646591186523
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: fp16 | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 1.00000
+Logit Top-1 match    : 100.00%
+Logit Top-5 overlap  : 100.00%
+KV cos-sim           : 1.00000
+KV relative L2 error : 0.00000
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | fp16]: {'logit_cosine_similarity': 1.0, 'logit_top1_match_rate': 100.0, 'logit_top5_overlap_rate': 100.0, 'kv_cosine_similarity': 1.0, 'kv_relative_mse': 0.0, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: fp16 | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=30% trial=0 key=913847339 success=True
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=True
+  depth=90% trial=0 key=378009742 success=True
+
+=== NIAH success rate: 5/5 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: fp16 | Device: cuda ===
+  [0] F1=0.270 | pred: 'The ground truth for fake news was established by an expert who manually inspect'
+  [1] F1=0.273 | pred: 'GhostVLAD is an extension of the NetVLAD approach, which was proposed for face r'
+  [2] F1=0.345 | pred: 'The proposed model outperforms the previous state-of-the-art methods by 68.8% to'
+  [3] F1=0.162 | pred: 'In addition to the original tweet, the context tweet is proposed as an additiona'
+  [4] F1=0.682 | pred: 'They looked at FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Pos'
+  [5] F1=0.074 | pred: 'Yes, the hashtag dataset contains only English data. The SemEval dataset contain'
+  [6] F1=0.133 | pred: 'The proposed evaluation is based on the comparison of the automatically generate'
+  [7] F1=0.706 | pred: 'The datasets used for evaluation are CNN/DailyMail news highlights dataset, New '
+  [8] F1=0.111 | pred: 'The proposed approach is compared with the w2g and w2gm approaches which are bas'
+  [9] F1=0.500 | pred: 'The ensemble was formed by simply averaging the predictions from the constituent'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.3256 ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: fp16 | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'fp16', 'sequence_length': 8192, 'prefill_time_sec': 0.8322, 'decode_time_sec': 0.8162, 'generated_tokens': 32, 'tokens_per_second': 39.21, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [0.8306, 0.8322, 0.8329], 'all_decode_runs': [0.8153, 0.8162, 0.8162], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_speed.json
+--------------------------------------------------
+ Method: turbo_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: turbo_quant | SeqLen: 8192 ===
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: turbo_quant | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[turbo_quant] Perplexity: 5.2196
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | turbo_quant]: 5.219613552093506
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: turbo_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.98561
+Logit Top-1 match    : 99.90%
+Logit Top-5 overlap  : 66.29%
+KV cos-sim           : 0.87097
+KV relative L2 error : 0.48413
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | turbo_quant]: {'logit_cosine_similarity': 0.9856066107749939, 'logit_top1_match_rate': 99.90234375, 'logit_top5_overlap_rate': 66.2890613079071, 'kv_cosine_similarity': 0.8709714207798243, 'kv_relative_mse': 0.4841256723739207, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: turbo_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=30% trial=0 key=913847339 success=True
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=True
+  depth=90% trial=0 key=378009742 success=True
+
+=== NIAH success rate: 5/5 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: turbo_quant | Device: cuda ===
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: turbo_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'turbo_quant', 'sequence_length': 8192, 'prefill_time_sec': 0.855, 'decode_time_sec': 0.9703, 'generated_tokens': 32, 'tokens_per_second': 32.98, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [0.8605, 0.855, 0.8545], 'all_decode_runs': [0.9703, 0.9705, 0.9699], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_speed.json
+--------------------------------------------------
+ Method: rotor_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: rotor_quant | SeqLen: 8192 ===
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: rotor_quant | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[rotor_quant] Perplexity: 4.9276
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | rotor_quant]: 4.92764139175415
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: rotor_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.99941
+Logit Top-1 match    : 99.90%
+Logit Top-5 overlap  : 94.47%
+KV cos-sim           : 0.98333
+KV relative L2 error : 0.17167
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | rotor_quant]: {'logit_cosine_similarity': 0.9994087219238281, 'logit_top1_match_rate': 99.90234375, 'logit_top5_overlap_rate': 94.47265863418579, 'kv_cosine_similarity': 0.9833289049565792, 'kv_relative_mse': 0.17167071753647178, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: rotor_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=False
+  depth=30% trial=0 key=913847339 success=True
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=True
+  depth=90% trial=0 key=378009742 success=False
+
+=== NIAH success rate: 3/5 = 60.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: rotor_quant | Device: cuda ===
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: rotor_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'rotor_quant', 'sequence_length': 8192, 'prefill_time_sec': 0.9232, 'decode_time_sec': 2.2666, 'generated_tokens': 32, 'tokens_per_second': 14.12, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [0.9211, 0.9252, 0.9232], 'all_decode_runs': [2.2688, 2.2633, 2.2666], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_speed.json
+--------------------------------------------------
+ Method: hyper_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: hyper_quant | SeqLen: 8192 ===
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: hyper_quant | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[hyper_quant] Perplexity: 5.3571
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | hyper_quant]: 5.35711669921875
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: hyper_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.97738
+Logit Top-1 match    : 99.51%
+Logit Top-5 overlap  : 59.88%
+KV cos-sim           : 0.84510
+KV relative L2 error : 0.53435
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | hyper_quant]: {'logit_cosine_similarity': 0.977383017539978, 'logit_top1_match_rate': 99.51171875, 'logit_top5_overlap_rate': 59.882813692092896, 'kv_cosine_similarity': 0.8451001578941941, 'kv_relative_mse': 0.5343484315089881, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: hyper_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=30% trial=0 key=913847339 success=False
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=False
+  depth=90% trial=0 key=378009742 success=False
+
+=== NIAH success rate: 2/5 = 40.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: hyper_quant | Device: cuda ===
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: hyper_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'hyper_quant', 'sequence_length': 8192, 'prefill_time_sec': 0.8981, 'decode_time_sec': 1.5531, 'generated_tokens': 32, 'tokens_per_second': 20.6, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [0.8981, 0.8918, 0.901], 'all_decode_runs': [1.5531, 1.5534, 1.5523], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_speed.json
+--------------------------------------------------
+ Method: ultra_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Compression Evaluation...
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: ultra_quant | SeqLen: 8192 ===
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: ultra_quant | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[ultra_quant] Perplexity: 4.9072
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | ultra_quant]: 4.907246112823486
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: ultra_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.99944
+Logit Top-1 match    : 99.90%
+Logit Top-5 overlap  : 94.16%
+KV cos-sim           : 0.98179
+KV relative L2 error : 0.17589
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | ultra_quant]: {'logit_cosine_similarity': 0.9994429349899292, 'logit_top1_match_rate': 99.90234375, 'logit_top5_overlap_rate': 94.1601574420929, 'kv_cosine_similarity': 0.9817944057285786, 'kv_relative_mse': 0.17588543018791825, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_fidelity.json
+>>> Running NIAH Evaluation (multi-depth)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: ultra_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=30% trial=0 key=913847339 success=True
+  depth=50% trial=0 key=551585301 success=True
+  depth=70% trial=0 key=143469773 success=True
+  depth=90% trial=0 key=378009742 success=True
+
+=== NIAH success rate: 5/5 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: ultra_quant | Device: cuda ===
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: ultra_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'ultra_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.1081, 'decode_time_sec': 0.9845, 'generated_tokens': 32, 'tokens_per_second': 32.5, 'warmup_runs': 1, 'measure_runs': 3, 'all_prefill_runs': [1.1081, 1.1095, 1.1042], 'all_decode_runs': [0.9845, 0.9842, 0.9848], 'note': '中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。'}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_speed.json
+==================================================
+ All Benchmarks Completed
+ Date: Wed Aug 26 06:29:43 AM JST 2026
+==================================================

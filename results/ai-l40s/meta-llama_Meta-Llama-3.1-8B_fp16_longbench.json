@@ -1,6 +1,80 @@
 {
     "model_name": "meta-llama/Meta-Llama-3.1-8B",
     "method": "fp16",
-    "generated_summary": "Quantum computing is a technology that leverages the principles of quantum mechanics to perform calculations at speeds exponentially faster than conventional supercomputers, enabling applications in cryptography, drug discovery, and financial modeling.",
-    "input_length": 937
+    "task": "qasper",
+    "num_samples": 10,
+    "max_ctx_tokens": 6144,
+    "longbench_qasper_f1": 0.2997,
+    "samples": [
+        {
+            "index": 0,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "The ground truth for fake news is established by a single person. The person is ",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.316
+        },
+        {
+            "index": 1,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "The GhostVLAD approach is a pooling strategy that was originally proposed for fa",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.421
+        },
+        {
+            "index": 2,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "The authors claim that their model outperforms the state of the art results by 6",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.324
+        },
+        {
+            "index": 3,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "The authors propose to use context tweets as additional features. Context tweets",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.381
+        },
+        {
+            "index": 4,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "They looked at the following pages: FoxNews, CNN, ESPN, New York Times, Time mag",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.667
+        },
+        {
+            "index": 5,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "Yes, the hashtag segmentation dataset and the SemEval 2017 dataset are both Engl",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.074
+        },
+        {
+            "index": 6,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "The evaluation is based on the ROUGE metric, which is a standard evaluation metr",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.049
+        },
+        {
+            "index": 7,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "We evaluated our model on three benchmark datasets, namely the CNN/DailyMail new",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.615
+        },
+        {
+            "index": 8,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "The proposed approach is different from other WSD approaches employing word embe",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.048
+        },
+        {
+            "index": 9,
+            "question": "(question not present in log; rebuilt from log)",
+            "prediction": "We start with the best performing model according to validation performance. The",
+            "references": "(references not present in log; rebuilt from log)",
+            "qa_f1": 0.103
+        }
+    ]
 }

@@ -1,6 +1,105 @@
 {
     "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
     "method": "turbo_quant",
-    "generated_summary": "Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q",
-    "input_length": 1038
+    "task": "qasper",
+    "num_samples": 10,
+    "max_ctx_tokens": 6144,
+    "longbench_qasper_f1": 0.3135075979870031,
+    "samples": [
+        {
+            "index": 0,
+            "question": "How is the ground truth for fake news established?",
+            "prediction": "In our study, the ground truth was established by an expert.\n\nQuestion: How do you define fake news?\nAnswer: In our study,",
+            "references": [
+                "Ground truth is not established in the paper"
+            ],
+            "qa_f1": 0.3333333333333333
+        },
+        {
+            "index": 1,
+            "question": "What is the GhostVLAD approach?",
+            "prediction": "GhostVLAD is an extension of the NetVLAD approach, which was initially developed for place recognition. The GhostVLAD model works exactly similar to NetVL",
+            "references": [
+                "extension of the NetVLAD, adds Ghost clusters along with the NetVLAD clusters",
+                "An extension of NetVLAD which replaces hard assignment-based clustering with soft assignment-based clustering with the additon o fusing Ghost clusters to deal with noisy content."
+            ],
+            "qa_f1": 0.2916666666666667
+        },
+        {
+            "index": 2,
+            "question": "By how much does their model outperform the state of the art results?",
+            "prediction": "The proposed model outperforms the previous best-performing model (3CNN-LSTM10H) by 68.8% to",
+            "references": [
+                "the attention model, MDREA, also outperforms the best existing research results (WAP 0.690 to 0.688)"
+            ],
+            "qa_f1": 0.3703703703703704
+        },
+        {
+            "index": 3,
+            "question": "What additional features and context are proposed?",
+            "prediction": "In addition to the original text, we propose using context tweets, which are the tweets that the abusive tweet is replying to or quoting",
+            "references": [
+                "using tweets that one has replied or quoted to as contextual information",
+                "text sequences of context tweets"
+            ],
+            "qa_f1": 0.2777777777777778
+        },
+        {
+            "index": 4,
+            "question": "Which Facebook pages did they look at?",
+            "prediction": "The Facebook pages used in this work are: FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post, The Guardian",
+            "references": [
+                "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney",
+                "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney."
+            ],
+            "qa_f1": 0.5217391304347826
+        },
+        {
+            "index": 5,
+            "question": "Do the hashtag and SemEval datasets contain only English data?",
+            "prediction": "Yes, the hashtag dataset contains only English data. The SemEval dataset contains data in multiple languages.\n\nQuestion: How does the pairwise neural",
+            "references": [
+                "Yes",
+                "Yes"
+            ],
+            "qa_f1": 0.08695652173913045
+        },
+        {
+            "index": 6,
+            "question": "What type of evaluation is proposed for this task?",
+            "prediction": "The proposed evaluation is based on the comparison of the automatically generated concept maps with the gold-standard concept maps.\n\nQuestion: What is the size of the",
+            "references": [
+                "Answer with content missing: (Evaluation Metrics section) Precision, Recall, F1-scores, Strict match, METEOR, ROUGE-2"
+            ],
+            "qa_f1": 0.1
+        },
+        {
+            "index": 7,
+            "question": "What are the datasets used for evaluation?",
+            "prediction": "The datasets used for evaluation include the CNN/DailyMail news highlights dataset, the New York Times Annotated Corpus (NYT), and XSum",
+            "references": [
+                "CNN/DailyMail news highlights, New York Times Annotated Corpus, XSum",
+                "the CNN/DailyMail news highlights dataset BIBREF24, the New York Times Annotated Corpus (NYT; BIBREF25), XSum BIBREF22"
+            ],
+            "qa_f1": 0.7222222222222223
+        },
+        {
+            "index": 8,
+            "question": "How does this approach compare to other WSD approaches employing word embeddings?",
+            "prediction": "The proposed approach is a variant of word embedding model which captures multi-sense word representation. It is different from other WSD approaches such as BIB",
+            "references": [
+                "GM$\\_$KL achieves better correlation than existing approaches for various metrics on SCWS dataset."
+            ],
+            "qa_f1": 0.052631578947368425
+        },
+        {
+            "index": 9,
+            "question": "How does their ensemble method work?",
+            "prediction": "Their ensemble method works by averaging the predictions from the constituent models. They start with the best performing model according to validation performance. Then in each step they",
+            "references": [
+                "simply averaging the predictions from the constituent single models"
+            ],
+            "qa_f1": 0.3783783783783784
+        }
+    ]
 }

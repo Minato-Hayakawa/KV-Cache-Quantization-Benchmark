@@ -1,6 +1,105 @@
 {
     "model_name": "meta-llama/Meta-Llama-3.1-8B",
     "method": "turbo_quant",
-    "generated_summary": "Quantum, and a single and it in the function that is a lot of the same or a way, and and and a single, but not much to a slow and 0. 1.",
-    "input_length": 937
+    "task": "qasper",
+    "num_samples": 10,
+    "max_ctx_tokens": 6144,
+    "longbench_qasper_f1": 0.1580349037831457,
+    "samples": [
+        {
+            "index": 0,
+            "question": "How is the ground truth for fake news established?",
+            "prediction": "The ground truth is established by a single person. The person is a journalist and a researcher. The person has a PhD in Computer Science and has been working in",
+            "references": [
+                "Ground truth is not established in the paper"
+            ],
+            "qa_f1": 0.31578947368421056
+        },
+        {
+            "index": 1,
+            "question": "What is the GhostVLAD approach?",
+            "prediction": "The GhostVLAD approach is a pooling strategy that was originally proposed for face recognition. It is an extension of the NetVLAD approach, which is itself an",
+            "references": [
+                "extension of the NetVLAD, adds Ghost clusters along with the NetVLAD clusters",
+                "An extension of NetVLAD which replaces hard assignment-based clustering with soft assignment-based clustering with the additon o fusing Ghost clusters to deal with noisy content."
+            ],
+            "qa_f1": 0.2631578947368421
+        },
+        {
+            "index": 2,
+            "question": "By how much does their model outperform the state of the art results?",
+            "prediction": "68.8% to 71.8% on the IEMOCAP dataset.\n\nQuestion: What is the main contribution of this paper?\nAnswer:",
+            "references": [
+                "the attention model, MDREA, also outperforms the best existing research results (WAP 0.690 to 0.688)"
+            ],
+            "qa_f1": 0.18750000000000003
+        },
+        {
+            "index": 3,
+            "question": "What additional features and context are proposed?",
+            "prediction": "The paper proposes the following additional features and context: (1) context tweets, (2) character-level features, (3) HybridCNN, (4)",
+            "references": [
+                "using tweets that one has replied or quoted to as contextual information",
+                "text sequences of context tweets"
+            ],
+            "qa_f1": 0.1739130434782609
+        },
+        {
+            "index": 4,
+            "question": "Which Facebook pages did they look at?",
+            "prediction": "We chose different pages (and therefore domains and stances), aiming at a balanced and varied dataset, but we did so mainly based on intuition and availability, and",
+            "references": [
+                "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney",
+                "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney."
+            ],
+            "qa_f1": 0.0
+        },
+        {
+            "index": 5,
+            "question": "Do the hashtag and SemEval datasets contain only English data?",
+            "prediction": "Yes, the data is English only.\nQuestion: Do you have any data for other languages?\nAnswer: We do not have data for other languages. We are",
+            "references": [
+                "Yes",
+                "Yes"
+            ],
+            "qa_f1": 0.07407407407407407
+        },
+        {
+            "index": 6,
+            "question": "What type of evaluation is proposed for this task?",
+            "prediction": "The task is evaluated using the standard ROUGE evaluation metric.\nQuestion: What is the task about?\nAnswer: The task is about creating a concept map that summarizes",
+            "references": [
+                "Answer with content missing: (Evaluation Metrics section) Precision, Recall, F1-scores, Strict match, METEOR, ROUGE-2"
+            ],
+            "qa_f1": 0.0975609756097561
+        },
+        {
+            "index": 7,
+            "question": "What are the datasets used for evaluation?",
+            "prediction": "We used the following datasets for evaluation:\n- CNN/DailyMail: contains news articles and their corresponding highlights. We used the standard splits of BIBREF24",
+            "references": [
+                "CNN/DailyMail news highlights, New York Times Annotated Corpus, XSum",
+                "the CNN/DailyMail news highlights dataset BIBREF24, the New York Times Annotated Corpus (NYT; BIBREF25), XSum BIBREF22"
+            ],
+            "qa_f1": 0.3157894736842105
+        },
+        {
+            "index": 8,
+            "question": "How does this approach compare to other WSD approaches employing word embeddings?",
+            "prediction": "The proposed approach is different from other word sense disambiguation approaches employing word embeddings. The proposed approach is a probabilistic approach which models word distributions as Gaussian",
+            "references": [
+                "GM$\\_$KL achieves better correlation than existing approaches for various metrics on SCWS dataset."
+            ],
+            "qa_f1": 0.05
+        },
+        {
+            "index": 9,
+            "question": "How does their ensemble method work?",
+            "prediction": "We started with the best model according to the validation set. Then in each step we added the best model that had not been tried yet. We kept it in",
+            "references": [
+                "simply averaging the predictions from the constituent single models"
+            ],
+            "qa_f1": 0.10256410256410256
+        }
+    ]
 }

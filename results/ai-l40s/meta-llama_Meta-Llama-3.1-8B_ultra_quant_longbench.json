@@ -1,6 +1,105 @@
 {
     "model_name": "meta-llama/Meta-Llama-3.1-8B",
     "method": "ultra_quant",
-    "generated_summary": "Quantum Information and you need to the other other years ago, and 6 3, 2. 1. The C. I had made that he was given by the following a small and",
-    "input_length": 937
+    "task": "qasper",
+    "num_samples": 10,
+    "max_ctx_tokens": 6144,
+    "longbench_qasper_f1": 0.2832412957518605,
+    "samples": [
+        {
+            "index": 0,
+            "question": "How is the ground truth for fake news established?",
+            "prediction": "The ground truth for fake news is established by a single person. The person is a journalist and has been working on fake news for a long time. The person",
+            "references": [
+                "Ground truth is not established in the paper"
+            ],
+            "qa_f1": 0.2631578947368421
+        },
+        {
+            "index": 1,
+            "question": "What is the GhostVLAD approach?",
+            "prediction": "The GhostVLAD approach is a pooling strategy that was originally proposed for face recognition. It is an extension of the NetVLAD approach, which adds ghost clusters",
+            "references": [
+                "extension of the NetVLAD, adds Ghost clusters along with the NetVLAD clusters",
+                "An extension of NetVLAD which replaces hard assignment-based clustering with soft assignment-based clustering with the additon o fusing Ghost clusters to deal with noisy content."
+            ],
+            "qa_f1": 0.42105263157894735
+        },
+        {
+            "index": 2,
+            "question": "By how much does their model outperform the state of the art results?",
+            "prediction": "The proposed model outperforms the state-of-the-art methods by 68.8% to 71.8% when applied to the IEMOCAP",
+            "references": [
+                "the attention model, MDREA, also outperforms the best existing research results (WAP 0.690 to 0.688)"
+            ],
+            "qa_f1": 0.3225806451612903
+        },
+        {
+            "index": 3,
+            "question": "What additional features and context are proposed?",
+            "prediction": "The paper proposes to use context tweets as additional features. Context tweets are tweets that the user has replied to or has quoted. The paper also proposes to use latent",
+            "references": [
+                "using tweets that one has replied or quoted to as contextual information",
+                "text sequences of context tweets"
+            ],
+            "qa_f1": 0.3809523809523809
+        },
+        {
+            "index": 4,
+            "question": "Which Facebook pages did they look at?",
+            "prediction": "They looked at a variety of pages, including Fox News, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon",
+            "references": [
+                "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney",
+                "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney."
+            ],
+            "qa_f1": 0.5599999999999999
+        },
+        {
+            "index": 5,
+            "question": "Do the hashtag and SemEval datasets contain only English data?",
+            "prediction": "Yes, both datasets contain only English data. We plan to extend our toolkit to other languages in the future.\nQuestion: How do you handle hashtags with non-",
+            "references": [
+                "Yes",
+                "Yes"
+            ],
+            "qa_f1": 0.07142857142857142
+        },
+        {
+            "index": 6,
+            "question": "What type of evaluation is proposed for this task?",
+            "prediction": "The authors propose to use the standard ROUGE evaluation metric for this task. They also propose to use the Pyramid metric, which is a metric that is more suitable",
+            "references": [
+                "Answer with content missing: (Evaluation Metrics section) Precision, Recall, F1-scores, Strict match, METEOR, ROUGE-2"
+            ],
+            "qa_f1": 0.046511627906976744
+        },
+        {
+            "index": 7,
+            "question": "What are the datasets used for evaluation?",
+            "prediction": "We evaluated our model on three benchmark datasets, namely the CNN/DailyMail news highlights dataset, the New York Times Annotated Corpus (NYT), and X",
+            "references": [
+                "CNN/DailyMail news highlights, New York Times Annotated Corpus, XSum",
+                "the CNN/DailyMail news highlights dataset BIBREF24, the New York Times Annotated Corpus (NYT; BIBREF25), XSum BIBREF22"
+            ],
+            "qa_f1": 0.6153846153846153
+        },
+        {
+            "index": 8,
+            "question": "How does this approach compare to other WSD approaches employing word embeddings?",
+            "prediction": "The proposed approach is different from other WSD approaches employing word embeddings. The proposed approach is a word embedding approach which learns multi-sense word embeddings by learning a",
+            "references": [
+                "GM$\\_$KL achieves better correlation than existing approaches for various metrics on SCWS dataset."
+            ],
+            "qa_f1": 0.04878048780487805
+        },
+        {
+            "index": 9,
+            "question": "How does their ensemble method work?",
+            "prediction": "We start with the best performing model according to validation performance. Then in each step we try adding the best performing model that has not been previously tried. We keep",
+            "references": [
+                "simply averaging the predictions from the constituent single models"
+            ],
+            "qa_f1": 0.10256410256410256
+        }
+    ]
 }

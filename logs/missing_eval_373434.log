@@ -1,0 +1,208 @@
+==================================================
+ Re-running Missing Evaluations Only
+ Working Directory: /hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark
+ Node: ai-l40s-00.cloud.r-ccs.riken.jp
+ Date: Wed Aug 26 09:47:05 AM JST 2026
+ Partition: ai-l40s
+==================================================
+>>> Running Analytical Footprint Calculation... [mistralai/Mistral-7B-Instruct-v0.3]
+=== Calculating Analytical Footprints | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 8192 ===
+Method: fp16         | Bits: 16.0 | Data:  1024.00 MB | Meta:     0.00 MB | Total:  1024.00 MB | Compression:  1.00x
+Method: turbo_quant  | Bits:  3.0 | Data:   192.00 MB | Meta:    16.00 MB | Total:   208.00 MB | Compression:  4.92x
+Method: rotor_quant  | Bits:  3.0 | Data:   192.00 MB | Meta:   704.00 MB | Total:   896.00 MB | Compression:  1.14x
+Method: hyper_quant  | Bits:  3.0 | Data:   192.00 MB | Meta:    16.00 MB | Total:   208.00 MB | Compression:  4.92x
+Method: ultra_quant  | Bits:  4.0 | Data:   256.00 MB | Meta:    16.00 MB | Total:   272.00 MB | Compression:  3.76x
+
+All analytical footprint results successfully saved to results/ai-l40s/
+>>> Running Compression Evaluation... [mistralai/Mistral-7B-Instruct-v0.3 | fp16]
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: fp16 | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'fp16', 'sequence_length': 8192, 'designed_bits': 16.0, 'stored_mb': 1024.0, 'designed_data_mb': 1024.0, 'designed_meta_mb': 0.0, 'designed_footprint_mb': 1024.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_compression.json
+>>> Running Compression Evaluation... [mistralai/Mistral-7B-Instruct-v0.3 | turbo_quant]
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: turbo_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'turbo_quant', 'sequence_length': 8192, 'designed_bits': 3.0, 'stored_mb': 528.0, 'designed_data_mb': 192.0, 'designed_meta_mb': 16.0, 'designed_footprint_mb': 208.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_compression.json
+>>> Running Compression Evaluation... [mistralai/Mistral-7B-Instruct-v0.3 | rotor_quant]
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: rotor_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'rotor_quant', 'sequence_length': 8192, 'designed_bits': 3.0, 'stored_mb': 1208.0, 'designed_data_mb': 192.0, 'designed_meta_mb': 704.0, 'designed_footprint_mb': 896.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_compression.json
+>>> Running Compression Evaluation... [mistralai/Mistral-7B-Instruct-v0.3 | hyper_quant]
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: hyper_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'hyper_quant', 'sequence_length': 8192, 'designed_bits': 3.0, 'stored_mb': 528.0, 'designed_data_mb': 192.0, 'designed_meta_mb': 16.0, 'designed_footprint_mb': 208.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_compression.json
+>>> Running Compression Evaluation... [mistralai/Mistral-7B-Instruct-v0.3 | ultra_quant]
+=== Measuring KV Cache Compression | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: ultra_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'ultra_quant', 'sequence_length': 8192, 'designed_bits': 4.0, 'stored_mb': 528.0, 'designed_data_mb': 256.0, 'designed_meta_mb': 16.0, 'designed_footprint_mb': 272.0, 'note': 'stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。'}
+Compression results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_compression.json
+--------------------------------------------------
+ Method: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: turbo_quant | Device: cuda ===
+  [0] F1=0.316 | pred: 'The ground truth is established by a single person. The person is a journalist a'
+  [1] F1=0.263 | pred: 'The GhostVLAD approach is a pooling strategy that was originally proposed for fa'
+  [2] F1=0.188 | pred: '68.8% to 71.8% on the IEMOCAP dataset.\n\nQuestion: What is the main contribution '
+  [3] F1=0.174 | pred: 'The paper proposes the following additional features and context: (1) context tw'
+  [4] F1=0.000 | pred: 'We chose different pages (and therefore domains and stances), aiming at a balanc'
+  [5] F1=0.074 | pred: 'Yes, the data is English only.\nQuestion: Do you have any data for other language'
+  [6] F1=0.098 | pred: 'The task is evaluated using the standard ROUGE evaluation metric.\nQuestion: What'
+  [7] F1=0.316 | pred: 'We used the following datasets for evaluation:\n- CNN/DailyMail: contains news ar'
+  [8] F1=0.050 | pred: 'The proposed approach is different from other word sense disambiguation approach'
+  [9] F1=0.103 | pred: 'We started with the best model according to the validation set. Then in each ste'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.1580 ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_longbench.json
+--------------------------------------------------
+ Method: rotor_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: rotor_quant | Device: cuda ===
+  [0] F1=0.270 | pred: 'The ground truth is established by a single person, who manually inspected the t'
+  [1] F1=0.053 | pred: 'The GhostVLAD approach is a method for aggregating frame-level features into a s'
+  [2] F1=0.324 | pred: 'The authors claim that their model outperforms the state of the art results by 6'
+  [3] F1=0.176 | pred: 'The authors propose to use context tweets as additional features. They also prop'
+  [4] F1=0.667 | pred: 'We looked at the following pages: FoxNews, CNN, ESPN, New York Times, Time magaz'
+  [5] F1=0.080 | pred: 'Yes, the hashtag segmentation datasets are English only. The SemEval 2017 datase'
+  [6] F1=0.205 | pred: 'The evaluation is based on the standard ROUGE metrics.\n\nQuestion: What is the si'
+  [7] F1=0.615 | pred: 'We evaluated our model on three benchmark datasets, namely the CNN/DailyMail new'
+  [8] F1=0.057 | pred: 'The proposed approach is a word embedding based approach and hence is different '
+  [9] F1=0.103 | pred: 'We start with the best performing model according to validation performance. The'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.2551 ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_longbench.json
+--------------------------------------------------
+ Method: hyper_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: hyper_quant | Device: cuda ===
+  [0] F1=0.125 | pred: 'By a human expert.\nQuestion: How is the expert selected?\nAnswer: By a human expe'
+  [1] F1=0.245 | pred: 'In this work, we use GhostVLAD pooling approach to improve language identificati'
+  [2] F1=0.111 | pred: '68.8% to 71.8%'
+  [3] F1=0.176 | pred: 'We investigate the effect of different features and variants on the baseline mod'
+  [4] F1=0.431 | pred: 'The Facebook pages used for the experiments described in this paper are: Fox New'
+  [5] F1=0.000 | pred: 'No, the SemEval 2017 dataset contains data in other languages, such as Spanish, '
+  [6] F1=0.095 | pred: 'The evaluation is a comparison of the importance of propositions.\n\nQuestion: Wha'
+  [7] F1=0.316 | pred: 'We used the CNN/DailyMail dataset for extractive summarization and the NYT datas'
+  [8] F1=0.059 | pred: 'We compare the proposed approach with the previous approaches such as w2g BIBREF'
+  [9] F1=0.300 | pred: 'We form an ensemble of models by averaging the predictions of the constituent mo'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.1859 ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_longbench.json
+--------------------------------------------------
+ Method: ultra_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: ultra_quant | Device: cuda ===
+  [0] F1=0.263 | pred: 'The ground truth for fake news is established by a single person. The person is '
+  [1] F1=0.421 | pred: 'The GhostVLAD approach is a pooling strategy that was originally proposed for fa'
+  [2] F1=0.323 | pred: 'The proposed model outperforms the state-of-the-art methods by 68.8% to 71.8% wh'
+  [3] F1=0.381 | pred: 'The paper proposes to use context tweets as additional features. Context tweets '
+  [4] F1=0.560 | pred: 'They looked at a variety of pages, including Fox News, CNN, ESPN, New York Times'
+  [5] F1=0.071 | pred: 'Yes, both datasets contain only English data. We plan to extend our toolkit to o'
+  [6] F1=0.047 | pred: 'The authors propose to use the standard ROUGE evaluation metric for this task. T'
+  [7] F1=0.615 | pred: 'We evaluated our model on three benchmark datasets, namely the CNN/DailyMail new'
+  [8] F1=0.049 | pred: 'The proposed approach is different from other WSD approaches employing word embe'
+  [9] F1=0.103 | pred: 'We start with the best performing model according to validation performance. The'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.2832 ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_longbench.json
+--------------------------------------------------
+ Method: turbo_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: turbo_quant | Device: cuda ===
+  [0] F1=0.333 | pred: 'In our study, the ground truth was established by an expert.\n\nQuestion: How do y'
+  [1] F1=0.292 | pred: 'GhostVLAD is an extension of the NetVLAD approach, which was initially developed'
+  [2] F1=0.370 | pred: 'The proposed model outperforms the previous best-performing model (3CNN-LSTM10H)'
+  [3] F1=0.278 | pred: 'In addition to the original text, we propose using context tweets, which are the'
+  [4] F1=0.522 | pred: 'The Facebook pages used in this work are: FoxNews, CNN, ESPN, New York Times, Ti'
+  [5] F1=0.087 | pred: 'Yes, the hashtag dataset contains only English data. The SemEval dataset contain'
+  [6] F1=0.100 | pred: 'The proposed evaluation is based on the comparison of the automatically generate'
+  [7] F1=0.722 | pred: 'The datasets used for evaluation include the CNN/DailyMail news highlights datas'
+  [8] F1=0.053 | pred: 'The proposed approach is a variant of word embedding model which captures multi-'
+  [9] F1=0.378 | pred: 'Their ensemble method works by averaging the predictions from the constituent mo'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.3135 ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_longbench.json
+--------------------------------------------------
+ Method: rotor_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: rotor_quant | Device: cuda ===
+  [0] F1=0.270 | pred: 'The ground truth for fake news was established by an expert who manually inspect'
+  [1] F1=0.298 | pred: 'GhostVLAD is an extension of the NetVLAD approach, which was originally proposed'
+  [2] F1=0.345 | pred: 'The proposed model outperforms the previous state-of-the-art methods by 68.8% to'
+  [3] F1=0.162 | pred: 'In addition to the original tweet, the context tweet is proposed as an additiona'
+  [4] F1=0.682 | pred: 'They looked at FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Pos'
+  [5] F1=0.074 | pred: 'Yes, the hashtag dataset contains only English data. The SemEval dataset contain'
+  [6] F1=0.053 | pred: 'The evaluation is based on the agreement of multiple crowdworkers.\n\nQuestion: Wh'
+  [7] F1=0.706 | pred: 'The datasets used for evaluation are CNN/DailyMail news highlights dataset, New '
+  [8] F1=0.121 | pred: 'The proposed approach, GM$\\_$KL, is a Gaussian mixture model using KL divergence'
+  [9] F1=0.103 | pred: 'They started with the best performing model according to validation performance.'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.2813 ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_longbench.json
+--------------------------------------------------
+ Method: hyper_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: hyper_quant | Device: cuda ===
+  [0] F1=0.270 | pred: 'The ground truth for fake news in our dataset was established by an expert manua'
+  [1] F1=0.240 | pred: 'GhostVLAD is a pooling strategy for language identification that was originally '
+  [2] F1=0.308 | pred: 'Their model outperforms the state-of-the-art methods by 68.8% to 71.8%.\n\nQuestio'
+  [3] F1=0.216 | pred: 'In addition to the original tweet, we propose the use of context tweets, which a'
+  [4] F1=0.553 | pred: 'They looked at pages such as Fox News, CNN, ESPN, New York Times, Time magazine,'
+  [5] F1=0.154 | pred: 'Yes.\n\nQuestion: How many hashtags are in the SemEval dataset?\nAnswer: 12,594.'
+  [6] F1=0.050 | pred: 'The proposed evaluation is based on the concept of peer evaluation, where the an'
+  [7] F1=0.286 | pred: 'The datasets used for evaluation are CNN/DailyMail, NYT, and XSum.\n\nQuestion: Wh'
+  [8] F1=0.061 | pred: 'The proposed approach employs a KL divergence based energy function for capturin'
+  [9] F1=0.444 | pred: 'The ensemble is formed by averaging the predictions from the constituent single '
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.2582 ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_longbench.json
+--------------------------------------------------
+ Method: ultra_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: ultra_quant | Device: cuda ===
+  [0] F1=0.270 | pred: 'The ground truth for fake news was established by an expert who manually inspect'
+  [1] F1=0.267 | pred: 'GhostVLAD is an extension of the NetVLAD approach, which was initially developed'
+  [2] F1=0.345 | pred: 'The proposed model outperforms the previous state-of-the-art methods by 68.8% to'
+  [3] F1=0.200 | pred: 'We propose the use of context tweets as an additional feature for neural network'
+  [4] F1=0.682 | pred: 'They looked at FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Pos'
+  [5] F1=0.077 | pred: 'Yes, the hashtag dataset contains only English data. The SemEval dataset contain'
+  [6] F1=0.140 | pred: 'The proposed evaluation is based on the comparison of the automatically generate'
+  [7] F1=0.706 | pred: 'The datasets used for evaluation are CNN/DailyMail news highlights dataset, New '
+  [8] F1=0.053 | pred: 'The proposed approach is different from other WSD approaches employing word embe'
+  [9] F1=0.118 | pred: 'The ensemble method used by the authors is as follows:\n1. Start with the best pe'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.2856 ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_longbench.json
+==================================================
+ Missing Evaluations Completed
+ Date: Wed Aug 26 09:54:38 AM JST 2026
+==================================================

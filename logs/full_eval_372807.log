@@ -1,0 +1,506 @@
+==================================================
+ Starting Comprehensive KV Cache Quantization Benchmark
+ Working Directory: /hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark
+ Node: ai-l40s-00.cloud.r-ccs.riken.jp
+ Date: Mon Aug 24 03:32:13 PM JST 2026
+ Partition: ai-l40s
+==================================================
+##################################################
+ Evaluating Model: meta-llama/Meta-Llama-3.1-8B
+##################################################
+>>> Running Theoretical Compression Rate Calculation (All Methods)...
+=== Calculating Theoretical Compression for All Methods | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 8192 ===
+Method: fp16         | Bits: 16.0 | Size:  1024.00 MB | Compression:  1.00x
+Method: turbo_quant  | Bits: 3.0 | Size:   192.00 MB | Compression:  5.33x
+Method: rotor_quant  | Bits: 3.0 | Size:   192.00 MB | Compression:  5.33x
+Method: hyper_quant  | Bits: 2.5 | Size:   160.00 MB | Compression:  6.40x
+Method: ultra_quant  | Bits: 2.0 | Size:   128.00 MB | Compression:  8.00x
+
+All theoretical compression results successfully saved to results/ai-l40s/
+--------------------------------------------------
+ Current Method: fp16 | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: fp16 | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[fp16] Perplexity: 5.5667
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | fp16]: 5.56669282913208
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: fp16 | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 1.00000
+Top-1 Match Rate   : 100.00%
+Top-5 Match Rate   : 100.00%
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | fp16]: {'cosine_similarity': 1.0, 'top1_match_rate': 100.0, 'top5_match_rate': 100.0, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: fp16 | Device: cuda ===
+Actual Prompt Token Length: 7605
+Output   : 998244353. What is the secret key for HPC cluster access
+Success  : True
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | fp16]: {'context_len': 8192, 'actual_prompt_len': 7605, 'response': '998244353. What is the secret key for HPC cluster access', 'success': True}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: meta-llama/Meta-Llama-3.1-8B | Method: fp16 | Device: cuda ===
+Generated Summary: Quantum computing is a technology that leverages the principles of quantum mechanics to perform calculations at speeds exponentially faster than conventional supercomputers, enabling applications in cryptography, drug discovery, and financial modeling.
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | fp16]: {'generated_summary': 'Quantum computing is a technology that leverages the principles of quantum mechanics to perform calculations at speeds exponentially faster than conventional supercomputers, enabling applications in cryptography, drug discovery, and financial modeling.', 'input_length': 937}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: fp16 | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'fp16', 'sequence_length': 8192, 'prefill_time_sec': 1.0482, 'decode_time_sec': 0.8928, 'generated_tokens': 32, 'tokens_per_second': 35.84}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_speed.json
+--------------------------------------------------
+ Current Method: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: turbo_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[turbo_quant] Perplexity: 6.8154
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | turbo_quant]: 6.815441131591797
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.69044
+Top-1 Match Rate   : 99.61%
+Top-5 Match Rate   : 44.65%
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | turbo_quant]: {'cosine_similarity': 0.6904431581497192, 'top1_match_rate': 99.609375, 'top5_match_rate': 44.648438692092896, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: turbo_quant | Device: cuda ===
+Actual Prompt Token Length: 7605
+Output   : The 1, 1, 1, 1, 1
+Success  : False
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | turbo_quant]: {'context_len': 8192, 'actual_prompt_len': 7605, 'response': 'The 1, 1, 1, 1, 1', 'success': False}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: meta-llama/Meta-Llama-3.1-8B | Method: turbo_quant | Device: cuda ===
+Generated Summary: Quantum, and a single and it in the function that is a lot of the same or a way, and and and a single, but not much to a slow and 0. 1.
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | turbo_quant]: {'generated_summary': 'Quantum, and a single and it in the function that is a lot of the same or a way, and and and a single, but not much to a slow and 0. 1.', 'input_length': 937}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: turbo_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'turbo_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.1102, 'decode_time_sec': 0.9461, 'generated_tokens': 32, 'tokens_per_second': 33.82}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_speed.json
+--------------------------------------------------
+ Current Method: rotor_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: rotor_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[rotor_quant] Perplexity: 5.7397
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | rotor_quant]: 5.7396721839904785
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: rotor_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.97893
+Top-1 Match Rate   : 99.90%
+Top-5 Match Rate   : 85.02%
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | rotor_quant]: {'cosine_similarity': 0.978927731513977, 'top1_match_rate': 99.90234375, 'top5_match_rate': 85.01952886581421, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: rotor_quant | Device: cuda ===
+Actual Prompt Token Length: 7605
+Output   : 1. The 1. The 1. The 1.
+Success  : False
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | rotor_quant]: {'context_len': 8192, 'actual_prompt_len': 7605, 'response': '1. The 1. The 1. The 1.', 'success': False}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: meta-llama/Meta-Llama-3.1-8B | Method: rotor_quant | Device: cuda ===
+Generated Summary: Quantum Administration, and 2019, and the same, and we can be to you want to the following a problem of the world of the American
+def make a lot of the best for a
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | rotor_quant]: {'generated_summary': 'Quantum Administration, and 2019, and the same, and we can be to you want to the following a problem of the world of the American\ndef make a lot of the best for a', 'input_length': 937}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: rotor_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'rotor_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.2154, 'decode_time_sec': 2.2293, 'generated_tokens': 32, 'tokens_per_second': 14.35}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_speed.json
+--------------------------------------------------
+ Current Method: hyper_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: hyper_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[hyper_quant] Perplexity: 6.6857
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | hyper_quant]: 6.685699939727783
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: hyper_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.70566
+Top-1 Match Rate   : 99.80%
+Top-5 Match Rate   : 47.07%
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | hyper_quant]: {'cosine_similarity': 0.705655574798584, 'top1_match_rate': 99.8046875, 'top5_match_rate': 47.0703125, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: hyper_quant | Device: cuda ===
+Actual Prompt Token Length: 7605
+Output   : 1, and the most of the most of the most of the most
+Success  : False
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | hyper_quant]: {'context_len': 8192, 'actual_prompt_len': 7605, 'response': '1, and the most of the most of the most of the most', 'success': False}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: meta-llama/Meta-Llama-3.1-8B | Method: hyper_quant | Device: cuda ===
+Generated Summary: if the most well, and the end of the number of the entire new problems, and it's a new problem. 1. A.
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | hyper_quant]: {'generated_summary': "if the most well, and the end of the number of the entire new problems, and it's a new problem. 1. A.", 'input_length': 937}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: hyper_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'hyper_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.0867, 'decode_time_sec': 0.945, 'generated_tokens': 32, 'tokens_per_second': 33.86}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_speed.json
+--------------------------------------------------
+ Current Method: ultra_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: ultra_quant | Device: cuda | Model: meta-llama/Meta-Llama-3.1-8B ===
+[ultra_quant] Perplexity: 5.6922
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | ultra_quant]: 5.6921772956848145
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: ultra_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.97068
+Top-1 Match Rate   : 99.90%
+Top-5 Match Rate   : 85.55%
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | ultra_quant]: {'cosine_similarity': 0.970683217048645, 'top1_match_rate': 99.90234375, 'top5_match_rate': 85.546875, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: ultra_quant | Device: cuda ===
+Actual Prompt Token Length: 7605
+Output   : 1. The 1. The 1. The 1.
+Success  : False
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | ultra_quant]: {'context_len': 8192, 'actual_prompt_len': 7605, 'response': '1. The 1. The 1. The 1.', 'success': False}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: meta-llama/Meta-Llama-3.1-8B | Method: ultra_quant | Device: cuda ===
+Generated Summary: Quantum Information and you need to the other other years ago, and 6 3, 2. 1. The C. I had made that he was given by the following a small and
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | ultra_quant]: {'generated_summary': 'Quantum Information and you need to the other other years ago, and 6 3, 2. 1. The C. I had made that he was given by the following a small and', 'input_length': 937}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: meta-llama/Meta-Llama-3.1-8B | Method: ultra_quant | SeqLen: 8192 ===
+Result: {'model_name': 'meta-llama/Meta-Llama-3.1-8B', 'method': 'ultra_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.3639, 'decode_time_sec': 0.8777, 'generated_tokens': 32, 'tokens_per_second': 36.46}
+Speed results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_speed.json
+##################################################
+ Evaluating Model: mistralai/Mistral-7B-Instruct-v0.3
+##################################################
+>>> Running Theoretical Compression Rate Calculation (All Methods)...
+=== Calculating Theoretical Compression for All Methods | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 8192 ===
+Method: fp16         | Bits: 16.0 | Size:  1024.00 MB | Compression:  1.00x
+Method: turbo_quant  | Bits: 3.0 | Size:   192.00 MB | Compression:  5.33x
+Method: rotor_quant  | Bits: 3.0 | Size:   192.00 MB | Compression:  5.33x
+Method: hyper_quant  | Bits: 2.5 | Size:   160.00 MB | Compression:  6.40x
+Method: ultra_quant  | Bits: 2.0 | Size:   128.00 MB | Compression:  8.00x
+
+All theoretical compression results successfully saved to results/ai-l40s/
+--------------------------------------------------
+ Current Method: fp16 | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: fp16 | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[fp16] Perplexity: 4.8756
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | fp16]: 4.875646591186523
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: fp16 | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 1.00000
+Top-1 Match Rate   : 100.00%
+Top-5 Match Rate   : 100.00%
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | fp16]: {'cosine_similarity': 1.0, 'top1_match_rate': 100.0, 'top5_match_rate': 100.0, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: fp16 | Device: cuda ===
+Actual Prompt Token Length: 7653
+Output   : 998244353
+Success  : True
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | fp16]: {'context_len': 8192, 'actual_prompt_len': 7653, 'response': '998244353', 'success': True}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: fp16 | Device: cuda ===
+Generated Summary: Quantum computing enables complex calculations at speeds exponentially faster than conventional supercomputers, with key applications in cryptography, drug discovery, and financial modeling.
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | fp16]: {'generated_summary': 'Quantum computing enables complex calculations at speeds exponentially faster than conventional supercomputers, with key applications in cryptography, drug discovery, and financial modeling.', 'input_length': 1038}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: fp16 | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'fp16', 'sequence_length': 8192, 'prefill_time_sec': 0.9921, 'decode_time_sec': 0.8509, 'generated_tokens': 32, 'tokens_per_second': 37.61}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_speed.json
+--------------------------------------------------
+ Current Method: turbo_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: turbo_quant | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[turbo_quant] Perplexity: 5.2240
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | turbo_quant]: 5.22395133972168
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: turbo_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.99054
+Top-1 Match Rate   : 99.71%
+Top-5 Match Rate   : 75.10%
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | turbo_quant]: {'cosine_similarity': 0.9905380606651306, 'top1_match_rate': 99.70703125, 'top5_match_rate': 75.09765625, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: turbo_quant | Device: cuda ===
+Actual Prompt Token Length: 7653
+Output   : 
+Success  : False
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | turbo_quant]: {'context_len': 8192, 'actual_prompt_len': 7653, 'response': '', 'success': False}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: turbo_quant | Device: cuda ===
+Generated Summary: Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | turbo_quant]: {'generated_summary': 'Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q', 'input_length': 1038}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: turbo_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'turbo_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.1313, 'decode_time_sec': 0.9116, 'generated_tokens': 32, 'tokens_per_second': 35.1}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_speed.json
+--------------------------------------------------
+ Current Method: rotor_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: rotor_quant | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[rotor_quant] Perplexity: 4.9304
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | rotor_quant]: 4.930351257324219
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: rotor_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.99924
+Top-1 Match Rate   : 99.90%
+Top-5 Match Rate   : 93.96%
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | rotor_quant]: {'cosine_similarity': 0.9992357492446899, 'top1_match_rate': 99.90234375, 'top5_match_rate': 93.9648449420929, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: rotor_quant | Device: cuda ===
+Actual Prompt Token Length: 7653
+Output   : 
+Success  : False
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | rotor_quant]: {'context_len': 8192, 'actual_prompt_len': 7653, 'response': '', 'success': False}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: rotor_quant | Device: cuda ===
+Generated Summary: Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | rotor_quant]: {'generated_summary': 'Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q', 'input_length': 1038}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: rotor_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'rotor_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.1575, 'decode_time_sec': 2.2195, 'generated_tokens': 32, 'tokens_per_second': 14.42}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_speed.json
+--------------------------------------------------
+ Current Method: hyper_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: hyper_quant | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[hyper_quant] Perplexity: 5.2015
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | hyper_quant]: 5.201521396636963
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: hyper_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.98699
+Top-1 Match Rate   : 99.51%
+Top-5 Match Rate   : 69.80%
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | hyper_quant]: {'cosine_similarity': 0.9869949817657471, 'top1_match_rate': 99.51171875, 'top5_match_rate': 69.80469226837158, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: hyper_quant | Device: cuda ===
+Actual Prompt Token Length: 7653
+Output   : 
+Success  : False
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | hyper_quant]: {'context_len': 8192, 'actual_prompt_len': 7653, 'response': '', 'success': False}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: hyper_quant | Device: cuda ===
+Generated Summary: Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | hyper_quant]: {'generated_summary': 'Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q', 'input_length': 1038}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: hyper_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'hyper_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.113, 'decode_time_sec': 0.9106, 'generated_tokens': 32, 'tokens_per_second': 35.14}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_speed.json
+--------------------------------------------------
+ Current Method: ultra_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running PPL Evaluation...
+Detected Active Device: cuda
+
+=== Evaluating PPL: ultra_quant | Device: cuda | Model: mistralai/Mistral-7B-Instruct-v0.3 ===
+[ultra_quant] Perplexity: 4.9072
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | ultra_quant]: 4.907246112823486
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_ppl.json
+>>> Running Fidelity Evaluation...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: ultra_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Cosine Similarity : 0.99944
+Top-1 Match Rate   : 99.90%
+Top-5 Match Rate   : 94.16%
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | ultra_quant]: {'cosine_similarity': 0.9994429349899292, 'top1_match_rate': 99.90234375, 'top5_match_rate': 94.1601574420929, 'evaluated_seq_len': 1024}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_fidelity.json
+>>> Running NIAH Evaluation...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: ultra_quant | Device: cuda ===
+Actual Prompt Token Length: 7653
+Output   : 
+Success  : False
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | ultra_quant]: {'context_len': 8192, 'actual_prompt_len': 7653, 'response': '', 'success': False}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_niah.json
+>>> Running LongBench Evaluation...
+Detected Active Device: cuda
+
+=== LongBench Quick Eval | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: ultra_quant | Device: cuda ===
+Generated Summary: Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | ultra_quant]: {'generated_summary': 'Quantum, Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q: Q', 'input_length': 1038}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_longbench.json
+>>> Running Speed Measurement...
+=== Measuring Inference Speed | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: ultra_quant | SeqLen: 8192 ===
+Result: {'model_name': 'mistralai/Mistral-7B-Instruct-v0.3', 'method': 'ultra_quant', 'sequence_length': 8192, 'prefill_time_sec': 1.31, 'decode_time_sec': 0.844, 'generated_tokens': 32, 'tokens_per_second': 37.92}
+Speed results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_speed.json
+==================================================
+ All Comprehensive Benchmarks Completed Successfully!
+ Date: Mon Aug 24 04:08:39 PM JST 2026
+==================================================

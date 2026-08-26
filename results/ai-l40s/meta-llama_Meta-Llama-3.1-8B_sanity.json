@@ -1,0 +1,70 @@
+{
+    "overall_pass": true,
+    "results": {
+        "passthrough": {
+            "generated_ids": [
+                7445,
+                3571,
+                323,
+                1218,
+                526,
+                1001,
+                13,
+                128001
+            ],
+            "identical_to_fp16": true,
+            "token_match_rate": 1.0,
+            "criterion": "identical_to_fp16 == True"
+        },
+        "turbo_quant_7bit": {
+            "generated_ids": [
+                7445,
+                3571,
+                323,
+                1218,
+                526,
+                1001,
+                13,
+                128001
+            ],
+            "token_match_rate_vs_fp16": 1.0,
+            "criterion": "token_match_rate >= 0.5 (near-lossless at 7bit)"
+        },
+        "rotor_quant_7bit": {
+            "generated_ids": [
+                7445,
+                3571,
+                323,
+                1218,
+                526,
+                1001,
+                13,
+                128001
+            ],
+            "token_match_rate_vs_fp16": 1.0,
+            "criterion": "token_match_rate >= 0.5 (near-lossless at 7bit)"
+        },
+        "hyper_quant_7bit": {
+            "generated_ids": [
+                7445,
+                3571,
+                323,
+                1218,
+                526,
+                1001,
+                13,
+                578,
+                3925,
+                315,
+                6617,
+                25213,
+                13003,
+                1203,
+                311,
+                279
+            ],
+            "token_match_rate_vs_fp16": 0.875,
+            "criterion": "token_match_rate >= 0.5 (near-lossless at 7bit)"
+        }
+    }
+}
