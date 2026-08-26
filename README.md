@@ -164,7 +164,7 @@ The standalone C++ micro-benchmark reports:
 Models: `meta-llama/Meta-Llama-3.1-8B`, `mistralai/Mistral-7B-Instruct-v0.3`
 Methods: fp16 (baseline), turbo_quant, rotor_quant, hyper_quant, ultra_quant
 
-> 🗂️ **Validity map**: the compression/speed/NIAH/LongBench numbers from earlier runs were **invalidated** (see [Fix History & Retractions](#%EF%B8%8F-fix-history--retractions)). The tables below show either results unaffected by those bugs, or analytically-derived values.
+> 🗂️ **Provenance**: the tables below are from the 2026-08 re-measurement with the fixed harness (jobs 373124 + 373434; full machine-aggregated tables in [`results/ai-l40s/valid_results_summary.md`](results/ai-l40s/valid_results_summary.md)).
 
 ### 1. KV cache footprint — analytical (8K context, derived values)
 
@@ -185,43 +185,98 @@ For reference, the simulation's *actual stored bytes* (int8 + fp32 scales, no pa
 
 ![Compression comparison](plots/compression_comparison.png)
 
-### 2. Quality — PPL and logit fidelity (pre-fix numbers, still valid)
+### 2. Quality — PPL, logit / KV fidelity (re-measured with the fixed harness)
 
-These evaluations are single-forward (prefill-style) runs and were **not affected** by the decode cache bug, so the earlier measurements remain usable. Two caveats from the fixes: fidelity is measured in **final-logit space** (not attention outputs), and Top-5 is an **overlap rate**, not a hit rate.
+Values below were re-measured with the 2026-08 fixed harness. They reflect the seed-fixed quantizers and HyperQuant's now-actually-applied D4 lattice projection, so they differ from the previously posted pre-fix numbers.
 
 **Perplexity (WikiText-2, window 2048 / stride 512 — lower is better)**
 
-| Model | fp16 | hyper_quant | rotor_quant | turbo_quant | ultra_quant |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| Meta-Llama-3.1-8B | 5.5667 | 6.6857 (degraded) | 5.7397 (mostly kept) | 6.8154 (degraded) | 5.6922 (mostly kept) |
-| Mistral-7B-Instruct-v0.3 | 4.8756 | 5.2015 | 4.9304 | 5.2240 | 4.9072 |
+| Model | Method | PPL |
+| :--- | :--- | ---: |
+| Meta-Llama-3.1-8B | fp16 | 5.5667 |
+| | turbo_quant | 6.8175 |
+| | rotor_quant | 5.7484 |
+| | hyper_quant | 7.3255 |
+| | ultra_quant | 5.6922 |
+| Mistral-7B-Instruct-v0.3 | fp16 | 4.8756 |
+| | turbo_quant | 5.2196 |
+| | rotor_quant | 4.9276 |
+| | hyper_quant | 5.3571 |
+| | ultra_quant | 4.9072 |
 
-**Logit fidelity (seq 1024) — vs fp16 logits**
+**logit / KV fidelity (seq 1024)**
 
-| Model | Method | Logit cosine | Logit Top-1 (%) | Logit Top-5 overlap (%) |
-| :--- | :--- | :--- | :--- | :--- |
-| Meta-Llama-3.1-8B | fp16 | 1.000000 | 100.00 | 100.00 |
-| | hyper_quant | 0.705656 | 99.80 | 47.07 |
-| | rotor_quant | 0.978928 | 99.90 | 85.02 |
-| | turbo_quant | 0.690443 | 99.61 | 44.65 |
-| | ultra_quant | 0.970683 | 99.90 | 85.55 |
-| Mistral-7B-Instruct-v0.3 | fp16 | 1.000000 | 100.00 | 100.00 |
-| | hyper_quant | 0.986995 | 99.51 | 69.80 |
-| | rotor_quant | 0.999236 | 99.90 | 93.96 |
-| | turbo_quant | 0.990538 | 99.71 | 75.10 |
-| | ultra_quant | 0.999443 | 99.90 | 94.16 |
+These are single-forward (prefill-style) evaluations. Fidelity is measured in **final-logit space** (not attention outputs), Top-5 is an **overlap rate**, and KV fidelity is the error of the cached K/V vectors themselves (the quantization error proper).
 
-![Perplexity comparison](plots/ppl_comparison.png)
+| Model | Method | Logit cos | Logit Top-1 (%) | Logit Top-5 overlap (%) | KV cos | KV rel. L2 |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Meta-Llama-3.1-8B | fp16 | 1.000000 | 100.00 | 100.00 | 1.000000 | 0.0000 |
+| | turbo_quant | 0.707082 | 99.90 | 49.53 | 0.775749 | 0.6176 |
+| | rotor_quant | 0.975850 | 99.80 | 84.04 | 0.947499 | 0.2886 |
+| | hyper_quant | 0.685053 | 99.71 | 40.78 | 0.753620 | 0.6562 |
+| | ultra_quant | 0.970683 | 99.90 | 85.55 | 0.940746 | 0.3033 |
+| Mistral-7B-Instruct-v0.3 | fp16 | 1.000000 | 100.00 | 100.00 | 1.000000 | 0.0000 |
+| | turbo_quant | 0.985607 | 99.90 | 66.29 | 0.870971 | 0.4841 |
+| | rotor_quant | 0.999409 | 99.90 | 94.47 | 0.983329 | 0.1717 |
+| | hyper_quant | 0.977383 | 99.51 | 59.88 | 0.845100 | 0.5343 |
+| | ultra_quant | 0.999443 | 99.90 | 94.16 | 0.981794 | 0.1759 |
 
-> Observation: on Mistral-7B every method holds high logit fidelity, while on Llama-3.1-8B the 3-bit per-token-scaled methods (hyper/turbo) degrade much more (0.69–0.70 cos). rotor/ultra stay high — consistent with their finer scaling (per-3D-block / 4-bit grid). Susceptibility clearly depends on the base model.
+> Observation: on Mistral-7B every method keeps high logit cosine (0.977–0.999), but turbo/hyper still drop to 59.9–66.3% Top-5 overlap (rotor/ultra stay ≈94%). On Llama-3.1-8B the 3-bit per-token-scaled methods (turbo/hyper) degrade much more (0.685–0.707 cos, KV rel. L2 up to 0.62–0.66). rotor/ultra stay high — consistent with their finer scaling (per-3D-block / 4-bit grid). Susceptibility clearly depends on the base model.
 
-### 3. Results pending re-run after the fixes
+### 3. Re-measured results (NIAH, LongBench, speed)
 
-The following were fully invalidated by the cache bug and are **re-measured** with the fixed harness (see `hpc_scripts/run_all_evals_ai_l40s.sh`):
+**Sanity gate**: PASS on both models (passthrough reproduces fp16 token-for-token; 7-bit quantizers near-lossless — Llama's hyper_quant 7-bit matched at 0.875, above the 0.5 criterion).
 
-- **NIAH** → multi-depth success rate (0–100%), replacing the old single-sample True/False. ❗ The old "all methods False" conclusion is **retracted** — it was caused by the harness, not the quantizers.
-- **LongBench** → Qasper QA-F1 average over 10 samples, replacing the old un-scored summary print-out.
-- **Speed** → median prefill/decode times, interpreted strictly as quantization-layer overhead. ❗ The old speed table (incl. ultra_quant beating fp16) is **retracted** — decode comparisons were not apples-to-apples.
+**NIAH (8K context, success rate over 5 depths × 1 trial)**
+
+| Model | Method | Success rate |
+| :--- | :--- | :---: |
+| Meta-Llama-3.1-8B | fp16 | 5/5 (1.00) |
+| | turbo_quant | 5/5 (1.00) |
+| | rotor_quant | 5/5 (1.00) |
+| | hyper_quant | 5/5 (1.00) |
+| | ultra_quant | 5/5 (1.00) |
+| Mistral-7B-Instruct-v0.3 | fp16 | 5/5 (1.00) |
+| | turbo_quant | 5/5 (1.00) |
+| | rotor_quant | 3/5 (0.60) |
+| | hyper_quant | 2/5 (0.40) |
+| | ultra_quant | 5/5 (1.00) |
+
+Note the small statistical resolution at 1 trial per depth. The old "all methods False" conclusion was a harness bug and is retracted.
+
+**LongBench (Qasper QA-F1, first 10 samples, context truncated to 6144 from the left — higher is better)**
+
+| Model | Method | Mean QA-F1 |
+| :--- | :--- | ---: |
+| Meta-Llama-3.1-8B | fp16 | 0.2997 * |
+| | turbo_quant | 0.1580 |
+| | rotor_quant | 0.2551 |
+| | hyper_quant | 0.1859 |
+| | ultra_quant | 0.2832 |
+| Mistral-7B-Instruct-v0.3 | fp16 | 0.3256 * |
+| | turbo_quant | 0.3135 |
+| | rotor_quant | 0.2813 |
+| | hyper_quant | 0.2582 |
+| | ultra_quant | 0.2856 |
+
+\* The two fp16 JSON files were restored from the log after the raw files were lost (questions/references missing, predictions truncated at 80 chars); the mean F1 itself is the value reported by the run and remains valid. The old results (un-scored degenerate text) were caused by the cache bug and are **retracted**.
+
+**Speed (8K context, 32 generated tokens, median of 3 — a quantization-overhead measurement; no speedup claims)**
+
+| Model | Method | Prefill (s) | Decode (s) | Tokens/s | Slowdown vs fp16 |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Meta-Llama-3.1-8B | fp16 | 1.2504 | 0.9545 | 33.52 | 1.00× |
+| | turbo_quant | 1.2895 | 1.2064 | 26.53 | 1.26× |
+| | rotor_quant | 1.4197 | 2.2416 | 14.28 | 2.35× |
+| | hyper_quant | 1.3413 | 1.7750 | 18.03 | 1.86× |
+| | ultra_quant | 1.6308 | 1.2326 | 25.96 | 1.29× |
+| Mistral-7B-Instruct-v0.3 | fp16 | 1.2066 | 0.9167 | 34.91 | 1.00× |
+| | turbo_quant | 1.2473 | 1.1662 | 27.44 | 1.27× |
+| | rotor_quant | 1.3771 | 2.2435 | 14.26 | 2.45× |
+| | hyper_quant | 1.2968 | 1.7350 | 18.44 | 1.89× |
+| | ultra_quant | 1.5876 | 1.2001 | 26.67 | 1.31× |
+
+Every quantized method is slower than fp16 (the quantizer's added cost); rotor's per-3D-block scaling makes it the slowest (2.35–2.45×). The old speed table (incl. ultra_quant beating fp16) is **retracted** — decode comparisons were not apples-to-apples.
 
 ---
 
@@ -233,7 +288,7 @@ Because the simulation stores everything as int8 + fp32 scales, all methods prev
 
 ### 2. Quantization robustness differs by base model (GQA etc.)
 
-The surviving quality metrics (PPL, logit fidelity) consistently show Llama-3.1-8B suffering more than Mistral-7B under the 3-bit per-token methods — architecture-dependent robustness is real, and there is no universally "safe" method among these simplified implementations.
+PPL, logit/KV fidelity, and LongBench QA-F1 all consistently show Llama-3.1-8B suffering more than Mistral-7B under the 3-bit per-token methods (turbo/hyper). Even on the end task, turbo nearly halves its QA-F1 on Llama (0.1580 vs 0.2997 fp16) while almost matching fp16 on Mistral (0.3135 vs 0.3256). Architecture-dependent robustness is real, and there is no universally "safe" method among these simplified implementations. On the overall balance of quality, footprint, and overhead, ultra_quant (4-bit, 272 MB, ~1.3× slowdown) came out as the most robust option here.
 
 ### 3. What this benchmark deliberately does not claim
 
