@@ -44,8 +44,12 @@ def calculate_all_footprints(model_name, seq_len=8192, batch_size=1, num_bits=3)
 
     config = AutoConfig.from_pretrained(model_name)
     num_layers = config.num_hidden_layers
-    num_kv_heads = getattr(config, "num_key_value_heads", config.num_attention_heads)
-    head_dim = getattr(config, "head_dim", config.hidden_size // config.num_attention_heads)
+    num_kv_heads = getattr(config, "num_key_value_heads", None) or config.num_attention_heads
+    # head_dim は Mistral 系など「属性は存在するが None」の場合があるため、
+    # getattr の既定値ではなく or でフォールバックする
+    head_dim = getattr(config, "head_dim", None) or (
+        config.hidden_size // config.num_attention_heads
+    )
 
     total_elements = 2 * batch_size * num_layers * seq_len * num_kv_heads * head_dim
     fp16_mb = total_elements * 2 / (1024 * 1024)

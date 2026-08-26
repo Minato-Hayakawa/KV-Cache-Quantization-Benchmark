@@ -225,11 +225,26 @@ class QuantizedKVCache(DynamicCache):
     def get_max_cache_shape(self, layer_idx: int = 0) -> int:
         return self.get_max_length(layer_idx)
 
-    def get_mask_sizes(self, query_length: int, layer_idx: int) -> tuple:
+    def get_mask_sizes(self, query_length, layer_idx: int) -> tuple:
         """
-        transformers 5.x 系のマスク生成用。量子化パスでは親クラスの層管理を
-        使っていないため、「過去長 + 今回のクエリ長」を自前リストから返す。
+        transformers のマスク生成用に (kv_length, kv_offset) を返す。
+
+        【バージョン両対応】第1引数の型は transformers のバージョンで異なる:
+          - 4.5x 系: cache_position (torch.Tensor) が渡される
+          - 5.x  系: query_length (int) が渡される
+        いずれも「今回のクエリ長」の情報なので、型に応じて長さを取り出す。
+        （古い系で Tensor を int 扱いして kv_length が Tensor 化し、
+        generate() 使用時に causal mask 生成がクラッシュするバグの修正)
+
+        量子化パスでは親クラスの層管理を使っていないため、
+        「過去長 + 今回のクエリ長」を自前リストから返す。
         """
         if self.method == "fp16" or self.quantizer is None:
+            # 引数はバージョンに応じた正しい型で来ているはずなので、そのまま親に委譲
             return super().get_mask_sizes(query_length, layer_idx)
-        return query_length + self.get_seq_length(layer_idx), 0
+        q_length = (
+            query_length.shape[0]
+            if isinstance(query_length, torch.Tensor)
+            else int(query_length)
+        )
+        return q_length + self.get_seq_length(layer_idx), 0

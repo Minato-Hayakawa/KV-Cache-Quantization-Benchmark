@@ -51,8 +51,12 @@ def kv_geometry(model_name):
     """config から KV キャッシュの幾何情報を取得"""
     config = AutoConfig.from_pretrained(model_name)
     num_layers = getattr(config, "num_hidden_layers")
-    num_kv_heads = getattr(config, "num_key_value_heads", getattr(config, "num_attention_heads"))
-    head_dim = getattr(config, "head_dim", config.hidden_size // config.num_attention_heads)
+    num_kv_heads = getattr(config, "num_key_value_heads", None) or config.num_attention_heads
+    # head_dim は Mistral 系など「属性は存在するが None」の場合があるため、
+    # getattr の既定値ではなく or でフォールバックする
+    head_dim = getattr(config, "head_dim", None) or (
+        config.hidden_size // config.num_attention_heads
+    )
     return num_layers, num_kv_heads, head_dim
 
 
