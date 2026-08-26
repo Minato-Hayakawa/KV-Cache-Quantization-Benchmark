@@ -39,6 +39,19 @@ def safe_model(model_name):
     return model_name.replace("/", "_")
 
 
+def _is_section_starter(line: str) -> bool:
+    """他セクションの開始行かどうか。集計状態(ctx)の打ち切り判定に使う。
+    セクション内に現れ得る未パース行(例: sanity の [fp16] generated:)は
+    開始行ではないので、状態を維持する。"""
+    s = line.lstrip()
+    return (
+        s.startswith("===")      # "=== ... ===" ヘッダ/区切り
+        or s.startswith("###")   # モデル境界の "#####" 行
+        or s.startswith(">>>")   # ">>> Running ..."
+        or line.startswith(" Model: ")
+    )
+
+
 def rebuild_from_log(log_path, outdir, force, report):
     with open(log_path, "r", encoding="utf-8", errors="replace") as f:
         lines = f.read().splitlines()
@@ -109,6 +122,8 @@ def rebuild_from_log(log_path, outdir, force, report):
             }
             continue
         if niah_ctx is not None:
+            if not line.strip():
+                continue  # セクション内の空行は読み飛ばす
             mt = re.match(r"^\s+depth=(\d+)% trial=(\d+) key=(\d+) success=(True|False)", line)
             if mt:
                 niah_ctx["trials"].append({
@@ -136,7 +151,13 @@ def rebuild_from_log(log_path, outdir, force, report):
                 fn = f"{safe_model(niah_ctx['model'])}_{niah_ctx['method']}_niah.json"
                 save_json(outdir, fn, data, force, report)
                 niah_ctx = None
-            continue
+                continue
+            # セクション内の未パース行は読み飛ばす。
+            # 他セクションの開始行が来た = クラッシュ等でサマリ行が無かった場合:
+            # 古い状態を破棄して通常処理へフォールスルー
+            if not _is_section_starter(line):
+                continue
+            niah_ctx = None
 
         # ---- LongBench ----
         ml = re.match(r"^=== LongBench \(Qasper QA-F1\) \| Model: (.*?) \| Method: (\w+)", line)
@@ -144,6 +165,8 @@ def rebuild_from_log(log_path, outdir, force, report):
             lb_ctx = {"model": ml.group(1), "method": ml.group(2), "samples": []}
             continue
         if lb_ctx is not None:
+            if not line.strip():
+                continue  # セクション内の空行は読み飛ばす
             mls = re.match(r"^\s+\[(\d+)\] F1=([\d.]+) \| pred: (.*)$", line)
             if mls:
                 pred_raw = mls.group(3)
@@ -173,7 +196,15 @@ def rebuild_from_log(log_path, outdir, force, report):
                 fn = f"{safe_model(lb_ctx['model'])}_{lb_ctx['method']}_longbench.json"
                 save_json(outdir, fn, data, force, report)
                 lb_ctx = None
-            continue
+                continue
+            # セクション内の未パース行は読み飛ばす。
+            # 他セクションの開始行が来た = クラッシュ等で平均値行が無かった場合:
+            # 古い状態を破棄して通常処理へフォールスルー
+            # (2026-08-26 full_eval は量子化LongBenchが全てクラッシュしており、
+            #  この状態残りで mistral の sanity ブロックが飲み込まれるバグがあった)
+            if not _is_section_starter(line):
+                continue
+            lb_ctx = None
 
         # ---- Sanity Check ----
         msc = re.match(r"^=== Sanity Check \| Model: (.*?) \| Device:", line)
@@ -181,6 +212,8 @@ def rebuild_from_log(log_path, outdir, force, report):
             sanity_ctx = {"model": msc.group(1), "results": {}, "last_ids_key": None}
             continue
         if sanity_ctx is not None:
+            if not line.strip():
+                continue  # セクション内の空行は読み飛ばす
             mpas_g = re.match(r"^\[passthrough\] generated: (\[.*\])", line)
             m7_g = re.match(r"^\[(\w+) 7bit\] generated: (\[.*\])", line)
             mpas_i = re.match(r"^\[passthrough\] identical: (True|False) \(match ([\d.]+)%\)", line)
@@ -216,7 +249,12 @@ def rebuild_from_log(log_path, outdir, force, report):
                 fn = f"{safe_model(sanity_ctx['model'])}_sanity.json"
                 save_json(outdir, fn, data, force, report)
                 sanity_ctx = None
-            continue
+                continue
+            # セクション内の未パース行([fp16] generated 等)は読み飛ばす。
+            # 他セクションの開始行が来た場合のみ状態を破棄してフォールスルー
+            if not _is_section_starter(line):
+                continue
+            sanity_ctx = None
 
         # ---- 理論フットプリント ----
         mft = re.match(r"^=== Calculating Analytical Footprints \| Model: (.*?) \| SeqLen: (\d+)", line)
@@ -224,6 +262,8 @@ def rebuild_from_log(log_path, outdir, force, report):
             theo_ctx = {"model": mft.group(1), "seq_len": int(mft.group(2)), "rows": []}
             continue
         if theo_ctx is not None:
+            if not line.strip():
+                continue  # セクション内の空行は読み飛ばす
             mtb = re.match(
                 r"^Method: (\w+)\s+\| Bits:\s*([\d.]+) \| Data:\s*([\d.]+) MB "
                 r"\| Meta:\s*([\d.]+) MB \| Total:\s*([\d.]+) MB \| Compression:\s*([\d.]+)x",
@@ -261,7 +301,13 @@ def rebuild_from_log(log_path, outdir, force, report):
                 sfn = f"{safe_model(theo_ctx['model'])}_all_methods_footprint_summary.json"
                 save_json(outdir, sfn, all_metrics, force, report)
                 theo_ctx = None
-            continue
+                continue
+            # セクション内の未パース行は読み飛ばす。
+            # 他セクションの開始行が来た = クラッシュ等で保存メッセージが無かった場合:
+            # 古い状態を破棄して通常処理へフォールスルー
+            if not _is_section_starter(line):
+                continue
+            theo_ctx = None
 
 
 def main():
