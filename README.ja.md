@@ -134,9 +134,21 @@ TurboQuantは「4-bitで高精度」を達成した画期的なアルゴリズ�
 - Mistral 7B v0.3（`mistralai/Mistral-7B-Instruct-v0.3`）
 
 ### 0. Sanity gate（回帰テスト） — `eval_pt/sanity_check.py`
-評価の最初に実行し、失敗したら全体を中止します：
-1. **passthrough**（量子化を行わない疑似量子化器）が fp16 と**トークン完全一致**すること → キャッシュ配管（蓄積・連結・全履歴返却）の正当性を量子化誤差から分離して検証。過去の decode キャッシュバグはこのテストで即検出できたはずのものです。
-2. **7bit の高ビット幅**でほぼロスレスな生成になること → 量子化往復の数式検証。
+評価の最初に実行し、失敗したら全体を中止します。
+
+**共通プロトコル**：約256トークンの固定プロンプトから **greedy 16トークン** を生成します。`model.generate` は使わず、prefill → 1トークンずつの手動デコードループ（評価スクリプトと同じパス）で生成し、fp16 ベースラインとのトークン列の一致を見ます。モデル精度は他の評価と揃えて CUDA では bfloat16 です。
+
+#### 全手法共通 — キャッシュ配管の検証（passthrough）
+**passthrough**（量子化を行わない疑似量子化器）が fp16 と**トークン完全一致**することのみを `overall_pass` の判定対象とします → キャッシュ配管（蓄積・連結・全履歴返却）の正当性を量子化誤差から分離して検証。過去の decode キャッシュバグはこのテストで即検出できたはずのものです。
+
+#### turbo_quant / rotor_quant / hyper_quant — 7bit 往復生成テスト
+ビット数を連続可変にできる（精度ノブを持つ）3手法について、本番より高ビットの **7bit** で動かしたときの fp16 とのトークン一致率を報告します（基準：一致率 ≥ 0.5 を準ロスレスとみなす情報表示で、`overall_pass` には含めません）。「同じ往復経路のまま誤差だけ小さくできる」設計なので、7bit でほぼロスレスなら量子化往復の数式が健全と判断できます。
+
+#### ultra_quant — 専用 sanity 実験（別経路）
+ultra_quant は FP4 (E2M1) の **16点固定グリッドが手法の定義そのもの** で、「7bit相当」の高ビットモードが存在しないため 7bit ループの対象外です。代わりに専用スクリプト `eval_pt/sanity_check_ultra.py`（sbatch: `hpc_scripts/run_sanity_ultra_ai_l40s.sh`）で、以下の2検証を行います（既存コードは変更せず、スクリプト内の継承クラスで差し込む構成）：
+
+1. **ロスレス分解テスト**（配管＋回転/スケールの数式検証）：FP4グリッドへの丸めのみを外した高精密バイパス版（WHT回転＋absmax/6スケール往復は本番と同一、格納は実質 fp32 相当）で fp16 とのトークン一致率 ≥ 0.9 を要求します（期待値は 1.0 前後。これを大きく外す場合は往復実装の破綻を疑う）。
+2. **ネイティブ4bit グリッド健全性チェック**（モデル不要の数値検証）：seed 固定の乱数テンソルを本番そのままの 4bit モードで compress→decompress し、(a) 相対L2誤差 < 0.40、(b) 全量子化インデックスが 0〜15 の範囲内（int8 溢れ型バグの検出）であることを確認します。グリッドマッピング自体は生成テストではロスレス性を根拠に判定できないため、誤差上限を定数として検証します。
 
 ### 品質指標（機能評価 = シミュレーション量子化）
 - **Perplexity**：WikiText-2、window 2048 / stride 512 → `eval_pt/eval_ppl.py`
@@ -223,7 +235,7 @@ TurboQuantは「4-bitで高精度」を達成した画期的なアルゴリズ�
 
 ### 3. 修正後ハーネスでの再計測結果（NIAH・LongBench・速度）
 
-**Sanity gate**：両モデル PASS（passthrough が fp16 とトークン完全一致、7bit で準ロスレス生成。Llama の hyper_quant 7bit のみ一致率 0.875 でしたが基準 0.5 はクリア）。
+**Sanity gate**：両モデル PASS（passthrough が fp16 とトークン完全一致、7bit で準ロスレス生成。Llama の hyper_quant 7bit のみ一致率 0.875 でしたが基準 0.5 はクリア。なお ultra_quant は 7bit テスト対象外のため含まず、専用 sanity は `run_sanity_ultra_ai_l40s.sh` で別途実施）。
 
 **NIAH（8Kコンテキスト、深度5 × 1試行の成功率）**
 
@@ -372,6 +384,7 @@ kvq-bench/
 ├── eval_pt/                    # 3. モデルレベル評価（Hugging Face）
 │   ├── custom_cache.py        # QuantizedKVCache（+ sanity 用 passthrough）
 │   ├── sanity_check.py        # ★ 回帰ゲート：配管が壊れたら評価中止
+│   ├── sanity_check_ultra.py  # ultra_quant 専用 sanity（7bit不可のため別経路）
 │   ├── eval_ppl.py            # Perplexity（WikiText-2, 2048/512）
 │   ├── eval_fidelity.py       # Logit + KV 忠実度
 │   ├── eval_niah.py           # NIAH（複数深度の成功率）
@@ -381,7 +394,8 @@ kvq-bench/
 │   └── theoretical_compression.py  # GPU不要の解析的 footprint
 │
 └── hpc_scripts/                # 4. HPC (Slurm) ジョブスクリプト
-    └── run_all_evals_ai_l40s.sh  # sanity → footprint → ppl → fidelity → niah → longbench → speed
+    ├── run_all_evals_ai_l40s.sh      # sanity → footprint → ppl → fidelity → niah → longbench → speed
+    └── run_sanity_ultra_ai_l40s.sh   # ultra_quant 専用 sanity のみ
 ```
 
 ---

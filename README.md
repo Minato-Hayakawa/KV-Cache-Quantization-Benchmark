@@ -132,9 +132,21 @@ Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 - Mistral 7B v0.3 (`mistralai/Mistral-7B-Instruct-v0.3`)
 
 ### 0. Sanity gate (regression test) — `eval_pt/sanity_check.py`
-Runs **first**, and the whole evaluation aborts if it fails:
-1. **`passthrough`** (an identity "quantizer" that stores raw tensors) must reproduce fp16 generation **token-for-token** — this validates the cache plumbing (accumulation, concatenation, full-history return) in isolation from quantization error. This test would have caught the historical decode bug immediately.
-2. **7-bit high-bit-width** quantizers must produce near-lossless generation — validates quantizer round-trip math.
+Runs **first**, and the whole evaluation aborts if it fails.
+
+**Common protocol**: greedily generate **16 tokens** from a fixed ~256-token prompt — not via `model.generate`, but through a manual prefill → one-token-at-a-time decode loop (the same path used by the eval scripts) — and compare the token sequence against the fp16 baseline. Model precision matches the other evaluations (bfloat16 on CUDA).
+
+#### Shared by all methods — cache plumbing (passthrough)
+The **`passthrough`** identity "quantizer" must reproduce fp16 generation **token-for-token**; it is the only criterion that enters `overall_pass`. This validates the cache plumbing (accumulation, concatenation, full-history return) in isolation from quantization error. The historical decode bug would have been caught here immediately.
+
+#### turbo_quant / rotor_quant / hyper_quant — 7-bit round-trip test
+For the three methods whose bit-width is a continuous precision knob, run each at **7-bit** (higher than production) and report the token match rate vs fp16 (advisory criterion: ≥ 0.5 counts as near-lossless; informational only and not part of `overall_pass`). Because higher bits run the *same* round-trip code path with only finer rounding, near-lossless generation at 7-bit validates the quantizer round-trip math.
+
+#### ultra_quant — dedicated sanity experiment (separate path)
+ultra_quant is defined by a **fixed 16-point FP4 (E2M1) grid** — a "7-bit equivalent" mode does not exist — so it is excluded from the 7-bit loop. Instead, a dedicated script `eval_pt/sanity_check_ultra.py` (sbatch: `hpc_scripts/run_sanity_ultra_ai_l40s.sh`) runs two checks (implemented as in-script subclasses; no changes to existing code):
+
+1. **Lossless-decomposition test** (plumbing + rotation/scale math): a high-precision bypass variant — identical WHT rotation and absmax/6 scale round-trip with *only* the FP4 grid snap removed (storage effectively fp32) — must match fp16 tokens at a rate **≥ 0.9** (expected ≈ 1.0; a large miss indicates broken rotation/scale plumbing).
+2. **Native 4-bit grid integrity** (model-free numeric check): quantize→dequantize a seeded random tensor in the production 4-bit mode and assert (a) relative L2 error < 0.40 and (b) every stored index lies in 0–15 (catches int8-overflow-style bugs). The grid mapping itself cannot be judged by a near-losslessness argument, so it is verified with an explicit error bound instead.
 
 ### Quality metrics (functional / simulated quantization)
 - **Perplexity** — WikiText-2, window 2048 / stride 512 → `eval_pt/eval_ppl.py`
@@ -225,7 +237,7 @@ These are single-forward (prefill-style) evaluations. Fidelity is measured in **
 
 ### 3. Re-measured results (NIAH, LongBench, speed)
 
-**Sanity gate**: PASS on both models (passthrough reproduces fp16 token-for-token; 7-bit quantizers near-lossless — Llama's hyper_quant 7-bit matched at 0.875, above the 0.5 criterion).
+**Sanity gate**: PASS on both models (passthrough reproduces fp16 token-for-token; 7-bit quantizers near-lossless — Llama's hyper_quant 7-bit matched at 0.875, above the 0.5 criterion; ultra_quant is not part of the 7-bit gate and is covered separately via `run_sanity_ultra_ai_l40s.sh`).
 
 **NIAH (8K context, success rate over 5 depths × 1 trial)**
 
@@ -374,6 +386,7 @@ kvq-bench/
 ├── eval_pt/                    # 3. Model-level evaluation (Hugging Face)
 │   ├── custom_cache.py        # QuantizedKVCache (+ passthrough for sanity)
 │   ├── sanity_check.py        # ★ regression gate: aborts eval if plumbing breaks
+│   ├── sanity_check_ultra.py  # ultra_quant-only sanity (separate path; no 7-bit mode)
 │   ├── eval_ppl.py            # Perplexity (WikiText-2, 2048/512)
 │   ├── eval_fidelity.py       # Logit + KV fidelity
 │   ├── eval_niah.py           # Needle in a Haystack (multi-depth success rate)
@@ -383,7 +396,8 @@ kvq-bench/
 │   └── theoretical_compression.py  # GPU-free analytical footprint
 │
 └── hpc_scripts/                # 4. HPC (Slurm) job scripts
-    └── run_all_evals_ai_l40s.sh  # sanity → footprint → ppl → fidelity → niah → longbench → speed
+    ├── run_all_evals_ai_l40s.sh      # sanity → footprint → ppl → fidelity → niah → longbench → speed
+    └── run_sanity_ultra_ai_l40s.sh   # ultra_quant-only sanity
 ```
 
 ---
