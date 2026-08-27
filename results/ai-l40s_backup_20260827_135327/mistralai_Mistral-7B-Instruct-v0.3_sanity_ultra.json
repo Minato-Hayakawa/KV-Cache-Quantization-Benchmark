@@ -1,0 +1,49 @@
+{
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "overall_pass": true,
+    "checks": {
+        "ultra_hp_bypass_generation": {
+            "generated_ids_fp16": [
+                23423,
+                1151,
+                22031,
+                23367,
+                2059,
+                2963,
+                4408,
+                1072,
+                1704,
+                1370,
+                1812,
+                29491,
+                2
+            ],
+            "generated_ids_hp_bypass": [
+                23423,
+                1151,
+                22031,
+                23367,
+                2059,
+                2963,
+                4408,
+                1072,
+                1704,
+                1370,
+                1812,
+                29491,
+                2
+            ],
+            "token_match_rate_vs_fp16": 1.0,
+            "criterion": "token_match_rate >= 0.9 (lossless rotation/scale round-trip; FP4 grid snap bypassed)",
+            "pass": true
+        },
+        "ultra_native_4bit_roundtrip": {
+            "rel_l2": 0.11036468406841654,
+            "index_min": 0,
+            "index_max": 15,
+            "index_in_range": true,
+            "criterion": "rel_l2 < 0.4 and all indices in [0, 15]",
+            "pass": true
+        }
+    }
+}

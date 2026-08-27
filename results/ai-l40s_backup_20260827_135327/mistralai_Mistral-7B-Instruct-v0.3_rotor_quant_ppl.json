@@ -1,0 +1,7 @@
+{
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "method": "rotor_quant",
+    "stride": 512,
+    "seq_len": 2048,
+    "perplexity": 4.92764139175415
+}

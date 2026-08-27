@@ -1,0 +1,22 @@
+{
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "method": "hyper_quant",
+    "sequence_length": 8192,
+    "prefill_time_sec": 1.2968,
+    "decode_time_sec": 1.735,
+    "generated_tokens": 32,
+    "tokens_per_second": 18.44,
+    "warmup_runs": 1,
+    "measure_runs": 3,
+    "all_prefill_runs": [
+        1.297,
+        1.2968,
+        1.2965
+    ],
+    "all_decode_runs": [
+        1.7371,
+        1.7347,
+        1.735
+    ],
+    "note": "中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。"
+}

@@ -1,0 +1,22 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "turbo_quant",
+    "sequence_length": 8192,
+    "prefill_time_sec": 1.2895,
+    "decode_time_sec": 1.2064,
+    "generated_tokens": 32,
+    "tokens_per_second": 26.53,
+    "warmup_runs": 1,
+    "measure_runs": 3,
+    "all_prefill_runs": [
+        1.29,
+        1.2893,
+        1.2895
+    ],
+    "all_decode_runs": [
+        1.2066,
+        1.2064,
+        1.2062
+    ],
+    "note": "中央値。カーネル非改変のため量子化オーバーヘッド込みの速度であり、高速化の主張はできない。"
+}

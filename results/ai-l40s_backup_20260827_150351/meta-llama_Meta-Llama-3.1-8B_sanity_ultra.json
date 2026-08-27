@@ -1,0 +1,39 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "overall_pass": true,
+    "checks": {
+        "ultra_hp_bypass_generation": {
+            "generated_ids_fp16": [
+                7445,
+                3571,
+                323,
+                1218,
+                526,
+                1001,
+                13,
+                128001
+            ],
+            "generated_ids_hp_bypass": [
+                7445,
+                3571,
+                323,
+                1218,
+                526,
+                1001,
+                13,
+                128001
+            ],
+            "token_match_rate_vs_fp16": 1.0,
+            "criterion": "token_match_rate >= 0.9 (lossless rotation/scale round-trip; FP4 grid snap bypassed)",
+            "pass": true
+        },
+        "ultra_native_4bit_roundtrip": {
+            "rel_l2": 0.11036468406841654,
+            "index_min": 0,
+            "index_max": 15,
+            "index_in_range": true,
+            "criterion": "rel_l2 < 0.4 and all indices in [0, 15]",
+            "pass": true
+        }
+    }
+}

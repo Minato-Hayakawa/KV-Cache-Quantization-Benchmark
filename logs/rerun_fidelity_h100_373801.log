@@ -1,0 +1,236 @@
+==================================================
+ Re-running Fidelity (natural non-repetitive text)
+ Working Directory: /hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark
+ Node: ai-h100l-00.cloud.r-ccs.riken.jp
+ Date: Thu Aug 27 01:53:27 PM JST 2026
+ Partition: ai-h100l-pu (H100; exception for this fidelity
+            re-run only, since ai-l40s was unavailable)
+==================================================
+Thu Aug 27 13:53:27 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.58.03              Driver Version: 595.58.03      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100 NVL                Off |   00000000:3D:00.0 Off |                    0 |
+| N/A   42C    P0             71W /  400W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+>>> Backing up results/ai-l40s -> results/ai-l40s_backup_20260827_135327
+--------------------------------------------------
+ Method: fp16 | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: fp16 | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 1.00000
+Logit Top-1 match    : 100.00%
+Logit Top-5 overlap  : 100.00%
+KV cos-sim           : 1.00000
+KV relative L2 error : 0.00000
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | fp16]: {'logit_cosine_similarity': 1.0, 'logit_top1_match_rate': 100.0, 'top1_mismatch_positions_head32': [], 'logit_top5_overlap_rate': 100.0, 'kv_cosine_similarity': 1.0, 'kv_relative_mse': 0.0, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_fidelity.json
+--------------------------------------------------
+ Method: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.85240
+Logit Top-1 match    : 91.80%
+Logit Top-5 overlap  : 57.13%
+KV cos-sim           : 0.85255
+KV relative L2 error : 0.52029
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | turbo_quant]: {'logit_cosine_similarity': 0.8523953557014465, 'logit_top1_match_rate': 91.796875, 'top1_mismatch_positions_head32': [5, 10, 11, 12, 18, 23, 29, 44, 57, 58, 72, 73, 86, 94, 109, 110, 112, 125, 131, 137, 148, 158, 162, 164, 165, 181, 185, 190, 209, 217, 219, 228], 'logit_top5_overlap_rate': 57.12890625, 'kv_cosine_similarity': 0.8525469023734331, 'kv_relative_mse': 0.5202899347059429, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_fidelity.json
+--------------------------------------------------
+ Method: rotor_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: rotor_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.98718
+Logit Top-1 match    : 96.97%
+Logit Top-5 overlap  : 84.41%
+KV cos-sim           : 0.97381
+KV relative L2 error : 0.20949
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | rotor_quant]: {'logit_cosine_similarity': 0.9871760606765747, 'logit_top1_match_rate': 96.97265625, 'top1_mismatch_positions_head32': [4, 11, 44, 50, 53, 72, 78, 109, 164, 165, 176, 181, 219, 248, 249, 263, 266, 268, 269, 282, 307, 316, 326, 327, 340, 361, 377, 391, 392, 401, 426], 'logit_top5_overlap_rate': 84.41406488418579, 'kv_cosine_similarity': 0.9738112790510058, 'kv_relative_mse': 0.209494836977683, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_fidelity.json
+--------------------------------------------------
+ Method: hyper_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: hyper_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.81587
+Logit Top-1 match    : 91.31%
+Logit Top-5 overlap  : 56.07%
+KV cos-sim           : 0.83022
+KV relative L2 error : 0.56288
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | hyper_quant]: {'logit_cosine_similarity': 0.8158679008483887, 'logit_top1_match_rate': 91.30859375, 'top1_mismatch_positions_head32': [5, 8, 12, 18, 23, 29, 35, 44, 52, 57, 58, 59, 63, 72, 73, 83, 86, 110, 119, 158, 164, 165, 173, 177, 181, 188, 192, 210, 217, 225, 229, 251], 'logit_top5_overlap_rate': 56.07422590255737, 'kv_cosine_similarity': 0.8302182406187057, 'kv_relative_mse': 0.5628774263896048, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_fidelity.json
+--------------------------------------------------
+ Method: ultra_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model meta-llama/Meta-Llama-3.1-8B...
+Model loaded successfully.
+
+=== Evaluating Fidelity: ultra_quant | Model: meta-llama/Meta-Llama-3.1-8B | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.98955
+Logit Top-1 match    : 97.75%
+Logit Top-5 overlap  : 87.13%
+KV cos-sim           : 0.97500
+KV relative L2 error : 0.20455
+
+Final Result [meta-llama/Meta-Llama-3.1-8B | ultra_quant]: {'logit_cosine_similarity': 0.9895529747009277, 'logit_top1_match_rate': 97.75390625, 'top1_mismatch_positions_head32': [8, 31, 44, 88, 109, 138, 158, 181, 182, 184, 192, 219, 229, 263, 270, 315, 327, 338, 364, 370, 385, 409, 410], 'logit_top5_overlap_rate': 87.1289074420929, 'kv_cosine_similarity': 0.9749987768009305, 'kv_relative_mse': 0.20455060352105647, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_fidelity.json
+--------------------------------------------------
+ Method: fp16 | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: fp16 | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 1.00000
+Logit Top-1 match    : 100.00%
+Logit Top-5 overlap  : 100.00%
+KV cos-sim           : 1.00000
+KV relative L2 error : 0.00000
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | fp16]: {'logit_cosine_similarity': 1.0, 'logit_top1_match_rate': 100.0, 'top1_mismatch_positions_head32': [], 'logit_top5_overlap_rate': 100.0, 'kv_cosine_similarity': 1.0, 'kv_relative_mse': 0.0, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_fidelity.json
+--------------------------------------------------
+ Method: turbo_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: turbo_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.98563
+Logit Top-1 match    : 93.07%
+Logit Top-5 overlap  : 73.50%
+KV cos-sim           : 0.91701
+KV relative L2 error : 0.39928
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | turbo_quant]: {'logit_cosine_similarity': 0.985630214214325, 'logit_top1_match_rate': 93.06640625, 'top1_mismatch_positions_head32': [7, 22, 32, 41, 42, 47, 55, 59, 65, 75, 79, 86, 122, 125, 127, 168, 169, 172, 185, 187, 198, 201, 202, 203, 217, 226, 237, 238, 245, 258, 260, 263], 'logit_top5_overlap_rate': 73.49609136581421, 'kv_cosine_similarity': 0.9170075245201588, 'kv_relative_mse': 0.3992758793756366, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_fidelity.json
+--------------------------------------------------
+ Method: rotor_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: rotor_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.99864
+Logit Top-1 match    : 97.85%
+Logit Top-5 overlap  : 93.59%
+KV cos-sim           : 0.98695
+KV relative L2 error : 0.15590
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | rotor_quant]: {'logit_cosine_similarity': 0.998637855052948, 'logit_top1_match_rate': 97.8515625, 'top1_mismatch_positions_head32': [57, 65, 79, 201, 211, 212, 237, 254, 272, 280, 289, 292, 314, 332, 334, 342, 456, 463, 480, 482, 488, 729], 'logit_top5_overlap_rate': 93.59375238418579, 'kv_cosine_similarity': 0.986952543258667, 'kv_relative_mse': 0.15589764958713204, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_fidelity.json
+--------------------------------------------------
+ Method: hyper_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: hyper_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.98370
+Logit Top-1 match    : 92.58%
+Logit Top-5 overlap  : 71.45%
+KV cos-sim           : 0.89787
+KV relative L2 error : 0.44590
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | hyper_quant]: {'logit_cosine_similarity': 0.9836963415145874, 'logit_top1_match_rate': 92.578125, 'top1_mismatch_positions_head32': [7, 8, 11, 18, 41, 46, 57, 65, 72, 75, 79, 86, 127, 169, 172, 184, 185, 187, 189, 198, 199, 201, 202, 211, 217, 226, 227, 234, 237, 238, 245, 254], 'logit_top5_overlap_rate': 71.44531011581421, 'kv_cosine_similarity': 0.8978664251044393, 'kv_relative_mse': 0.44590260786935687, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_fidelity.json
+--------------------------------------------------
+ Method: ultra_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running Fidelity Evaluation (natural text, seq_len=1024)...
+Detected Active Device: cuda
+
+Loading model mistralai/Mistral-7B-Instruct-v0.3...
+Model loaded successfully.
+
+=== Evaluating Fidelity: ultra_quant | Model: mistralai/Mistral-7B-Instruct-v0.3 | SeqLen: 1024 ===
+Evaluated Sequence Length: 1024 tokens
+Logit cos-sim        : 0.99896
+Logit Top-1 match    : 97.66%
+Logit Top-5 overlap  : 93.89%
+KV cos-sim           : 0.98810
+KV relative L2 error : 0.14849
+
+Final Result [mistralai/Mistral-7B-Instruct-v0.3 | ultra_quant]: {'logit_cosine_similarity': 0.9989573955535889, 'logit_top1_match_rate': 97.65625, 'top1_mismatch_positions_head32': [7, 55, 57, 79, 86, 169, 170, 202, 238, 258, 272, 280, 289, 292, 322, 334, 354, 361, 424, 442, 456, 480, 488, 729], 'logit_top5_overlap_rate': 93.88672113418579, 'kv_cosine_similarity': 0.9880951447412372, 'kv_relative_mse': 0.1484933350002393, 'evaluated_seq_len': 1024, 'note': 'logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度'}
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_fidelity.json
+==================================================
+ Summary of re-measured Top-1 match rates
+==================================================
+            meta-llama/Meta-Llama-3.1-8B | fp16         | Top-1= 100.00% | Top-5= 100.00% | logit cos=1.0000 | mismatch_pos_head=[]
+            meta-llama/Meta-Llama-3.1-8B | hyper_quant  | Top-1=  91.31% | Top-5=  56.07% | logit cos=0.8159 | mismatch_pos_head=[5, 8, 12, 18, 23, 29, 35, 44, 52, 57, 58, 59, 63, 72, 73, 83, 86, 110, 119, 158, 164, 165, 173, 177, 181, 188, 192, 210, 217, 225, 229, 251]
+            meta-llama/Meta-Llama-3.1-8B | rotor_quant  | Top-1=  96.97% | Top-5=  84.41% | logit cos=0.9872 | mismatch_pos_head=[4, 11, 44, 50, 53, 72, 78, 109, 164, 165, 176, 181, 219, 248, 249, 263, 266, 268, 269, 282, 307, 316, 326, 327, 340, 361, 377, 391, 392, 401, 426]
+            meta-llama/Meta-Llama-3.1-8B | turbo_quant  | Top-1=  91.80% | Top-5=  57.13% | logit cos=0.8524 | mismatch_pos_head=[5, 10, 11, 12, 18, 23, 29, 44, 57, 58, 72, 73, 86, 94, 109, 110, 112, 125, 131, 137, 148, 158, 162, 164, 165, 181, 185, 190, 209, 217, 219, 228]
+            meta-llama/Meta-Llama-3.1-8B | ultra_quant  | Top-1=  97.75% | Top-5=  87.13% | logit cos=0.9896 | mismatch_pos_head=[8, 31, 44, 88, 109, 138, 158, 181, 182, 184, 192, 219, 229, 263, 270, 315, 327, 338, 364, 370, 385, 409, 410]
+      mistralai/Mistral-7B-Instruct-v0.3 | fp16         | Top-1= 100.00% | Top-5= 100.00% | logit cos=1.0000 | mismatch_pos_head=[]
+      mistralai/Mistral-7B-Instruct-v0.3 | hyper_quant  | Top-1=  92.58% | Top-5=  71.45% | logit cos=0.9837 | mismatch_pos_head=[7, 8, 11, 18, 41, 46, 57, 65, 72, 75, 79, 86, 127, 169, 172, 184, 185, 187, 189, 198, 199, 201, 202, 211, 217, 226, 227, 234, 237, 238, 245, 254]
+      mistralai/Mistral-7B-Instruct-v0.3 | rotor_quant  | Top-1=  97.85% | Top-5=  93.59% | logit cos=0.9986 | mismatch_pos_head=[57, 65, 79, 201, 211, 212, 237, 254, 272, 280, 289, 292, 314, 332, 334, 342, 456, 463, 480, 482, 488, 729]
+      mistralai/Mistral-7B-Instruct-v0.3 | turbo_quant  | Top-1=  93.07% | Top-5=  73.50% | logit cos=0.9856 | mismatch_pos_head=[7, 22, 32, 41, 42, 47, 55, 59, 65, 75, 79, 86, 122, 125, 127, 168, 169, 172, 185, 187, 198, 201, 202, 203, 217, 226, 237, 238, 245, 258, 260, 263]
+      mistralai/Mistral-7B-Instruct-v0.3 | ultra_quant  | Top-1=  97.66% | Top-5=  93.89% | logit cos=0.9990 | mismatch_pos_head=[7, 55, 57, 79, 86, 169, 170, 202, 238, 258, 272, 280, 289, 292, 322, 334, 354, 361, 424, 442, 456, 480, 488, 729]
+==================================================
+ Re-run Completed
+ Date: Thu Aug 27 02:23:02 PM JST 2026
+==================================================

@@ -1,0 +1,62 @@
+[
+    {
+        "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+        "method": "fp16",
+        "designed_bits": 16.0,
+        "sequence_length": 8192,
+        "designed_data_mb": 1024.0,
+        "designed_meta_mb": 0.0,
+        "designed_footprint_mb": 1024.0,
+        "fp16_baseline_mb": 1024.0,
+        "designed_compression_ratio": 1.0,
+        "calculation_type": "analytical"
+    },
+    {
+        "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+        "method": "turbo_quant",
+        "designed_bits": 3.0,
+        "sequence_length": 8192,
+        "designed_data_mb": 192.0,
+        "designed_meta_mb": 16.0,
+        "designed_footprint_mb": 208.0,
+        "fp16_baseline_mb": 1024.0,
+        "designed_compression_ratio": 4.92,
+        "calculation_type": "analytical"
+    },
+    {
+        "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+        "method": "rotor_quant",
+        "designed_bits": 3.0,
+        "sequence_length": 8192,
+        "designed_data_mb": 192.0,
+        "designed_meta_mb": 704.0,
+        "designed_footprint_mb": 896.0,
+        "fp16_baseline_mb": 1024.0,
+        "designed_compression_ratio": 1.14,
+        "calculation_type": "analytical"
+    },
+    {
+        "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+        "method": "hyper_quant",
+        "designed_bits": 3.0,
+        "sequence_length": 8192,
+        "designed_data_mb": 192.0,
+        "designed_meta_mb": 16.0,
+        "designed_footprint_mb": 208.0,
+        "fp16_baseline_mb": 1024.0,
+        "designed_compression_ratio": 4.92,
+        "calculation_type": "analytical"
+    },
+    {
+        "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+        "method": "ultra_quant",
+        "designed_bits": 4.0,
+        "sequence_length": 8192,
+        "designed_data_mb": 256.0,
+        "designed_meta_mb": 16.0,
+        "designed_footprint_mb": 272.0,
+        "fp16_baseline_mb": 1024.0,
+        "designed_compression_ratio": 3.76,
+        "calculation_type": "analytical"
+    }
+]

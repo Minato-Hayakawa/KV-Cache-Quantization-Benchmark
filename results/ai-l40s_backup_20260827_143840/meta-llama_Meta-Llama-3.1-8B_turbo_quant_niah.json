@@ -1,0 +1,193 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "turbo_quant",
+    "context_len": 8192,
+    "depths": [
+        0.1,
+        0.3,
+        0.5,
+        0.7,
+        0.9
+    ],
+    "trials_per_depth": 5,
+    "n_trials": 25,
+    "n_success": 25,
+    "niah_success_rate": 1.0,
+    "trials": [
+        {
+            "depth": 0.1,
+            "trial": 0,
+            "secret_key": 513653999,
+            "response": "513653999. The secret key for HPC cluster access is 513",
+            "success": true
+        },
+        {
+            "depth": 0.1,
+            "trial": 1,
+            "secret_key": 913847339,
+            "response": "The secret key for HPC cluster access is 913847339. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.1,
+            "trial": 2,
+            "secret_key": 551585301,
+            "response": "The secret key for HPC cluster access is 551585301. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.1,
+            "trial": 3,
+            "secret_key": 143469773,
+            "response": "The secret key for HPC cluster access is 143469773. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.1,
+            "trial": 4,
+            "secret_key": 378009742,
+            "response": "378009742. The secret key for HPC cluster access is 378",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 0,
+            "secret_key": 648977048,
+            "response": "The secret key for HPC cluster access is 648977048. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 1,
+            "secret_key": 621760889,
+            "response": "The secret key for HPC cluster access is 621760889. What is",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 2,
+            "secret_key": 534794718,
+            "response": "The secret key for HPC cluster access is 534794718. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 3,
+            "secret_key": 941597326,
+            "response": "The secret key for HPC cluster access is 941597326. What is",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 4,
+            "secret_key": 991047768,
+            "response": "The secret key for HPC cluster access is 991047768. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 0,
+            "secret_key": 425679554,
+            "response": "The secret key for HPC cluster access is 425679554. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 1,
+            "secret_key": 611742081,
+            "response": "The secret key for HPC cluster access is 611742081. The history",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 2,
+            "secret_key": 484452587,
+            "response": "The secret key for HPC cluster access is 484452587. The history",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 3,
+            "secret_key": 726401695,
+            "response": "726401695. The history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 4,
+            "secret_key": 334551094,
+            "response": "The secret key for HPC cluster access is 334551094. What is",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 0,
+            "secret_key": 641903389,
+            "response": "641903389. The history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 1,
+            "secret_key": 249544006,
+            "response": "The secret key for HPC cluster access is 249544006. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 2,
+            "secret_key": 402621084,
+            "response": "The secret key for HPC cluster access is 402621084. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 3,
+            "secret_key": 250050891,
+            "response": "The secret key for HPC cluster access is 250050891. The secret",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 4,
+            "secret_key": 911538590,
+            "response": "911538590. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 0,
+            "secret_key": 201823753,
+            "response": "201823753. The history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 1,
+            "secret_key": 763968655,
+            "response": "763968655\nWhat is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 2,
+            "secret_key": 958351976,
+            "response": "958351976. The history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 3,
+            "secret_key": 368979133,
+            "response": "368979133. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 4,
+            "secret_key": 671835844,
+            "response": "671835844\nWhat is the secret key for HPC cluster access?",
+            "success": true
+        }
+    ]
+}

@@ -1,0 +1,100 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:42<02:07, 42.46s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:25<01:25, 42.55s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:38<01:38, 49.48s/it]
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_fidelity.py", line 186, in <module>
+    AutoModelForCausalLM.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5048, in from_pretrained
+    ) = cls._load_pretrained_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5468, in _load_pretrained_model
+    _error_msgs, disk_offload_index = load_shard_file(args)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 843, in load_shard_file
+    disk_offload_index = _load_state_dict_into_meta_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 770, in _load_state_dict_into_meta_model
+    _load_parameter_into_model(model, param_name, param.to(param_device))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 10.75 GiB of which 82.00 MiB is free. Of the allocated memory 10.54 GiB is allocated by PyTorch, and 17.63 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:42<02:07, 42.49s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:25<01:25, 42.56s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:38<01:38, 49.48s/it]
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_fidelity.py", line 186, in <module>
+    AutoModelForCausalLM.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5048, in from_pretrained
+    ) = cls._load_pretrained_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5468, in _load_pretrained_model
+    _error_msgs, disk_offload_index = load_shard_file(args)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 843, in load_shard_file
+    disk_offload_index = _load_state_dict_into_meta_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 770, in _load_state_dict_into_meta_model
+    _load_parameter_into_model(model, param_name, param.to(param_device))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 10.75 GiB of which 82.00 MiB is free. Of the allocated memory 10.54 GiB is allocated by PyTorch, and 17.63 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:43<02:10, 43.50s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:26<01:25, 42.99s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:39<01:39, 49.95s/it]
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_fidelity.py", line 186, in <module>
+    AutoModelForCausalLM.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5048, in from_pretrained
+    ) = cls._load_pretrained_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5468, in _load_pretrained_model
+    _error_msgs, disk_offload_index = load_shard_file(args)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 843, in load_shard_file
+    disk_offload_index = _load_state_dict_into_meta_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 770, in _load_state_dict_into_meta_model
+    _load_parameter_into_model(model, param_name, param.to(param_device))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 10.75 GiB of which 82.00 MiB is free. Of the allocated memory 10.54 GiB is allocated by PyTorch, and 17.63 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:42<02:07, 42.48s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:25<01:25, 42.58s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:38<01:38, 49.49s/it]
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_fidelity.py", line 186, in <module>
+    AutoModelForCausalLM.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5048, in from_pretrained
+    ) = cls._load_pretrained_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5468, in _load_pretrained_model
+    _error_msgs, disk_offload_index = load_shard_file(args)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 843, in load_shard_file
+    disk_offload_index = _load_state_dict_into_meta_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 770, in _load_state_dict_into_meta_model
+    _load_parameter_into_model(model, param_name, param.to(param_device))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 10.75 GiB of which 82.00 MiB is free. Of the allocated memory 10.54 GiB is allocated by PyTorch, and 17.63 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:45<02:17, 45.75s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:38<01:40, 50.08s/it]Loading checkpoint shards:  50%|█████     | 2/4 [01:52<01:52, 56.49s/it]
+Traceback (most recent call last):
+  File "/hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark/eval_pt/eval_fidelity.py", line 186, in <module>
+    AutoModelForCausalLM.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5048, in from_pretrained
+    ) = cls._load_pretrained_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 5468, in _load_pretrained_model
+    _error_msgs, disk_offload_index = load_shard_file(args)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 843, in load_shard_file
+    disk_offload_index = _load_state_dict_into_meta_model(
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/users/u0001988/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 770, in _load_state_dict_into_meta_model
+    _load_parameter_into_model(model, param_name, param.to(param_device))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 10.75 GiB of which 82.00 MiB is free. Of the allocated memory 10.54 GiB is allocated by PyTorch, and 17.63 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

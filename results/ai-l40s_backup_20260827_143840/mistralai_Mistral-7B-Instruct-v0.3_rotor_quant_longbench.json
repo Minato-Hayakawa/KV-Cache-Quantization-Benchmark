@@ -1,0 +1,105 @@
+{
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "method": "rotor_quant",
+    "task": "qasper",
+    "num_samples": 10,
+    "max_ctx_tokens": 6144,
+    "longbench_qasper_f1": 0.28133147706218853,
+    "samples": [
+        {
+            "index": 0,
+            "question": "How is the ground truth for fake news established?",
+            "prediction": "The ground truth for fake news was established by an expert who manually inspected the text field within the tweets to label them as containing fake news, or not",
+            "references": [
+                "Ground truth is not established in the paper"
+            ],
+            "qa_f1": 0.2702702702702703
+        },
+        {
+            "index": 1,
+            "question": "What is the GhostVLAD approach?",
+            "prediction": "GhostVLAD is an extension of the NetVLAD approach, which was originally proposed for face recognition. GhostVLAD works exactly similar to NetVLAD except",
+            "references": [
+                "extension of the NetVLAD, adds Ghost clusters along with the NetVLAD clusters",
+                "An extension of NetVLAD which replaces hard assignment-based clustering with soft assignment-based clustering with the additon o fusing Ghost clusters to deal with noisy content."
+            ],
+            "qa_f1": 0.29787234042553196
+        },
+        {
+            "index": 2,
+            "question": "By how much does their model outperform the state of the art results?",
+            "prediction": "The proposed model outperforms the previous state-of-the-art methods by 68.8% to 71.8% when applied",
+            "references": [
+                "the attention model, MDREA, also outperforms the best existing research results (WAP 0.690 to 0.688)"
+            ],
+            "qa_f1": 0.3448275862068965
+        },
+        {
+            "index": 3,
+            "question": "What additional features and context are proposed?",
+            "prediction": "In addition to the original tweet, the context tweet is proposed as an additional feature. The context tweet is the tweet that the original tweet",
+            "references": [
+                "using tweets that one has replied or quoted to as contextual information",
+                "text sequences of context tweets"
+            ],
+            "qa_f1": 0.16216216216216217
+        },
+        {
+            "index": 4,
+            "question": "Which Facebook pages did they look at?",
+            "prediction": "They looked at FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon",
+            "references": [
+                "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney",
+                "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney."
+            ],
+            "qa_f1": 0.6818181818181818
+        },
+        {
+            "index": 5,
+            "question": "Do the hashtag and SemEval datasets contain only English data?",
+            "prediction": "Yes, the hashtag dataset contains only English data. The SemEval dataset contains data in multiple languages, but we only used the English data for our experiments",
+            "references": [
+                "Yes",
+                "Yes"
+            ],
+            "qa_f1": 0.07407407407407407
+        },
+        {
+            "index": 6,
+            "question": "What type of evaluation is proposed for this task?",
+            "prediction": "The evaluation is based on the agreement of multiple crowdworkers.\n\nQuestion: What is the main difference between the proposed task and traditional summarization tasks?",
+            "references": [
+                "Answer with content missing: (Evaluation Metrics section) Precision, Recall, F1-scores, Strict match, METEOR, ROUGE-2"
+            ],
+            "qa_f1": 0.052631578947368425
+        },
+        {
+            "index": 7,
+            "question": "What are the datasets used for evaluation?",
+            "prediction": "The datasets used for evaluation are CNN/DailyMail news highlights dataset, New York Times Annotated Corpus (NYT), and XSum.",
+            "references": [
+                "CNN/DailyMail news highlights, New York Times Annotated Corpus, XSum",
+                "the CNN/DailyMail news highlights dataset BIBREF24, the New York Times Annotated Corpus (NYT; BIBREF25), XSum BIBREF22"
+            ],
+            "qa_f1": 0.7058823529411765
+        },
+        {
+            "index": 8,
+            "question": "How does this approach compare to other WSD approaches employing word embeddings?",
+            "prediction": "The proposed approach, GM$\\_$KL, is a Gaussian mixture model using KL divergence as energy function for learning multi-sense word embedding",
+            "references": [
+                "GM$\\_$KL achieves better correlation than existing approaches for various metrics on SCWS dataset."
+            ],
+            "qa_f1": 0.12121212121212123
+        },
+        {
+            "index": 9,
+            "question": "How does their ensemble method work?",
+            "prediction": "They started with the best performing model according to validation performance. Then in each step they tried adding the best performing model that had not been previously tried. They kept",
+            "references": [
+                "simply averaging the predictions from the constituent single models"
+            ],
+            "qa_f1": 0.10256410256410256
+        }
+    ]
+}

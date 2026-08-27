@@ -1,0 +1,12 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "hyper_quant",
+    "seq_len": 1024,
+    "logit_cosine_similarity": 0.685052752494812,
+    "logit_top1_match_rate": 99.70703125,
+    "logit_top5_overlap_rate": 40.78124761581421,
+    "kv_cosine_similarity": 0.7536198757588863,
+    "kv_relative_mse": 0.65615468705073,
+    "evaluated_seq_len": 1024,
+    "note": "logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度"
+}
