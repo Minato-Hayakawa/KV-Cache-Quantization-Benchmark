@@ -127,7 +127,7 @@ Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 | :--- | :--- |
 | ai-l40s | NVIDIA (L40S) |
 
-> **Exception**: only the fidelity re-run (after the Top-1 saturation fix) used the **ai-h100l-pu (NVIDIA H100)** partition, because ai-l40s was unavailable at that time (`hpc_scripts/run_rerun_fidelity_ai_h100l_pu.sh`). The quantizers' numeric results do not depend on the GPU model, so this does not affect the results. All speed values are from ai-l40s and were not measured in this job.
+> **Exception**: only the fidelity re-run (after the Top-1 saturation fix) used the **ai-h100l-pu (NVIDIA H100)** partition, because ai-l40s was unavailable at that time (`hpc_scripts/run_rerun_fidelity_ai_h100l_pu_llama.sh` / `run_rerun_fidelity_ai_h100l_pu_mistral.sh` — split into two per-model jobs because the pu partition enforces a 30-minute limit). The quantizers' numeric results do not depend on the GPU model, so this does not affect the results. All speed values are from ai-l40s and were not measured in this job.
 
 ### Models evaluated
 - Meta-Llama 3.1 8B (`meta-llama/Meta-Llama-3.1-8B`)

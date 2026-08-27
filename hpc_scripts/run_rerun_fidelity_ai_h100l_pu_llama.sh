@@ -1,28 +1,26 @@
 #!/bin/bash
-#SBATCH --job-name=kv_quant_rerun_fidelity_h100
+#SBATCH --job-name=kv_quant_rerun_fidelity_llama
 #SBATCH --partition=ai-h100l-pu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=30:00
-#SBATCH --output=logs/rerun_fidelity_h100_%j.log
-#SBATCH --error=logs/rerun_fidelity_h100_%j.err
+#SBATCH --output=logs/rerun_fidelity_llama_%j.log
+#SBATCH --error=logs/rerun_fidelity_llama_%j.err
 
-# 注意1: --gres=gpu:1 は【指定しない】こと。
-#   ai-h100l-pu は専用パーティション ai-h100l とノード共用の全員向け
-#   パーティション (最大実行時間30分) で、pu側にはGRESが公開されていない。
-#   そのため --gres=gpu:1 を付けると投入時に
-#     sbatch: error: Batch job submission failed: Requested node
-#     configuration is not available
-#   で弾かれる (実迷: 2026-08-27)。ノードには H100 NVL が1枚しかないため
-#   GRES指定は不要。外せばジョブからGPUはそのまま見える。
-
-# 忠実度 (logit/KV fidelity) のみを再測定する。
+# 忠実度 (logit/KV fidelity) のみを再測定する。【Llama-3.1-8B 側 / 分割 2本のうち 1本目】
+#
 # 目的: 旧 eval_fidelity.py は反復的な合成文を使っていたため Top-1 が飽和し
 # (全条件が 1023/1024 = 99.90% 等の格子点に張り付く)、指標として識別力を
 # 失っていた。修正版 (非反復の自然文) で全条件を再測定し、表の Top-1 列を
 # 更新する。他の指標 (PPL/NIAH/LongBench/compression/speed) は飽和の影響を
 # 受けないため再測定しない。
+#
+# 【なぜ分割か】
+# ai-h100l-pu の最大実行時間は 30 分。一括版 (両モデル x 5手法 = 10本) は
+# モデルロード (1本あたり数分) が支配的で 30 分に収まらなかったため、
+# モデルごとに分割して 2 ジョブ並列で実行する (本スクリプト: Llama 側。
+# もう一方: run_rerun_fidelity_ai_h100l_pu_mistral.sh)。
 #
 # 【計算資源についての特例】
 # 本来の全評価は ai-l40s (NVIDIA L40S) パーティションで実施しているが、
@@ -31,13 +29,18 @@
 # 量子化器の数値結果はデバイスに依存しないためパーティション変更の影響は
 # ないが、速度値は本ジョブでは測定しないこと (速度表は ai-l40s の既存値)。
 #
-# 対象 (計10本):
-#   - fidelity: 全5手法 (fp16 含む) x 両モデル, seq_len 1024
-#     fp16 は fp16-vs-fp16 の回帰チェック兼用 (Top-1 が厳密に 100.00% になること)
+# 注意1: --gres=gpu:1 は【指定しない】こと。
+#   ai-h100l-pu は専用パーティション ai-h100l とノード共用の全員向け
+#   パーティション (最大実行時間30分) で、pu側にはGRESが公開されていない。
+#   そのため --gres=gpu:1 を付けると投入時に
+#     sbatch: error: Batch job submission failed: Requested node
+#     configuration is not available
+#   で弾かれる (実迷: 2026-08-27)。ノードには H100 NVL が1枚しかないため
+#   GRES指定は不要。外せばジョブからGPUはそのまま見える。
 #
-# 時間見積もり: 1本あたりのコストはモデルロードが支配的 (forward は
-#   1024トークン x 2回のみ)。10本で ~20 分程度を想定。パーティションの
-#   上限 30 分に収まらない場合は MODELS を1件ずつに分けて2ジョブにすること。
+# 対象 (計5本):
+#   - fidelity: 全5手法 (fp16 含む) x Llama-3.1-8B, seq_len 1024
+#     fp16 は fp16-vs-fp16 の回帰チェック兼用 (Top-1 が厳密に 100.00% になること)
 #
 # 出力ファイル名は既存と同じ ({model}_{method}_fidelity.json、
 # results/ai-l40s/ 配下) のため、成功したものから既存JSONが正規データで
@@ -52,6 +55,7 @@ mkdir -p logs results/ai-l40s
 
 echo "=================================================="
 echo " Re-running Fidelity (natural non-repetitive text)"
+echo " Split job: Llama-3.1-8B only (1 of 2)"
 echo " Working Directory: $(pwd)"
 echo " Node: $(hostname)"
 echo " Date: $(date)"
@@ -69,7 +73,6 @@ cp -r results/ai-l40s "$BACKUP_DIR"
 
 MODELS=(
     "meta-llama/Meta-Llama-3.1-8B"
-    "mistralai/Mistral-7B-Instruct-v0.3"
 )
 
 METHODS=(
@@ -91,7 +94,7 @@ for MODEL in "${MODELS[@]}"; do
 done
 
 echo "=================================================="
-echo " Summary of re-measured Top-1 match rates"
+echo " Summary of re-measured fidelity results"
 echo "=================================================="
 python - <<'EOF'
 import glob, json, os
