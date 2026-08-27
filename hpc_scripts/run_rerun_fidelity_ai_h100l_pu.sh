@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name=kv_quant_rerun_fidelity
-#SBATCH --partition=ai-l40s
+#SBATCH --job-name=kv_quant_rerun_fidelity_h100
+#SBATCH --partition=ai-h100l-pu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
-#SBATCH --time=01:00:00
-#SBATCH --output=logs/rerun_fidelity_%j.log
-#SBATCH --error=logs/rerun_fidelity_%j.err
+#SBATCH --time=30:00
+#SBATCH --output=logs/rerun_fidelity_h100_%j.log
+#SBATCH --error=logs/rerun_fidelity_h100_%j.err
 
 # 忠実度 (logit/KV fidelity) のみを再測定する。
 # 目的: 旧 eval_fidelity.py は反復的な合成文を使っていたため Top-1 が飽和し
@@ -16,13 +16,24 @@
 # 更新する。他の指標 (PPL/NIAH/LongBench/compression/speed) は飽和の影響を
 # 受けないため再測定しない。
 #
+# 【計算資源についての特例】
+# 本来の全評価は ai-l40s (NVIDIA L40S) パーティションで実施しているが、
+# 再測定時点で ai-l40s が利用不可のため、【忠実度の再測定のみ】
+# ai-h100l-pu (NVIDIA H100) パーティションを使用する。
+# 量子化器の数値結果はデバイスに依存しないためパーティション変更の影響は
+# ないが、速度値は本ジョブでは測定しないこと (速度表は ai-l40s の既存値)。
+#
 # 対象 (計10本):
 #   - fidelity: 全5手法 (fp16 含む) x 両モデル, seq_len 1024
 #     fp16 は fp16-vs-fp16 の回帰チェック兼用 (Top-1 が厳密に 100.00% になること)
 #
-# 出力ファイル名は既存と同じ ({model}_{method}_fidelity.json) のため、
-# 成功したものから既存JSONが正規データで上書きされる。
-# 条件 (seq_len 1024) は既存と同一。変えないこと。
+# 時間見積もり: 1本あたりのコストはモデルロードが支配的 (forward は
+#   1024トークン x 2回のみ)。10本で ~20 分程度を想定。パーティションの
+#   上限 30 分に収まらない場合は MODELS を1件ずつに分けて2ジョブにすること。
+#
+# 出力ファイル名は既存と同じ ({model}_{method}_fidelity.json、
+# results/ai-l40s/ 配下) のため、成功したものから既存JSONが正規データで
+# 上書きされる。条件 (seq_len 1024) は既存と同一。変えないこと。
 #
 # 完了後の後片付け (ローカルまたはクラスタ上で):
 #   python results/summarize_results.py   # 表・プロットの再生成
@@ -36,7 +47,8 @@ echo " Re-running Fidelity (natural non-repetitive text)"
 echo " Working Directory: $(pwd)"
 echo " Node: $(hostname)"
 echo " Date: $(date)"
-echo " Partition: ai-l40s"
+echo " Partition: ai-h100l-pu (H100; exception for this fidelity"
+echo "            re-run only, since ai-l40s was unavailable)"
 echo "=================================================="
 
 # 上書き前に既存 results/ai-l40s を丸ごとバックアップ
