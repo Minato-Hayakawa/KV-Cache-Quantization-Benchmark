@@ -9,44 +9,184 @@
         0.7,
         0.9
     ],
-    "trials_per_depth": 1,
-    "n_trials": 5,
-    "n_success": 5,
+    "trials_per_depth": 5,
+    "n_trials": 25,
+    "n_success": 25,
     "niah_success_rate": 1.0,
     "trials": [
         {
             "depth": 0.1,
             "trial": 0,
             "secret_key": 513653999,
-            "response": "(response not present in log; rebuilt from log)",
+            "response": "513653999. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.1,
+            "trial": 1,
+            "secret_key": 913847339,
+            "response": "913847339\nThe history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.1,
+            "trial": 2,
+            "secret_key": 551585301,
+            "response": "551585301. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.1,
+            "trial": 3,
+            "secret_key": 143469773,
+            "response": "143469773. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.1,
+            "trial": 4,
+            "secret_key": 378009742,
+            "response": "378009742. What is the secret key for HPC cluster access?",
             "success": true
         },
         {
             "depth": 0.3,
             "trial": 0,
-            "secret_key": 913847339,
-            "response": "(response not present in log; rebuilt from log)",
+            "secret_key": 648977048,
+            "response": "648977048. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 1,
+            "secret_key": 621760889,
+            "response": "621760889\nThe history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 2,
+            "secret_key": 534794718,
+            "response": "534794718. The history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 3,
+            "secret_key": 941597326,
+            "response": "941597326\nThe history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 4,
+            "secret_key": 991047768,
+            "response": "991047768. What is the secret key for HPC cluster access?",
             "success": true
         },
         {
             "depth": 0.5,
             "trial": 0,
-            "secret_key": 551585301,
-            "response": "(response not present in log; rebuilt from log)",
+            "secret_key": 425679554,
+            "response": "425679554. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 1,
+            "secret_key": 611742081,
+            "response": "611742081. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 2,
+            "secret_key": 484452587,
+            "response": "484452587. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 3,
+            "secret_key": 726401695,
+            "response": "726401695. What is the secret key for HPC cluster access?",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 4,
+            "secret_key": 334551094,
+            "response": "334551094. What is the secret key for HPC cluster access?",
             "success": true
         },
         {
             "depth": 0.7,
             "trial": 0,
-            "secret_key": 143469773,
-            "response": "(response not present in log; rebuilt from log)",
+            "secret_key": 641903389,
+            "response": "The secret key for HPC cluster access is 641903389. The history",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 1,
+            "secret_key": 249544006,
+            "response": "249544006\nThe history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 2,
+            "secret_key": 402621084,
+            "response": "The secret key for HPC cluster access is 402621084. The history",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 3,
+            "secret_key": 250050891,
+            "response": "The secret key for HPC cluster access is 250050891. The history",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 4,
+            "secret_key": 911538590,
+            "response": "The secret key for HPC cluster access is 911538590. The history",
             "success": true
         },
         {
             "depth": 0.9,
             "trial": 0,
-            "secret_key": 378009742,
-            "response": "(response not present in log; rebuilt from log)",
+            "secret_key": 201823753,
+            "response": "The secret key for HPC cluster access is 201823753. The history",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 1,
+            "secret_key": 763968655,
+            "response": "763968655\nThe history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 2,
+            "secret_key": 958351976,
+            "response": "958351976\nThe history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 3,
+            "secret_key": 368979133,
+            "response": "368979133\nThe history of modern computing dates back to the mid-",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 4,
+            "secret_key": 671835844,
+            "response": "671835844. What is the secret key for HPC cluster access?",
             "success": true
         }
     ]

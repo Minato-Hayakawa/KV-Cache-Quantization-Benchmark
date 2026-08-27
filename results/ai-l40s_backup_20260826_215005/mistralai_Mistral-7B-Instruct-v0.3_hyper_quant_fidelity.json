@@ -1,0 +1,12 @@
+{
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "method": "hyper_quant",
+    "seq_len": 1024,
+    "logit_cosine_similarity": 0.977383017539978,
+    "logit_top1_match_rate": 99.51171875,
+    "logit_top5_overlap_rate": 59.882813692092896,
+    "kv_cosine_similarity": 0.8451001578941941,
+    "kv_relative_mse": 0.5343484315089881,
+    "evaluated_seq_len": 1024,
+    "note": "logit_* は最終 logits 空間、kv_* はキャッシュ K/V ベクトル空間の忠実度"
+}

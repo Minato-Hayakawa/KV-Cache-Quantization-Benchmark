@@ -1,0 +1,53 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "rotor_quant",
+    "context_len": 8192,
+    "depths": [
+        0.1,
+        0.3,
+        0.5,
+        0.7,
+        0.9
+    ],
+    "trials_per_depth": 1,
+    "n_trials": 5,
+    "n_success": 5,
+    "niah_success_rate": 1.0,
+    "trials": [
+        {
+            "depth": 0.1,
+            "trial": 0,
+            "secret_key": 513653999,
+            "response": "(response not present in log; rebuilt from log)",
+            "success": true
+        },
+        {
+            "depth": 0.3,
+            "trial": 0,
+            "secret_key": 913847339,
+            "response": "(response not present in log; rebuilt from log)",
+            "success": true
+        },
+        {
+            "depth": 0.5,
+            "trial": 0,
+            "secret_key": 551585301,
+            "response": "(response not present in log; rebuilt from log)",
+            "success": true
+        },
+        {
+            "depth": 0.7,
+            "trial": 0,
+            "secret_key": 143469773,
+            "response": "(response not present in log; rebuilt from log)",
+            "success": true
+        },
+        {
+            "depth": 0.9,
+            "trial": 0,
+            "secret_key": 378009742,
+            "response": "(response not present in log; rebuilt from log)",
+            "success": true
+        }
+    ]
+}

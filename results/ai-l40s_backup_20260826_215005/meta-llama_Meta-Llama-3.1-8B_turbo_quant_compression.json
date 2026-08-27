@@ -1,0 +1,11 @@
+{
+    "model_name": "meta-llama/Meta-Llama-3.1-8B",
+    "method": "turbo_quant",
+    "sequence_length": 8192,
+    "designed_bits": 3.0,
+    "stored_mb": 528.0,
+    "designed_data_mb": 192.0,
+    "designed_meta_mb": 16.0,
+    "designed_footprint_mb": 208.0,
+    "note": "stored_mb は簡易実装(int8保存)の実占有で設計ビットを反映しない。designed_footprint_mb は(designed_bits基準データ+実装メタデータ)の解析値。"
+}

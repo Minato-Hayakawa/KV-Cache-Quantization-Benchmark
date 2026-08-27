@@ -1,0 +1,33 @@
+==================================================
+ ultra_quant Dedicated Sanity Check
+ Working Directory: /hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark
+ Node: ai-l40s-01.cloud.r-ccs.riken.jp
+ Date: Wed Aug 26 09:50:05 PM JST 2026
+ Partition: ai-l40s
+==================================================
+--------------------------------------------------
+ Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+=== ultra_quant Dedicated Sanity | Model: meta-llama/Meta-Llama-3.1-8B | Device: cuda ===
+[native 4bit] rel L2 = 0.1104 (< 0.4), index range = [0, 15] -> PASS
+[fp16]            generated: [7445, 3571, 323, 1218, 526, 1001, 13, 128001]
+[ultra HP bypass] generated: [7445, 3571, 323, 1218, 526, 1001, 13, 128001]
+[ultra HP bypass] match rate vs fp16: 100.0% (>= 90%) -> PASS
+
+=== ultra_quant Sanity Overall: PASS ===
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_sanity_ultra.json
+--------------------------------------------------
+ Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+=== ultra_quant Dedicated Sanity | Model: mistralai/Mistral-7B-Instruct-v0.3 | Device: cuda ===
+[native 4bit] rel L2 = 0.1104 (< 0.4), index range = [0, 15] -> PASS
+[fp16]            generated: [23423, 1151, 22031, 23367, 2059, 2963, 4408, 1072, 1704, 1370, 1812, 29491, 2]
+[ultra HP bypass] generated: [23423, 1151, 22031, 23367, 2059, 2963, 4408, 1072, 1704, 1370, 1812, 29491, 2]
+[ultra HP bypass] match rate vs fp16: 100.0% (>= 90%) -> PASS
+
+=== ultra_quant Sanity Overall: PASS ===
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_sanity_ultra.json
+==================================================
+ ultra_quant Sanity Completed (FAIL=0)
+ Date: Wed Aug 26 09:51:22 PM JST 2026
+==================================================

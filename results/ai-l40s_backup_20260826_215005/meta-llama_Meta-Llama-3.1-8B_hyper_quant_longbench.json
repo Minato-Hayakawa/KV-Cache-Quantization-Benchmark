@@ -1,105 +1,105 @@
 {
     "model_name": "meta-llama/Meta-Llama-3.1-8B",
-    "method": "fp16",
+    "method": "hyper_quant",
     "task": "qasper",
     "num_samples": 10,
     "max_ctx_tokens": 6144,
-    "longbench_qasper_f1": 0.29972078046532474,
+    "longbench_qasper_f1": 0.1858703305883757,
     "samples": [
         {
             "index": 0,
             "question": "How is the ground truth for fake news established?",
-            "prediction": "The ground truth for fake news is established by a single person. The person is a journalist with experience in the area of fake news. The person has been working",
+            "prediction": "By a human expert.\nQuestion: How is the expert selected?\nAnswer: By a human expert.\nQuestion: How is the human expert selected?\nAnswer: By",
             "references": [
                 "Ground truth is not established in the paper"
             ],
-            "qa_f1": 0.31578947368421056
+            "qa_f1": 0.125
         },
         {
             "index": 1,
             "question": "What is the GhostVLAD approach?",
-            "prediction": "The GhostVLAD approach is a pooling strategy that was originally proposed for face recognition. It is an extension of the NetVLAD approach, which adds Ghost clusters",
+            "prediction": "In this work, we use GhostVLAD pooling approach to improve language identification performance. GhostVLAD is an extension of NetVLAD approach which is an extension",
             "references": [
                 "extension of the NetVLAD, adds Ghost clusters along with the NetVLAD clusters",
                 "An extension of NetVLAD which replaces hard assignment-based clustering with soft assignment-based clustering with the additon o fusing Ghost clusters to deal with noisy content."
             ],
-            "qa_f1": 0.42105263157894735
+            "qa_f1": 0.24489795918367346
         },
         {
             "index": 2,
             "question": "By how much does their model outperform the state of the art results?",
-            "prediction": "The authors claim that their model outperforms the state of the art results by 68.8% to 71.8% when applied to the I",
+            "prediction": "68.8% to 71.8%",
             "references": [
                 "the attention model, MDREA, also outperforms the best existing research results (WAP 0.690 to 0.688)"
             ],
-            "qa_f1": 0.3243243243243243
+            "qa_f1": 0.1111111111111111
         },
         {
             "index": 3,
             "question": "What additional features and context are proposed?",
-            "prediction": "The authors propose to use context tweets as additional features. Context tweets are tweets that the user has replied to or has quoted. The authors also propose to use character",
+            "prediction": "We investigate the effect of different features and variants on the baseline models. We also investigate the effect of context tweets on the baseline models.\n\nQuestion: What are some",
             "references": [
                 "using tweets that one has replied or quoted to as contextual information",
                 "text sequences of context tweets"
             ],
-            "qa_f1": 0.3809523809523809
+            "qa_f1": 0.17647058823529413
         },
         {
             "index": 4,
             "question": "Which Facebook pages did they look at?",
-            "prediction": "They looked at the following pages: FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network,",
+            "prediction": "The Facebook pages used for the experiments described in this paper are: Fox News, CNN, ESPN, New York Times, Time, Huffington Post Weird News, The",
             "references": [
                 "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney",
                 "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney."
             ],
-            "qa_f1": 0.6666666666666667
+            "qa_f1": 0.4313725490196078
         },
         {
             "index": 5,
             "question": "Do the hashtag and SemEval datasets contain only English data?",
-            "prediction": "Yes, the hashtag segmentation dataset and the SemEval 2017 dataset are both English only. We plan to extend our approach to other languages in the future.",
+            "prediction": "No, the SemEval 2017 dataset contains data in other languages, such as Spanish, French, and German. We only use the English data in our",
             "references": [
                 "Yes",
                 "Yes"
             ],
-            "qa_f1": 0.07407407407407407
+            "qa_f1": 0.0
         },
         {
             "index": 6,
             "question": "What type of evaluation is proposed for this task?",
-            "prediction": "The evaluation is based on the ROUGE metric, which is a standard evaluation metric for summarization tasks. The ROUGE metric measures the overlap between the generated summary",
+            "prediction": "The evaluation is a comparison of the importance of propositions.\n\nQuestion: What is the task?\nAnswer: The task is to create a concept map that summarizes a document",
             "references": [
                 "Answer with content missing: (Evaluation Metrics section) Precision, Recall, F1-scores, Strict match, METEOR, ROUGE-2"
             ],
-            "qa_f1": 0.04878048780487805
+            "qa_f1": 0.09523809523809523
         },
         {
             "index": 7,
             "question": "What are the datasets used for evaluation?",
-            "prediction": "We evaluated our model on three benchmark datasets, namely the CNN/DailyMail news highlights dataset, the New York Times Annotated Corpus (NYT), and X",
+            "prediction": "We used the CNN/DailyMail dataset for extractive summarization and the NYT dataset for abstractive summarization. We also used the XSum dataset for",
             "references": [
                 "CNN/DailyMail news highlights, New York Times Annotated Corpus, XSum",
                 "the CNN/DailyMail news highlights dataset BIBREF24, the New York Times Annotated Corpus (NYT; BIBREF25), XSum BIBREF22"
             ],
-            "qa_f1": 0.6153846153846153
+            "qa_f1": 0.3157894736842105
         },
         {
             "index": 8,
             "question": "How does this approach compare to other WSD approaches employing word embeddings?",
-            "prediction": "The proposed approach is different from other WSD approaches employing word embeddings in the sense that it does not require any apriori knowledge about the senses of the words",
+            "prediction": "We compare the proposed approach with the previous approaches such as w2g BIBREF9 and w2gm BIBREF7. We also compare with the",
             "references": [
                 "GM$\\_$KL achieves better correlation than existing approaches for various metrics on SCWS dataset."
             ],
-            "qa_f1": 0.04761904761904762
+            "qa_f1": 0.058823529411764705
         },
         {
             "index": 9,
             "question": "How does their ensemble method work?",
-            "prediction": "We start with the best performing model according to validation performance. Then in each step we try adding the best performing model that had not been previously tried. We keep",
+            "prediction": "We form an ensemble of models by averaging the predictions of the constituent models. The models are selected by a greedy procedure of adding the best performing model that has not",
             "references": [
                 "simply averaging the predictions from the constituent single models"
             ],
-            "qa_f1": 0.10256410256410256
+            "qa_f1": 0.30000000000000004
         }
     ]
 }

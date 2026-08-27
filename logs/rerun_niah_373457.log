@@ -1,0 +1,414 @@
+==================================================
+ Re-running NIAH (trials_per_depth=5) + fp16 LongBench
+ Working Directory: /hs/work0/home/users/u0001988/KV-Cache-Quantization-Benchmark
+ Node: ai-l40s-01.cloud.r-ccs.riken.jp
+ Date: Wed Aug 26 09:50:05 PM JST 2026
+ Partition: ai-l40s
+==================================================
+>>> Backing up results/ai-l40s -> results/ai-l40s_backup_20260826_215005
+--------------------------------------------------
+ Method: fp16 | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: fp16 | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=10% trial=1 key=913847339 success=True
+  depth=10% trial=2 key=551585301 success=True
+  depth=10% trial=3 key=143469773 success=True
+  depth=10% trial=4 key=378009742 success=True
+  depth=30% trial=0 key=648977048 success=True
+  depth=30% trial=1 key=621760889 success=True
+  depth=30% trial=2 key=534794718 success=True
+  depth=30% trial=3 key=941597326 success=True
+  depth=30% trial=4 key=991047768 success=True
+  depth=50% trial=0 key=425679554 success=True
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=True
+  depth=50% trial=3 key=726401695 success=True
+  depth=50% trial=4 key=334551094 success=True
+  depth=70% trial=0 key=641903389 success=True
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=True
+  depth=70% trial=3 key=250050891 success=True
+  depth=70% trial=4 key=911538590 success=True
+  depth=90% trial=0 key=201823753 success=True
+  depth=90% trial=1 key=763968655 success=True
+  depth=90% trial=2 key=958351976 success=True
+  depth=90% trial=3 key=368979133 success=True
+  depth=90% trial=4 key=671835844 success=True
+
+=== NIAH success rate: 25/25 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_niah.json
+--------------------------------------------------
+ Method: turbo_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: turbo_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=10% trial=1 key=913847339 success=True
+  depth=10% trial=2 key=551585301 success=True
+  depth=10% trial=3 key=143469773 success=True
+  depth=10% trial=4 key=378009742 success=True
+  depth=30% trial=0 key=648977048 success=True
+  depth=30% trial=1 key=621760889 success=True
+  depth=30% trial=2 key=534794718 success=True
+  depth=30% trial=3 key=941597326 success=True
+  depth=30% trial=4 key=991047768 success=True
+  depth=50% trial=0 key=425679554 success=True
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=True
+  depth=50% trial=3 key=726401695 success=True
+  depth=50% trial=4 key=334551094 success=True
+  depth=70% trial=0 key=641903389 success=True
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=True
+  depth=70% trial=3 key=250050891 success=True
+  depth=70% trial=4 key=911538590 success=True
+  depth=90% trial=0 key=201823753 success=True
+  depth=90% trial=1 key=763968655 success=True
+  depth=90% trial=2 key=958351976 success=True
+  depth=90% trial=3 key=368979133 success=True
+  depth=90% trial=4 key=671835844 success=True
+
+=== NIAH success rate: 25/25 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_turbo_quant_niah.json
+--------------------------------------------------
+ Method: rotor_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: rotor_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=10% trial=1 key=913847339 success=True
+  depth=10% trial=2 key=551585301 success=True
+  depth=10% trial=3 key=143469773 success=True
+  depth=10% trial=4 key=378009742 success=True
+  depth=30% trial=0 key=648977048 success=True
+  depth=30% trial=1 key=621760889 success=True
+  depth=30% trial=2 key=534794718 success=True
+  depth=30% trial=3 key=941597326 success=True
+  depth=30% trial=4 key=991047768 success=True
+  depth=50% trial=0 key=425679554 success=True
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=True
+  depth=50% trial=3 key=726401695 success=True
+  depth=50% trial=4 key=334551094 success=True
+  depth=70% trial=0 key=641903389 success=True
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=True
+  depth=70% trial=3 key=250050891 success=True
+  depth=70% trial=4 key=911538590 success=True
+  depth=90% trial=0 key=201823753 success=True
+  depth=90% trial=1 key=763968655 success=True
+  depth=90% trial=2 key=958351976 success=True
+  depth=90% trial=3 key=368979133 success=True
+  depth=90% trial=4 key=671835844 success=True
+
+=== NIAH success rate: 25/25 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_rotor_quant_niah.json
+--------------------------------------------------
+ Method: hyper_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: hyper_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=10% trial=1 key=913847339 success=True
+  depth=10% trial=2 key=551585301 success=True
+  depth=10% trial=3 key=143469773 success=True
+  depth=10% trial=4 key=378009742 success=True
+  depth=30% trial=0 key=648977048 success=True
+  depth=30% trial=1 key=621760889 success=True
+  depth=30% trial=2 key=534794718 success=True
+  depth=30% trial=3 key=941597326 success=True
+  depth=30% trial=4 key=991047768 success=True
+  depth=50% trial=0 key=425679554 success=True
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=True
+  depth=50% trial=3 key=726401695 success=True
+  depth=50% trial=4 key=334551094 success=True
+  depth=70% trial=0 key=641903389 success=True
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=True
+  depth=70% trial=3 key=250050891 success=True
+  depth=70% trial=4 key=911538590 success=True
+  depth=90% trial=0 key=201823753 success=True
+  depth=90% trial=1 key=763968655 success=True
+  depth=90% trial=2 key=958351976 success=True
+  depth=90% trial=3 key=368979133 success=True
+  depth=90% trial=4 key=671835844 success=True
+
+=== NIAH success rate: 25/25 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_hyper_quant_niah.json
+--------------------------------------------------
+ Method: ultra_quant | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: meta-llama/Meta-Llama-3.1-8B | Context: 8192 | Method: ultra_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=10% trial=1 key=913847339 success=True
+  depth=10% trial=2 key=551585301 success=True
+  depth=10% trial=3 key=143469773 success=True
+  depth=10% trial=4 key=378009742 success=True
+  depth=30% trial=0 key=648977048 success=True
+  depth=30% trial=1 key=621760889 success=True
+  depth=30% trial=2 key=534794718 success=True
+  depth=30% trial=3 key=941597326 success=True
+  depth=30% trial=4 key=991047768 success=True
+  depth=50% trial=0 key=425679554 success=True
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=True
+  depth=50% trial=3 key=726401695 success=True
+  depth=50% trial=4 key=334551094 success=True
+  depth=70% trial=0 key=641903389 success=True
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=True
+  depth=70% trial=3 key=250050891 success=True
+  depth=70% trial=4 key=911538590 success=True
+  depth=90% trial=0 key=201823753 success=True
+  depth=90% trial=1 key=763968655 success=True
+  depth=90% trial=2 key=958351976 success=True
+  depth=90% trial=3 key=368979133 success=True
+  depth=90% trial=4 key=671835844 success=True
+
+=== NIAH success rate: 25/25 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_ultra_quant_niah.json
+--------------------------------------------------
+ Method: fp16 | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: fp16 | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=10% trial=1 key=913847339 success=True
+  depth=10% trial=2 key=551585301 success=True
+  depth=10% trial=3 key=143469773 success=True
+  depth=10% trial=4 key=378009742 success=True
+  depth=30% trial=0 key=648977048 success=True
+  depth=30% trial=1 key=621760889 success=True
+  depth=30% trial=2 key=534794718 success=True
+  depth=30% trial=3 key=941597326 success=True
+  depth=30% trial=4 key=991047768 success=True
+  depth=50% trial=0 key=425679554 success=True
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=True
+  depth=50% trial=3 key=726401695 success=True
+  depth=50% trial=4 key=334551094 success=True
+  depth=70% trial=0 key=641903389 success=True
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=True
+  depth=70% trial=3 key=250050891 success=True
+  depth=70% trial=4 key=911538590 success=True
+  depth=90% trial=0 key=201823753 success=True
+  depth=90% trial=1 key=763968655 success=True
+  depth=90% trial=2 key=958351976 success=True
+  depth=90% trial=3 key=368979133 success=True
+  depth=90% trial=4 key=671835844 success=True
+
+=== NIAH success rate: 25/25 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_niah.json
+--------------------------------------------------
+ Method: turbo_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: turbo_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=10% trial=1 key=913847339 success=False
+  depth=10% trial=2 key=551585301 success=True
+  depth=10% trial=3 key=143469773 success=True
+  depth=10% trial=4 key=378009742 success=True
+  depth=30% trial=0 key=648977048 success=True
+  depth=30% trial=1 key=621760889 success=True
+  depth=30% trial=2 key=534794718 success=True
+  depth=30% trial=3 key=941597326 success=False
+  depth=30% trial=4 key=991047768 success=False
+  depth=50% trial=0 key=425679554 success=True
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=True
+  depth=50% trial=3 key=726401695 success=True
+  depth=50% trial=4 key=334551094 success=True
+  depth=70% trial=0 key=641903389 success=False
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=True
+  depth=70% trial=3 key=250050891 success=False
+  depth=70% trial=4 key=911538590 success=True
+  depth=90% trial=0 key=201823753 success=False
+  depth=90% trial=1 key=763968655 success=False
+  depth=90% trial=2 key=958351976 success=False
+  depth=90% trial=3 key=368979133 success=True
+  depth=90% trial=4 key=671835844 success=False
+
+=== NIAH success rate: 16/25 = 64.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_turbo_quant_niah.json
+--------------------------------------------------
+ Method: rotor_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: rotor_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=False
+  depth=10% trial=1 key=913847339 success=False
+  depth=10% trial=2 key=551585301 success=False
+  depth=10% trial=3 key=143469773 success=True
+  depth=10% trial=4 key=378009742 success=True
+  depth=30% trial=0 key=648977048 success=True
+  depth=30% trial=1 key=621760889 success=False
+  depth=30% trial=2 key=534794718 success=False
+  depth=30% trial=3 key=941597326 success=True
+  depth=30% trial=4 key=991047768 success=True
+  depth=50% trial=0 key=425679554 success=True
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=True
+  depth=50% trial=3 key=726401695 success=False
+  depth=50% trial=4 key=334551094 success=True
+  depth=70% trial=0 key=641903389 success=True
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=True
+  depth=70% trial=3 key=250050891 success=True
+  depth=70% trial=4 key=911538590 success=True
+  depth=90% trial=0 key=201823753 success=True
+  depth=90% trial=1 key=763968655 success=True
+  depth=90% trial=2 key=958351976 success=True
+  depth=90% trial=3 key=368979133 success=True
+  depth=90% trial=4 key=671835844 success=True
+
+=== NIAH success rate: 19/25 = 76.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_rotor_quant_niah.json
+--------------------------------------------------
+ Method: hyper_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: hyper_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=10% trial=1 key=913847339 success=True
+  depth=10% trial=2 key=551585301 success=True
+  depth=10% trial=3 key=143469773 success=False
+  depth=10% trial=4 key=378009742 success=False
+  depth=30% trial=0 key=648977048 success=False
+  depth=30% trial=1 key=621760889 success=False
+  depth=30% trial=2 key=534794718 success=False
+  depth=30% trial=3 key=941597326 success=False
+  depth=30% trial=4 key=991047768 success=False
+  depth=50% trial=0 key=425679554 success=False
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=False
+  depth=50% trial=3 key=726401695 success=False
+  depth=50% trial=4 key=334551094 success=False
+  depth=70% trial=0 key=641903389 success=False
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=False
+  depth=70% trial=3 key=250050891 success=False
+  depth=70% trial=4 key=911538590 success=False
+  depth=90% trial=0 key=201823753 success=False
+  depth=90% trial=1 key=763968655 success=False
+  depth=90% trial=2 key=958351976 success=False
+  depth=90% trial=3 key=368979133 success=False
+  depth=90% trial=4 key=671835844 success=False
+
+=== NIAH success rate: 5/25 = 20.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_hyper_quant_niah.json
+--------------------------------------------------
+ Method: ultra_quant | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running NIAH Evaluation (multi-depth, trials_per_depth=5)...
+Detected Active Device: cuda
+
+=== Needle In A Haystack | Model: mistralai/Mistral-7B-Instruct-v0.3 | Context: 8192 | Method: ultra_quant | Device: cuda ===
+  depth=10% trial=0 key=513653999 success=True
+  depth=10% trial=1 key=913847339 success=True
+  depth=10% trial=2 key=551585301 success=True
+  depth=10% trial=3 key=143469773 success=True
+  depth=10% trial=4 key=378009742 success=True
+  depth=30% trial=0 key=648977048 success=True
+  depth=30% trial=1 key=621760889 success=True
+  depth=30% trial=2 key=534794718 success=True
+  depth=30% trial=3 key=941597326 success=True
+  depth=30% trial=4 key=991047768 success=True
+  depth=50% trial=0 key=425679554 success=True
+  depth=50% trial=1 key=611742081 success=True
+  depth=50% trial=2 key=484452587 success=True
+  depth=50% trial=3 key=726401695 success=True
+  depth=50% trial=4 key=334551094 success=True
+  depth=70% trial=0 key=641903389 success=True
+  depth=70% trial=1 key=249544006 success=True
+  depth=70% trial=2 key=402621084 success=True
+  depth=70% trial=3 key=250050891 success=True
+  depth=70% trial=4 key=911538590 success=True
+  depth=90% trial=0 key=201823753 success=True
+  depth=90% trial=1 key=763968655 success=True
+  depth=90% trial=2 key=958351976 success=True
+  depth=90% trial=3 key=368979133 success=True
+  depth=90% trial=4 key=671835844 success=True
+
+=== NIAH success rate: 25/25 = 100.0% ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_ultra_quant_niah.json
+--------------------------------------------------
+ Method: fp16 | Model: meta-llama/Meta-Llama-3.1-8B
+--------------------------------------------------
+>>> Running LongBench Evaluation (fp16 re-run)...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: meta-llama/Meta-Llama-3.1-8B | Method: fp16 | Device: cuda ===
+  [0] F1=0.316 | pred: 'The ground truth for fake news is established by a single person. The person is '
+  [1] F1=0.421 | pred: 'The GhostVLAD approach is a pooling strategy that was originally proposed for fa'
+  [2] F1=0.324 | pred: 'The authors claim that their model outperforms the state of the art results by 6'
+  [3] F1=0.381 | pred: 'The authors propose to use context tweets as additional features. Context tweets'
+  [4] F1=0.667 | pred: 'They looked at the following pages: FoxNews, CNN, ESPN, New York Times, Time mag'
+  [5] F1=0.074 | pred: 'Yes, the hashtag segmentation dataset and the SemEval 2017 dataset are both Engl'
+  [6] F1=0.049 | pred: 'The evaluation is based on the ROUGE metric, which is a standard evaluation metr'
+  [7] F1=0.615 | pred: 'We evaluated our model on three benchmark datasets, namely the CNN/DailyMail new'
+  [8] F1=0.048 | pred: 'The proposed approach is different from other WSD approaches employing word embe'
+  [9] F1=0.103 | pred: 'We start with the best performing model according to validation performance. The'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.2997 ===
+
+Results successfully saved to results/ai-l40s/meta-llama_Meta-Llama-3.1-8B_fp16_longbench.json
+--------------------------------------------------
+ Method: fp16 | Model: mistralai/Mistral-7B-Instruct-v0.3
+--------------------------------------------------
+>>> Running LongBench Evaluation (fp16 re-run)...
+Detected Active Device: cuda
+
+=== LongBench (Qasper QA-F1) | Model: mistralai/Mistral-7B-Instruct-v0.3 | Method: fp16 | Device: cuda ===
+  [0] F1=0.270 | pred: 'The ground truth for fake news was established by an expert who manually inspect'
+  [1] F1=0.273 | pred: 'GhostVLAD is an extension of the NetVLAD approach, which was proposed for face r'
+  [2] F1=0.345 | pred: 'The proposed model outperforms the previous state-of-the-art methods by 68.8% to'
+  [3] F1=0.162 | pred: 'In addition to the original tweet, the context tweet is proposed as an additiona'
+  [4] F1=0.682 | pred: 'They looked at FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Pos'
+  [5] F1=0.074 | pred: 'Yes, the hashtag dataset contains only English data. The SemEval dataset contain'
+  [6] F1=0.133 | pred: 'The proposed evaluation is based on the comparison of the automatically generate'
+  [7] F1=0.706 | pred: 'The datasets used for evaluation are CNN/DailyMail news highlights dataset, New '
+  [8] F1=0.111 | pred: 'The proposed approach is compared with the w2g and w2gm approaches which are bas'
+  [9] F1=0.500 | pred: 'The ensemble was formed by simply averaging the predictions from the constituent'
+
+=== LongBench Qasper mean QA-F1 over 10 samples: 0.3256 ===
+
+Results successfully saved to results/ai-l40s/mistralai_Mistral-7B-Instruct-v0.3_fp16_longbench.json
+==================================================
+ Re-run Completed
+ Date: Wed Aug 26 10:03:02 PM JST 2026
+==================================================

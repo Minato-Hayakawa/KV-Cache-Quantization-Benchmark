@@ -1,105 +1,105 @@
 {
-    "model_name": "meta-llama/Meta-Llama-3.1-8B",
-    "method": "fp16",
+    "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+    "method": "ultra_quant",
     "task": "qasper",
     "num_samples": 10,
     "max_ctx_tokens": 6144,
-    "longbench_qasper_f1": 0.29972078046532474,
+    "longbench_qasper_f1": 0.2856201656318097,
     "samples": [
         {
             "index": 0,
             "question": "How is the ground truth for fake news established?",
-            "prediction": "The ground truth for fake news is established by a single person. The person is a journalist with experience in the area of fake news. The person has been working",
+            "prediction": "The ground truth for fake news was established by an expert who manually inspected the text field within the tweets to label them as containing fake news, or not",
             "references": [
                 "Ground truth is not established in the paper"
             ],
-            "qa_f1": 0.31578947368421056
+            "qa_f1": 0.2702702702702703
         },
         {
             "index": 1,
             "question": "What is the GhostVLAD approach?",
-            "prediction": "The GhostVLAD approach is a pooling strategy that was originally proposed for face recognition. It is an extension of the NetVLAD approach, which adds Ghost clusters",
+            "prediction": "GhostVLAD is an extension of the NetVLAD approach, which was initially developed for place recognition by R. Arandjelovic et al. [",
             "references": [
                 "extension of the NetVLAD, adds Ghost clusters along with the NetVLAD clusters",
                 "An extension of NetVLAD which replaces hard assignment-based clustering with soft assignment-based clustering with the additon o fusing Ghost clusters to deal with noisy content."
             ],
-            "qa_f1": 0.42105263157894735
+            "qa_f1": 0.2666666666666666
         },
         {
             "index": 2,
             "question": "By how much does their model outperform the state of the art results?",
-            "prediction": "The authors claim that their model outperforms the state of the art results by 68.8% to 71.8% when applied to the I",
+            "prediction": "The proposed model outperforms the previous state-of-the-art methods by 68.8% to 71.8% when applied",
             "references": [
                 "the attention model, MDREA, also outperforms the best existing research results (WAP 0.690 to 0.688)"
             ],
-            "qa_f1": 0.3243243243243243
+            "qa_f1": 0.3448275862068965
         },
         {
             "index": 3,
             "question": "What additional features and context are proposed?",
-            "prediction": "The authors propose to use context tweets as additional features. Context tweets are tweets that the user has replied to or has quoted. The authors also propose to use character",
+            "prediction": "We propose the use of context tweets as an additional feature for neural network models.\n\nQuestion: What is the effect of character-level features on the",
             "references": [
                 "using tweets that one has replied or quoted to as contextual information",
                 "text sequences of context tweets"
             ],
-            "qa_f1": 0.3809523809523809
+            "qa_f1": 0.19999999999999998
         },
         {
             "index": 4,
             "question": "Which Facebook pages did they look at?",
-            "prediction": "They looked at the following pages: FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network,",
+            "prediction": "They looked at FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon",
             "references": [
                 "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney",
                 "FoxNews, CNN, ESPN, New York Times, Time magazine, Huffington Post Weird News, The Guardian, Cartoon Network, Cooking Light, Home Cooking Adventure, Justin Bieber, Nickelodeon, Spongebob, Disney."
             ],
-            "qa_f1": 0.6666666666666667
+            "qa_f1": 0.6818181818181818
         },
         {
             "index": 5,
             "question": "Do the hashtag and SemEval datasets contain only English data?",
-            "prediction": "Yes, the hashtag segmentation dataset and the SemEval 2017 dataset are both English only. We plan to extend our approach to other languages in the future.",
+            "prediction": "Yes, the hashtag dataset contains only English data. The SemEval dataset contains data in multiple languages, but we only used the English portion of it.",
             "references": [
                 "Yes",
                 "Yes"
             ],
-            "qa_f1": 0.07407407407407407
+            "qa_f1": 0.07692307692307693
         },
         {
             "index": 6,
             "question": "What type of evaluation is proposed for this task?",
-            "prediction": "The evaluation is based on the ROUGE metric, which is a standard evaluation metric for summarization tasks. The ROUGE metric measures the overlap between the generated summary",
+            "prediction": "The proposed evaluation is based on the comparison of the automatically generated concept maps with the gold-standard concept maps. The evaluation metrics are based on the comparison of the",
             "references": [
                 "Answer with content missing: (Evaluation Metrics section) Precision, Recall, F1-scores, Strict match, METEOR, ROUGE-2"
             ],
-            "qa_f1": 0.04878048780487805
+            "qa_f1": 0.1395348837209302
         },
         {
             "index": 7,
             "question": "What are the datasets used for evaluation?",
-            "prediction": "We evaluated our model on three benchmark datasets, namely the CNN/DailyMail news highlights dataset, the New York Times Annotated Corpus (NYT), and X",
+            "prediction": "The datasets used for evaluation are CNN/DailyMail news highlights dataset, New York Times Annotated Corpus (NYT), and XSum.",
             "references": [
                 "CNN/DailyMail news highlights, New York Times Annotated Corpus, XSum",
                 "the CNN/DailyMail news highlights dataset BIBREF24, the New York Times Annotated Corpus (NYT; BIBREF25), XSum BIBREF22"
             ],
-            "qa_f1": 0.6153846153846153
+            "qa_f1": 0.7058823529411765
         },
         {
             "index": 8,
             "question": "How does this approach compare to other WSD approaches employing word embeddings?",
-            "prediction": "The proposed approach is different from other WSD approaches employing word embeddings in the sense that it does not require any apriori knowledge about the senses of the words",
+            "prediction": "The proposed approach is different from other WSD approaches employing word embeddings in the sense that it learns multi-sense word embedding distributions by using a",
             "references": [
                 "GM$\\_$KL achieves better correlation than existing approaches for various metrics on SCWS dataset."
             ],
-            "qa_f1": 0.04761904761904762
+            "qa_f1": 0.052631578947368425
         },
         {
             "index": 9,
             "question": "How does their ensemble method work?",
-            "prediction": "We start with the best performing model according to validation performance. Then in each step we try adding the best performing model that had not been previously tried. We keep",
+            "prediction": "The ensemble method used by the authors is as follows:\n1. Start with the best performing model according to validation performance.\n2. In each step,",
             "references": [
                 "simply averaging the predictions from the constituent single models"
             ],
-            "qa_f1": 0.10256410256410256
+            "qa_f1": 0.11764705882352941
         }
     ]
 }
