@@ -129,6 +129,8 @@ TurboQuantは「4-bitで高精度」を達成した画期的なアルゴリズ�
 | :--- | :--- |
 | ai-l40s | NVIDIA（L40S） |
 
+> **例外**：忠実度評価の再測定（Top-1 飽和修正後のもの）のみ、実行時点で ai-l40s が利用不可だったため **ai-h100l-pu（NVIDIA H100）** パーティションを使用しました（`hpc_scripts/run_rerun_fidelity_ai_h100l_pu.sh`）。量子化器の数値結果はデバイスに依存しないため結果への影響はありません。速度値はすべて ai-l40s での測定値であり、このジョブでは測定していません。
+
 ### 使用するLLM
 - Meta-Llama 3.1 8B（`meta-llama/Meta-Llama-3.1-8B`）
 - Mistral 7B v0.3（`mistralai/Mistral-7B-Instruct-v0.3`）
