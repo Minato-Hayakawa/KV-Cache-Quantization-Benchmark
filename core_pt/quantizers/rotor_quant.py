@@ -18,6 +18,13 @@ class RotorQuantizer(BaseQuantizer):
 
     注意: 3 次元ブロックごとに fp32 スケールを持つため、メタデータが
     量子化データ本体より大きくなる構造（解析的 footprint 参照）。
+
+    head_dim が 3 で割り切れない場合の端数処理:
+      head_dim=128 の場合、42 ブロック × 3 次元 = 126 次元のみを
+      回転・量子化し、残余の 2 次元（tail）は回転も量子化もせず
+      fp32 のまま生保持して連結する（compress の "tail" キー参照）。
+      解析的 footprint のメタデータも (42 ブロック × 4B + 2 次元 × 4B)
+      /トークン/ヘッド/KV で計算する（eval_pt/eval_compression.py 参照）。
     """
 
     def __init__(

@@ -67,9 +67,16 @@ def designed_metadata_bytes(method, num_layers, num_kv_heads, head_dim, seq_len)
         # per-token ベクトルあたり fp32 スケール 1 個
         return kb * 4
     if method == "rotor_quant":
+        # head_dim=128 は 3 で割り切れない → 42 ブロック × 3 次元 = 126 次元を
+        # 回転・量子化し、残余 2 次元は非回転・非量子化で fp32 生保持する
+        # （core_pt/quantizers/rotor_quant.py の "tail" キー参照）。
+        # メタデータ = (42 スケール + 2 尻尾次元) × fp32 /トークン。
+        # 8K 両モデル幾何では 2×32×8×8192×(42×4+2×4)B = 704MB。
+        # ※designed_data（192MB）は 128 次元全てを 3bit としており尻尾 2 次元を
+        #   二重計上しているが、fp32 保持側に寄せた保守的（過大）見積もりとして
+        #   意図的にこのままにしている（影響は圧縮率 1.14×→1.15× 程度で軽微）。
         num_blocks = head_dim // 3
         tail = head_dim - num_blocks * 3
-        # 3D ブロックごとに fp32 スケール + 非回転の尻尾は fp32 生保持
         return kb * (num_blocks * 4 + tail * 4)
     if method == "fp16":
         return 0

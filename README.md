@@ -150,7 +150,8 @@ ultra_quant is defined by a **fixed 16-point FP4 (E2M1) grid** — a "7-bit equi
 
 ### Quality metrics (functional / simulated quantization)
 - **Perplexity** — WikiText-2, window 2048 / stride 512 → `eval_pt/eval_ppl.py`
-- **Logit fidelity** — cosine similarity, Top-1 match, Top-5 **overlap** rate of *final logits* against the fp16 run (seq 1024) → `eval_pt/eval_fidelity.py`
+- **Logit fidelity** — cosine similarity, Top-1 match, Top-5 **overlap** rate of *final logits* against the fp16 run (seq 1024, natural non-repetitive text) → `eval_pt/eval_fidelity.py`
+  - Note: with repetitive synthetic input, next-token margins are huge at almost every position, so Top-1 **saturates** (e.g., pinned at 1023/1024 ≈ 99.90% for all conditions) and loses discriminative power. The Top-1 column in the table below is an old measurement under that saturated regime, shown for reference only.
 - **KV fidelity** — cosine similarity and relative L2 error of the cached K/V vectors themselves vs fp16 (isolates quantization error from model nonlinearity) → same script
 - **NIAH (Needle In A Haystack)** — success **rate** over depths {10/30/50/70/90%} × 5 trials per depth (= 25 trials) at 8K context, greedy 16-token decode, exact key match → `eval_pt/eval_niah.py`
 - **LongBench** — real LongBench **Qasper** QA task, first 10 samples, official-style token F1, context truncated to 6144 from the left → `eval_pt/eval_longbench.py`
@@ -221,6 +222,8 @@ Values below were re-measured with the 2026-08 fixed harness. They reflect the s
 **logit / KV fidelity (seq 1024)**
 
 These are single-forward (prefill-style) evaluations. Fidelity is measured in **final-logit space** (not attention outputs), Top-5 is an **overlap rate**, and KV fidelity is the error of the cached K/V vectors themselves (the quantization error proper).
+
+> **Note on the Top-1 column**: the table was produced by the old script (repetitive synthetic text), where Top-1 saturates at 99.5–99.90% for all conditions (1023/1024 ≈ 99.90% is the lattice point meaning "argmax flipped at exactly 1 of 1024 positions", and flips concentrate at low-margin positions near BOS). The script has since been fixed to use natural non-repetitive text, and this column will be re-measured. The other columns (logit cos, Top-5, KV error) are unaffected by the saturation and remain valid.
 
 | Model | Method | Logit cos | Logit Top-1 (%) | Logit Top-5 overlap (%) | KV cos | KV rel. L2 |
 | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
