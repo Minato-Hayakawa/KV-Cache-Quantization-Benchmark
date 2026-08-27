@@ -13,6 +13,19 @@ It contains simplified PyTorch re-implementations **inspired by** four recent me
 
 ---
 
+## 🧭 Background & Motivation
+
+- In March 2026 Google announced the KV-cache quantization method **TurboQuant** (paper on arXiv since April 2025, ICLR 2026). TurboQuant is a two-stage scheme — **PolarQuant** (Cartesian → polar coordinates, making per-block normalization skippable) plus a **QJL correction** (Johnson–Lindenstrauss transform compressing each value to a 1-bit sign) — claiming 6× memory reduction at 3-bit, up to 8× faster attention on H100, and near-zero accuracy loss (validated on Gemma / Mistral).
+- Since then, follow-up methods based on similar ideas — **RotorQuant**, **HyperQuant**, **UltraQuant** — have been developed at an accelerating pace.
+
+**The gap**: each of these methods has been evaluated independently, on *different models, different hardware, and different metrics* — there is **no cross-comparison data under identical conditions**. The vLLM team's [independent validation of TurboQuant](https://vllm.ai/blog/2026-05-11-turboquant) (May 2026) obtained results more mixed than the original paper (FP8 KV-cache matching BF16 throughput at 2× capacity with negligible loss; aggressive `3bit-nc`-style settings dropping up to ~20 points on reasoning/coding tasks), demonstrating that conclusions can change with evaluation conditions. Practitioners currently lack the data needed to decide which method to deploy.
+
+**This project**: builds a benchmark framework in which four simplified re-implementations are evaluated under the **same model, same hardware, and same metrics** — accuracy (PPL, logit/KV fidelity, NIAH success rate, LongBench QA-F1), compression (analytical footprint), and speed (quantizer overhead). The goal is to clarify each method's practical merits and its **dependence on the base model (architecture)**.
+
+**Target audience**: researchers working on Transformer efficiency / quantization algorithms, engineers designing and implementing LLM inference stacks, and practitioners who need long-context inference within limited VRAM.
+
+---
+
 ## 🌟 Methods (simplified re-implementations)
 
 | Method | Paper's idea | This repo implements | Paper's claimed bit-width | This impl's `designed_bits` |
@@ -23,6 +36,13 @@ It contains simplified PyTorch re-implementations **inspired by** four recent me
 | **UltraQuant** | FP4 hardware-direct decode | Walsh–Hadamard + FP4 (E2M1) grid mapping, per-token scale | 4-bit | 4.0 |
 
 `designed_bits` is **derived from each implementation's quantization levels** (auto-computed, not hand-set). Sub-4-bit claims *as rates* (bps) require entropy coding, which is out of scope here — so despite the HyperQuant paper operating at 1.7–2 bps, this implementation can only achieve 3 bit/scalar.
+
+**How the four methods differ from each other** (positions within this benchmark):
+
+- **TurboQuant** — the simplest of the four and the base of all the others (RotorQuant re-structures its rotation into 3D blocks; HyperQuant / UltraQuant swap in Hadamard-family transforms). In the full paper it is also the only method with a two-stage design (main body + 1-bit QJL residual) — UltraQuant deliberately deletes that QJL stage.
+- **RotorQuant** — improves the *rotation computation itself* rather than the quantizer. Its per-3D-block scale granularity is the finest of the four, which improves fidelity but inflates metadata — giving it the worst analytical compression ratio in this repo (≈1.14×, see Results).
+- **HyperQuant** — the only **lattice (vector) quantizer**: instead of rounding each component independently, points are packed densely on a D4 lattice. It is also the only method whose design includes entropy coding all the way (rate-distortion-limit aware), and the widest target scope (weights and video DiTs in addition to KV cache). Without the unimplemented Rice coding, its footprint here equals turbo_quant's.
+- **UltraQuant** — the only **hardware-affinity-first** design (no software codebook lookup) and the only **fixed 4-bit** method: values map directly onto GPU-native FP4 (E2M1) grid points. High fidelity at a more modest ≈3.76× compression; its motivation is eliminating TurboQuant-family decode overhead (up to 5.56× TPOT regression in the vLLM validation).
 
 ---
 
@@ -151,12 +171,12 @@ ultra_quant is defined by a **fixed 16-point FP4 (E2M1) grid** — a "7-bit equi
 2. **Native 4-bit grid integrity** (model-free numeric check): quantize→dequantize a seeded random tensor in the production 4-bit mode and assert (a) relative L2 error < 0.40 and (b) every stored index lies in 0–15 (catches int8-overflow-style bugs). The grid mapping itself cannot be judged by a near-losslessness argument, so it is verified with an explicit error bound instead.
 
 ### Quality metrics (functional / simulated quantization)
-- **Perplexity** — WikiText-2, window 2048 / stride 512 → `eval_pt/eval_ppl.py`
-- **Logit fidelity** — cosine similarity, Top-1 match, Top-5 **overlap** rate of *final logits* against the fp16 run (seq 1024, natural non-repetitive text) → `eval_pt/eval_fidelity.py`
+- **Perplexity** — WikiText-2, window 2048 / stride 512 → `eval_pt/eval_ppl.py`. Lower is better; ideal is ≈ the fp16 baseline. Because the scale is exponential, a few % above fp16 reads as "mostly preserved" while ~20% up is a clear degradation.
+- **Logit fidelity** — cosine similarity, Top-1 match, Top-5 **overlap** rate of *final logits* against the fp16 run (seq 1024, natural non-repetitive text) → `eval_pt/eval_fidelity.py`. Cosine near 1.0 (≥0.99) reads as near-lossless (~0.7 is a clear degradation); Top-1 / Top-5 near 100% are ideal.
   - Note: with repetitive synthetic input, next-token margins are huge at almost every position, so Top-1 **saturates** (e.g., pinned at 1023/1024 ≈ 99.90% for all conditions) and loses discriminative power. The original script had this flaw; it has been fixed and the results re-measured (see the table below).
 - **KV fidelity** — cosine similarity and relative L2 error of the cached K/V vectors themselves vs fp16 (isolates quantization error from model nonlinearity) → same script
-- **NIAH (Needle In A Haystack)** — success **rate** over depths {10/30/50/70/90%} × 5 trials per depth (= 25 trials) at 8K context, greedy 16-token decode, exact key match → `eval_pt/eval_niah.py`
-- **LongBench** — real LongBench **Qasper** QA task, first 10 samples, official-style token F1, context truncated to 6144 from the left → `eval_pt/eval_longbench.py`
+- **NIAH (Needle In A Haystack)** — success **rate** over depths {10/30/50/70/90%} × 5 trials per depth (= 25 trials) at 8K context, greedy 16-token decode, key substring contained in the response → `eval_pt/eval_niah.py`. 100% is ideal; a method that drops at specific depths risks losing information in long-context use.
+- **LongBench** — real LongBench **Qasper** QA task, first 10 samples, official-style token F1, context truncated to 6144 from the left → `eval_pt/eval_longbench.py`. Higher is better (1.0 = perfect); ideal is ≈ zero gap vs fp16. Small sample size — interpret as a trend, not a strict ranking.
 
 ### Systems metrics (carefully framed)
 - **Analytical KV footprint** — per-method `designed_bits` (derived from the implementation), data bytes at that bit-width, plus implementation-faithful metadata (per-token / per-3D-block scales stored as fp32) → `eval_pt/theoretical_compression.py` (GPU-free) and `eval_pt/eval_compression.py` (adds actual stored bytes of the int8 simulation).
@@ -194,7 +214,7 @@ Both models share the same KV geometry (32 layers × 8 KV heads × 128 head_dim 
 | ultra_quant | 4.0 | 256.0 | 16.0 | 272.0 | **3.76×** |
 
 - hyper_quant shows the same designed footprint as turbo_quant because **Rice entropy coding is not implemented** — without it, the paper's 1.7–2 bps rates are unreachable here.
-- rotor_quant's **per-3D-block fp32 scales** make its metadata (704 MB) larger than its 3-bit data (192 MB) — an implementation-structure insight: fine-grained scaling destroys the headline compression.
+- rotor_quant's **per-3D-block fp32 scales** make its metadata (704 MB) larger than its 3-bit data (192 MB) — an implementation-structure insight: fine-grained scaling destroys the headline compression. Because head_dim 128 is not divisible by 3, only 126 dims (42 blocks) are rotated/quantized and the remaining 2 dims are kept raw in fp32; the metadata is (42 scales + 2 tail dims) × 4 B × 32 layers × 8 KV heads × 8K tokens × 2 (K+V) = 704 MB.
 
 For reference, the simulation's *actual stored bytes* (int8 + fp32 scales, no packing — measured deterministically on the older runs, and equally valid for the fixed code) are: fp16 1,024 MB; turbo/hyper/ultra 528 MB; rotor 1,208 MB. Identical across bit-widths **by construction** (everything is stored as int8), which is exactly why bit-width claims must come from the analytical table above, not from stored bytes.
 
@@ -313,11 +333,27 @@ Every quantized method is slower than fp16 (the quantizer's added cost); rotor's
 
 Because the simulation stores everything as int8 + fp32 scales, all methods previously "measured" 528 MB regardless of bit-width — a tautology of the storage format, not a finding. The analytical view is the honest one: turbo/hyper ≈ 4.9×, ultra ≈ 3.8×, and rotor collapses to ≈ 1.1× because per-3D-block fp32 scales outgrow the 3-bit payload. Real hardware numbers would further require true bit-packing.
 
+Compression ratio is **governed by metadata granularity, not bit-width alone**: rotor_quant's per-3D-block fp32 scales (704 MB) reach ≈3.7× its 3-bit payload (192 MB), erasing the compression almost entirely. Fine-grained scaling buys fidelity but eats the compression — an inherent trade-off. hyper_quant matching turbo_quant's footprint is a direct consequence of its unimplemented Rice coding: without entropy coding the paper's 1.7–2 bps is unreachable (3.0 bit/scalar here).
+
 ### 2. Quantization robustness differs by base model (GQA etc.)
 
-PPL, logit/KV fidelity, and LongBench QA-F1 all consistently show Llama-3.1-8B suffering more than Mistral-7B under the 3-bit per-token methods (turbo/hyper). Even on the end task, turbo nearly halves its QA-F1 on Llama (0.1580 vs 0.2997 fp16) while almost matching fp16 on Mistral (0.3135 vs 0.3256). Architecture-dependent robustness is real, and there is no universally "safe" method among these simplified implementations. On the overall balance of quality, footprint, and overhead, ultra_quant (4-bit, 272 MB, ~1.3× slowdown) came out as the most robust option here.
+PPL, logit/KV fidelity, and LongBench QA-F1 all consistently show Llama-3.1-8B suffering more than Mistral-7B under the 3-bit per-token methods (turbo/hyper). Even on the end task, turbo nearly halves its QA-F1 on Llama (0.1580 vs 0.2997 fp16) while almost matching fp16 on Mistral (0.3135 vs 0.3256). Architecture-dependent robustness is real, and there is no universally "safe" method among these simplified implementations.
 
-### 3. What this benchmark deliberately does not claim
+On the overall **compression × quality × overhead** balance, the methods split into clear profiles: turbo/hyper offer the highest compression (4.92×) but large quality drops on Llama; rotor_quant is high-fidelity but pays heavily in practice (1.14× compression, slowest); and **ultra_quant (4-bit, 272 MB, ~1.3× slowdown) emerged as the most robust all-around option** in this comparison.
+
+### 3. Single-forward metrics and decode-path tasks can disagree (NIAH)
+
+The PPL/fidelity story ("Mistral is more robust") inverts on retrieval: on NIAH, Llama keeps 25/25 for *all* methods while Mistral fails under the 3-bit methods (turbo 16/25, rotor 19/25, hyper 5/25; ultra stays perfect). Notably, rotor_quant holds Mistral's best fidelity (KV cos 0.987, PPL 4.93) yet still degrades in NIAH — **prefill-style fidelity cannot capture error accumulation across decode steps**. Trial count also matters: the 25-trial protocol revealed Mistral turbo's degradation (16/25) that the earlier 5-trial version missed (5/5) — a concrete example of statistical resolution changing the conclusion.
+
+### 4. Method rankings flip across metrics — do not judge on a single metric (LongBench)
+
+The end-task QA reproduces the base-model-dependent trend seen in PPL/fidelity, but rankings do not carry over: rotor_quant's top-tier fidelity does not translate into QA-F1 gains (0.2551 / 0.2813, below fp16 on both models), and ultra_quant is closest to fp16 on Llama (0.2832) while turbo is closest on Mistral (0.3135). With only 10 samples, read these as trends — but the lesson stands: **rankings depend on the metric, so method selection needs multi-metric evidence**.
+
+### 5. Overhead is an evaluation axis independent of compression and accuracy (Speed)
+
+All quantizers add overhead over fp16, ranked: turbo (1.26–1.27×) < ultra (1.29–1.31×) < hyper (1.86–1.89×, D4 lattice projection cost) < rotor (2.35–2.45×, slowest — per-3D-block scale processing). The differences follow each quantizer's processing structure (rotation cost, scale granularity, lattice projection). rotor_quant pays the largest cost on both memory and speed for its fidelity; turbo is lightest but degrades sharply on Llama; ultra_quant sits at only ~1.3× overhead with stable quality — i.e., **speed must be evaluated independently of footprint/quality claims**.
+
+### 6. What this benchmark deliberately does not claim
 
 No decode-speedup claims (no fused kernels), no production memory claims (analytical footprint only), no paper-reproduction claims (simplified algorithms), and no strong statistical claims (small samples). The framework's value is in **functional quality comparison under simulated quantization**, which requires the cache plumbing to be exactly correct — hence the `sanity_check.py` gate.
 
@@ -326,6 +362,16 @@ No decode-speedup claims (no fused kernels), no production memory claims (analyt
 ## ✅ Conclusion
 
 Re-defined goal of this benchmark: *a functional, mathematically honest comparison of simplified KV-cache quantizers in quality terms (PPL, fidelity, retrieval, QA), with memory expressed as an analytical footprint and speed recorded as quantization overhead — with no claims beyond what a kernel-free simulation can support.*
+
+---
+
+## 🔮 Future Work
+
+- **Full implementation of the papers' key components**: QJL residual correction (TurboQuant), Rice entropy coding (HyperQuant), and UE8M0 block scaling + MFMA integration (UltraQuant), enabling direct comparison against the papers' claimed numbers.
+- **Fused GPU kernels**: validate the C++ micro-benchmark kernels (`core_cpp` — implemented but not yet verified) and move toward a genuine speed evaluation that exploits memory-bandwidth savings.
+- **Larger evaluation scale**: NIAH has already been raised to 5 trials per depth; next steps are more LongBench samples and further trial increases for statistically reliable conclusions.
+- **Broader model coverage**: evaluate models beyond Llama/Mistral (e.g., Gemma, validated in the original TurboQuant paper) to test how general the observed base-model dependence is.
+- **Metadata reduction for rotor_quant**: revisit its scale granularity and storage format to reconcile high fidelity with a useful compression ratio.
 
 ---
 
@@ -338,6 +384,7 @@ Previous results contained serious harness bugs. Documented for transparency:
 3. **Compression baseline 289 MB was a hardcoded constant** in an older script version, and the reported "ratio" was `289/measured` (inverted semantics) — replaced by stored-bytes + analytical footprint.
 4. **`designed_bits` were hand-set** (ultra=2.0 etc.) instead of derived — now auto-derived from each quantizer's levels (ultra=4.0).
 5. Additional fixes: D4 lattice now actually applied in HyperQuant's store path (it was dead code), quantizers are seed-fixed (previously non-deterministic across runs), fidelity metrics correctly labeled as logit-space, NIAH/LongBench upgraded to scored protocols.
+6. Data-management lapse: the fp16 LongBench raw JSON was lost at one point — re-measured properly in job 373457, and the mean F1 reproduced the previously reported values exactly (0.2997 / 0.3256).
 
 ---
 
@@ -426,6 +473,7 @@ If you find this benchmark useful in your research, please cite the underlying p
 * RotorQuant: [github.com/scrya-com/rotorquant](https://github.com/scrya-com/rotorquant)
 * HyperQuant: [arXiv:2606.23406](https://arxiv.org/abs/2606.23406) — HyperQuant: A Rate-Distortion-Optimal Quantization Pipeline (2026)
 * UltraQuant: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474) — UltraQuant: 4-bit KV Caching for Context-Heavy Agents (2026)
+* Independent validation of TurboQuant: [vLLM Blog — A First Comprehensive Study of TurboQuant: Accuracy and Performance](https://vllm.ai/blog/2026-05-11-turboquant) (2026)
 
 ---
 
