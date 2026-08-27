@@ -3,11 +3,19 @@
 #SBATCH --partition=ai-h100l-pu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=30:00
 #SBATCH --output=logs/rerun_fidelity_h100_%j.log
 #SBATCH --error=logs/rerun_fidelity_h100_%j.err
+
+# 注意1: --gres=gpu:1 は【指定しない】こと。
+#   ai-h100l-pu は専用パーティション ai-h100l とノード共用の全員向け
+#   パーティション (最大実行時間30分) で、pu側にはGRESが公開されていない。
+#   そのため --gres=gpu:1 を付けると投入時に
+#     sbatch: error: Batch job submission failed: Requested node
+#     configuration is not available
+#   で弾かれる (実迷: 2026-08-27)。ノードには H100 NVL が1枚しかないため
+#   GRES指定は不要。外せばジョブからGPUはそのまま見える。
 
 # 忠実度 (logit/KV fidelity) のみを再測定する。
 # 目的: 旧 eval_fidelity.py は反復的な合成文を使っていたため Top-1 が飽和し
@@ -50,6 +58,9 @@ echo " Date: $(date)"
 echo " Partition: ai-h100l-pu (H100; exception for this fidelity"
 echo "            re-run only, since ai-l40s was unavailable)"
 echo "=================================================="
+
+# GPU認識の確認 (GRESなしでGPUが見えているか。失敗時はここで止める)
+nvidia-smi || { echo "!!! GPU not visible in job; aborting."; exit 1; }
 
 # 上書き前に既存 results/ai-l40s を丸ごとバックアップ
 BACKUP_DIR="results/ai-l40s_backup_$(date +%Y%m%d_%H%M%S)"
