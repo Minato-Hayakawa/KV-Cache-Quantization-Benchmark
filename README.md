@@ -216,6 +216,8 @@ Values below were re-measured with the 2026-08 fixed harness. They reflect the s
 | | hyper_quant | 5.3571 |
 | | ultra_quant | 4.9072 |
 
+![Perplexity comparison](plots/ppl_comparison.png)
+
 **logit / KV fidelity (seq 1024)**
 
 These are single-forward (prefill-style) evaluations. Fidelity is measured in **final-logit space** (not attention outputs), Top-5 is an **overlap rate**, and KV fidelity is the error of the cached K/V vectors themselves (the quantization error proper).
@@ -232,6 +234,8 @@ These are single-forward (prefill-style) evaluations. Fidelity is measured in **
 | | rotor_quant | 0.999409 | 99.90 | 94.47 | 0.983329 | 0.1717 |
 | | hyper_quant | 0.977383 | 99.51 | 59.88 | 0.845100 | 0.5343 |
 | | ultra_quant | 0.999443 | 99.90 | 94.16 | 0.981794 | 0.1759 |
+
+![Fidelity comparison](plots/fidelity_comparison.png)
 
 > Observation: on Mistral-7B every method keeps high logit cosine (0.977–0.999), but turbo/hyper still drop to 59.9–66.3% Top-5 overlap (rotor/ultra stay ≈94%). On Llama-3.1-8B the 3-bit per-token-scaled methods (turbo/hyper) degrade much more (0.685–0.707 cos, KV rel. L2 up to 0.62–0.66). rotor/ultra stay high — consistent with their finer scaling (per-3D-block / 4-bit grid). Susceptibility clearly depends on the base model.
 
@@ -256,6 +260,8 @@ These are single-forward (prefill-style) evaluations. Fidelity is measured in **
 
 Re-measured at 5 trials per depth (job 373457) for better statistical resolution; the 25-trial protocol also reveals degradation the 5-trial version missed (Mistral turbo_quant dropped from 5/5 to 16/25). The model-dependence is inverted vs. PPL/fidelity: on retrieval, Mistral-7B suffers under the 3-bit methods (turbo 0.64 / rotor 0.76 / hyper 0.20) while Llama-3.1-8B stays perfect across all five methods; ultra_quant is retrieval-safe on both. The old "all methods False" conclusion was a harness bug and remains retracted.
 
+![NIAH success rate](plots/niah_success_rate.png)
+
 **LongBench (Qasper QA-F1, first 10 samples, context truncated to 6144 from the left — higher is better)**
 
 | Model | Method | Mean QA-F1 |
@@ -273,6 +279,8 @@ Re-measured at 5 trials per depth (job 373457) for better statistical resolution
 
 The two fp16 runs were re-measured fresh in job 373457, superseding the earlier log-restored files; the mean F1 values reproduced the previously reported numbers exactly (0.2997 / 0.3256). The old results (un-scored degenerate text) were caused by the cache bug and are **retracted**.
 
+![LongBench QA-F1](plots/longbench_f1.png)
+
 **Speed (8K context, 32 generated tokens, median of 3 — a quantization-overhead measurement; no speedup claims)**
 
 | Model | Method | Prefill (s) | Decode (s) | Tokens/s | Slowdown vs fp16 |
@@ -289,6 +297,8 @@ The two fp16 runs were re-measured fresh in job 373457, superseding the earlier 
 | | ultra_quant | 1.5876 | 1.2001 | 26.67 | 1.31× |
 
 Every quantized method is slower than fp16 (the quantizer's added cost); rotor's per-3D-block scaling makes it the slowest (2.35–2.45×). The old speed table (incl. ultra_quant beating fp16) is **retracted** — decode comparisons were not apples-to-apples.
+
+![Speed comparison](plots/speed_comparison.png)
 
 ---
 
