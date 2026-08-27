@@ -153,7 +153,7 @@ ultra_quant is defined by a **fixed 16-point FP4 (E2M1) grid** — a "7-bit equi
 ### Quality metrics (functional / simulated quantization)
 - **Perplexity** — WikiText-2, window 2048 / stride 512 → `eval_pt/eval_ppl.py`
 - **Logit fidelity** — cosine similarity, Top-1 match, Top-5 **overlap** rate of *final logits* against the fp16 run (seq 1024, natural non-repetitive text) → `eval_pt/eval_fidelity.py`
-  - Note: with repetitive synthetic input, next-token margins are huge at almost every position, so Top-1 **saturates** (e.g., pinned at 1023/1024 ≈ 99.90% for all conditions) and loses discriminative power. The Top-1 column in the table below is an old measurement under that saturated regime, shown for reference only.
+  - Note: with repetitive synthetic input, next-token margins are huge at almost every position, so Top-1 **saturates** (e.g., pinned at 1023/1024 ≈ 99.90% for all conditions) and loses discriminative power. The original script had this flaw; it has been fixed and the results re-measured (see the table below).
 - **KV fidelity** — cosine similarity and relative L2 error of the cached K/V vectors themselves vs fp16 (isolates quantization error from model nonlinearity) → same script
 - **NIAH (Needle In A Haystack)** — success **rate** over depths {10/30/50/70/90%} × 5 trials per depth (= 25 trials) at 8K context, greedy 16-token decode, exact key match → `eval_pt/eval_niah.py`
 - **LongBench** — real LongBench **Qasper** QA task, first 10 samples, official-style token F1, context truncated to 6144 from the left → `eval_pt/eval_longbench.py`
@@ -225,24 +225,24 @@ Values below were re-measured with the 2026-08 fixed harness. They reflect the s
 
 These are single-forward (prefill-style) evaluations. Fidelity is measured in **final-logit space** (not attention outputs), Top-5 is an **overlap rate**, and KV fidelity is the error of the cached K/V vectors themselves (the quantization error proper).
 
-> **Note on the Top-1 column**: the table was produced by the old script (repetitive synthetic text), where Top-1 saturates at 99.5–99.90% for all conditions (1023/1024 ≈ 99.90% is the lattice point meaning "argmax flipped at exactly 1 of 1024 positions", and flips concentrate at low-margin positions near BOS). The script has since been fixed to use natural non-repetitive text, and this column will be re-measured. The other columns (logit cos, Top-5, KV error) are unaffected by the saturation and remain valid.
+> **Measurement conditions**: re-measured on natural non-repetitive text on 2026-08-27 (job 373801, ai-h100l-pu/H100 — numerics are GPU-model independent). In the old measurement (repetitive synthetic text), Top-1 saturated at 99.5–99.90% for all conditions (1023/1024 ≈ 99.90% is the lattice point meaning "argmax flipped at exactly 1 of 1024 positions", with flips concentrated at low-margin positions near BOS). With natural text, mismatches spread across the sequence and Top-1 discriminates the methods as intended.
 
 | Model | Method | Logit cos | Logit Top-1 (%) | Logit Top-5 overlap (%) | KV cos | KV rel. L2 |
 | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
 | Meta-Llama-3.1-8B | fp16 | 1.000000 | 100.00 | 100.00 | 1.000000 | 0.0000 |
-| | turbo_quant | 0.707082 | 99.90 | 49.53 | 0.775749 | 0.6176 |
-| | rotor_quant | 0.975850 | 99.80 | 84.04 | 0.947499 | 0.2886 |
-| | hyper_quant | 0.685053 | 99.71 | 40.78 | 0.753620 | 0.6562 |
-| | ultra_quant | 0.970683 | 99.90 | 85.55 | 0.940746 | 0.3033 |
+| | turbo_quant | 0.852395 | 91.80 | 57.13 | 0.852547 | 0.5203 |
+| | rotor_quant | 0.987176 | 96.97 | 84.41 | 0.973811 | 0.2095 |
+| | hyper_quant | 0.815868 | 91.31 | 56.07 | 0.830218 | 0.5629 |
+| | ultra_quant | 0.989553 | 97.75 | 87.13 | 0.974999 | 0.2046 |
 | Mistral-7B-Instruct-v0.3 | fp16 | 1.000000 | 100.00 | 100.00 | 1.000000 | 0.0000 |
-| | turbo_quant | 0.985607 | 99.90 | 66.29 | 0.870971 | 0.4841 |
-| | rotor_quant | 0.999409 | 99.90 | 94.47 | 0.983329 | 0.1717 |
-| | hyper_quant | 0.977383 | 99.51 | 59.88 | 0.845100 | 0.5343 |
-| | ultra_quant | 0.999443 | 99.90 | 94.16 | 0.981794 | 0.1759 |
+| | turbo_quant | 0.985630 | 93.07 | 73.50 | 0.917008 | 0.3993 |
+| | rotor_quant | 0.998638 | 97.85 | 93.59 | 0.986953 | 0.1559 |
+| | hyper_quant | 0.983696 | 92.58 | 71.45 | 0.897866 | 0.4459 |
+| | ultra_quant | 0.998957 | 97.66 | 93.89 | 0.988095 | 0.1485 |
 
 ![Fidelity comparison](plots/fidelity_comparison.png)
 
-> Observation: on Mistral-7B every method keeps high logit cosine (0.977–0.999), but turbo/hyper still drop to 59.9–66.3% Top-5 overlap (rotor/ultra stay ≈94%). On Llama-3.1-8B the 3-bit per-token-scaled methods (turbo/hyper) degrade much more (0.685–0.707 cos, KV rel. L2 up to 0.62–0.66). rotor/ultra stay high — consistent with their finer scaling (per-3D-block / 4-bit grid). Susceptibility clearly depends on the base model.
+> Observation: the natural-text re-measurement confirms the same trend — the 3-bit per-token-scaled methods (turbo/hyper) now also degrade in Top-1 on Llama-3.1-8B (91%, logit cos 0.82–0.85), while Mistral-7B holds up much better (Top-1 92–93%, cos ≥0.98). rotor/ultra stay high-fidelity on both models thanks to their finer scaling (per-3D-block / 4-bit grid): Top-1 ≥96.6%, cos ≥0.987. Susceptibility clearly depends on the base model, now visible in Top-1 as well.
 
 ### 3. Re-measured results (NIAH, LongBench, speed)
 
