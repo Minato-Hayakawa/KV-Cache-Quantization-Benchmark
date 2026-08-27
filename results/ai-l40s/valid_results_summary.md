@@ -1,8 +1,9 @@
 # 実験結果サマリ（ai-l40s 再計測分）
 
 `results/ai-l40s/*.json` から機械集計。対象プラットフォーム: ai-l40s (NVIDIA L40S)。
-fp16 LongBench のみログからの復元ファイル（question/references欠損、prediction 80文字打ち切り、F1は3桁丸め）。
-平均F1の値自体はログの生値で有効。
+主なジョブ: 373124 + 373434（2026-08 全評価）、373457（NIAH を trials_per_depth=5 で全手法再実行 + fp16 LongBench 再実行）、373515（ultra_quant 専用 sanity）。
+fp16 LongBench は job 373457 で正規に再計測されたものに差し替え済み（復元ファイルは廃止。平均F1は旧ログ報告値と一致）。
+NIAH は深度5 × 各5試行 = 計25試行に増量（job 373457）。集計データはリポジトリ直下の `summary_results.csv`（`python results/summarize_results.py` で生成）。
 
 ## 0. Sanity gate（回帰テスト）
 
@@ -55,31 +56,31 @@ fp16 LongBench のみログからの復元ファイル（question/references欠�
 | Mistral-7B-Instruct-v0.3 | hyper_quant | 0.977383 | 99.51 | 59.88 | 0.845100 | 0.5343 |
 | Mistral-7B-Instruct-v0.3 | ultra_quant | 0.999443 | 99.90 | 94.16 | 0.981794 | 0.1759 |
 
-## 4. NIAH（8Kコンテキスト、深度5 × 1試行の成功率）
+## 4. NIAH（8Kコンテキスト、深度5 × 各5試行 = 計25試行の成功率、job 373457）
 
 | モデル | 手法 | 成功率 | n_success / n_trials |
 | :--- | :--- | :---: | :---: |
-| Meta-Llama-3.1-8B | fp16 | 1.00 | 5 / 5 |
-| Meta-Llama-3.1-8B | turbo_quant | 1.00 | 5 / 5 |
-| Meta-Llama-3.1-8B | rotor_quant | 1.00 | 5 / 5 |
-| Meta-Llama-3.1-8B | hyper_quant | 1.00 | 5 / 5 |
-| Meta-Llama-3.1-8B | ultra_quant | 1.00 | 5 / 5 |
-| Mistral-7B-Instruct-v0.3 | fp16 | 1.00 | 5 / 5 |
-| Mistral-7B-Instruct-v0.3 | turbo_quant | 1.00 | 5 / 5 |
-| Mistral-7B-Instruct-v0.3 | rotor_quant | 0.60 | 3 / 5 |
-| Mistral-7B-Instruct-v0.3 | hyper_quant | 0.40 | 2 / 5 |
-| Mistral-7B-Instruct-v0.3 | ultra_quant | 1.00 | 5 / 5 |
+| Meta-Llama-3.1-8B | fp16 | 1.00 | 25 / 25 |
+| Meta-Llama-3.1-8B | turbo_quant | 1.00 | 25 / 25 |
+| Meta-Llama-3.1-8B | rotor_quant | 1.00 | 25 / 25 |
+| Meta-Llama-3.1-8B | hyper_quant | 1.00 | 25 / 25 |
+| Meta-Llama-3.1-8B | ultra_quant | 1.00 | 25 / 25 |
+| Mistral-7B-Instruct-v0.3 | fp16 | 1.00 | 25 / 25 |
+| Mistral-7B-Instruct-v0.3 | turbo_quant | 0.64 | 16 / 25 |
+| Mistral-7B-Instruct-v0.3 | rotor_quant | 0.76 | 19 / 25 |
+| Mistral-7B-Instruct-v0.3 | hyper_quant | 0.20 | 5 / 25 |
+| Mistral-7B-Instruct-v0.3 | ultra_quant | 1.00 | 25 / 25 |
 
 ## 5. LongBench Qasper QA-F1（先頭10サンプル、左6144トークン切り捨て）
 
 | モデル | 手法 | 平均 QA-F1 |
 | :--- | :--- | ---: |
-| Meta-Llama-3.1-8B | fp16 | 0.2997 *(復元ファイル) |
+| Meta-Llama-3.1-8B | fp16 | 0.2997 |
 | Meta-Llama-3.1-8B | turbo_quant | 0.1580 |
 | Meta-Llama-3.1-8B | rotor_quant | 0.2551 |
 | Meta-Llama-3.1-8B | hyper_quant | 0.1859 |
 | Meta-Llama-3.1-8B | ultra_quant | 0.2832 |
-| Mistral-7B-Instruct-v0.3 | fp16 | 0.3256 *(復元ファイル) |
+| Mistral-7B-Instruct-v0.3 | fp16 | 0.3256 |
 | Mistral-7B-Instruct-v0.3 | turbo_quant | 0.3135 |
 | Mistral-7B-Instruct-v0.3 | rotor_quant | 0.2813 |
 | Mistral-7B-Instruct-v0.3 | hyper_quant | 0.2582 |

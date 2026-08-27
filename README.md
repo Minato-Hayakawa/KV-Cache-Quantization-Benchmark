@@ -152,7 +152,7 @@ ultra_quant is defined by a **fixed 16-point FP4 (E2M1) grid** — a "7-bit equi
 - **Perplexity** — WikiText-2, window 2048 / stride 512 → `eval_pt/eval_ppl.py`
 - **Logit fidelity** — cosine similarity, Top-1 match, Top-5 **overlap** rate of *final logits* against the fp16 run (seq 1024) → `eval_pt/eval_fidelity.py`
 - **KV fidelity** — cosine similarity and relative L2 error of the cached K/V vectors themselves vs fp16 (isolates quantization error from model nonlinearity) → same script
-- **NIAH (Needle In A Haystack)** — success **rate** over depths {10/30/50/70/90%} × 1 trial at 8K context, greedy 16-token decode, exact key match → `eval_pt/eval_niah.py`
+- **NIAH (Needle In A Haystack)** — success **rate** over depths {10/30/50/70/90%} × 5 trials per depth (= 25 trials) at 8K context, greedy 16-token decode, exact key match → `eval_pt/eval_niah.py`
 - **LongBench** — real LongBench **Qasper** QA task, first 10 samples, official-style token F1, context truncated to 6144 from the left → `eval_pt/eval_longbench.py`
 
 ### Systems metrics (carefully framed)
@@ -176,7 +176,7 @@ The standalone C++ micro-benchmark reports:
 Models: `meta-llama/Meta-Llama-3.1-8B`, `mistralai/Mistral-7B-Instruct-v0.3`
 Methods: fp16 (baseline), turbo_quant, rotor_quant, hyper_quant, ultra_quant
 
-> 🗂️ **Provenance**: the tables below are from the 2026-08 re-measurement with the fixed harness (jobs 373124 + 373434; full machine-aggregated tables in [`results/ai-l40s/valid_results_summary.md`](results/ai-l40s/valid_results_summary.md)).
+> 🗂️ **Provenance**: the tables below are from the 2026-08 re-measurement with the fixed harness (jobs 373124 + 373434, plus job 373457 for NIAH at `trials_per_depth=5` and the fp16 LongBench re-run, and job 373515 for the ultra_quant sanity; full machine-aggregated tables in [`results/ai-l40s/valid_results_summary.md`](results/ai-l40s/valid_results_summary.md); merged data in [`summary_results.csv`](summary_results.csv) via `python results/summarize_results.py`).
 
 ### 1. KV cache footprint — analytical (8K context, derived values)
 
@@ -239,39 +239,39 @@ These are single-forward (prefill-style) evaluations. Fidelity is measured in **
 
 **Sanity gate**: PASS on both models (passthrough reproduces fp16 token-for-token; 7-bit quantizers near-lossless — Llama's hyper_quant 7-bit matched at 0.875, above the 0.5 criterion; ultra_quant is not part of the 7-bit gate and is covered separately via `run_sanity_ultra_ai_l40s.sh`).
 
-**NIAH (8K context, success rate over 5 depths × 1 trial)**
+**NIAH (8K context, success rate over 5 depths × 5 trials = 25 trials)**
 
 | Model | Method | Success rate |
 | :--- | :--- | :---: |
-| Meta-Llama-3.1-8B | fp16 | 5/5 (1.00) |
-| | turbo_quant | 5/5 (1.00) |
-| | rotor_quant | 5/5 (1.00) |
-| | hyper_quant | 5/5 (1.00) |
-| | ultra_quant | 5/5 (1.00) |
-| Mistral-7B-Instruct-v0.3 | fp16 | 5/5 (1.00) |
-| | turbo_quant | 5/5 (1.00) |
-| | rotor_quant | 3/5 (0.60) |
-| | hyper_quant | 2/5 (0.40) |
-| | ultra_quant | 5/5 (1.00) |
+| Meta-Llama-3.1-8B | fp16 | 25/25 (1.00) |
+| | turbo_quant | 25/25 (1.00) |
+| | rotor_quant | 25/25 (1.00) |
+| | hyper_quant | 25/25 (1.00) |
+| | ultra_quant | 25/25 (1.00) |
+| Mistral-7B-Instruct-v0.3 | fp16 | 25/25 (1.00) |
+| | turbo_quant | 16/25 (0.64) |
+| | rotor_quant | 19/25 (0.76) |
+| | hyper_quant | 5/25 (0.20) |
+| | ultra_quant | 25/25 (1.00) |
 
-Note the small statistical resolution at 1 trial per depth. The old "all methods False" conclusion was a harness bug and is retracted.
+Re-measured at 5 trials per depth (job 373457) for better statistical resolution; the 25-trial protocol also reveals degradation the 5-trial version missed (Mistral turbo_quant dropped from 5/5 to 16/25). The model-dependence is inverted vs. PPL/fidelity: on retrieval, Mistral-7B suffers under the 3-bit methods (turbo 0.64 / rotor 0.76 / hyper 0.20) while Llama-3.1-8B stays perfect across all five methods; ultra_quant is retrieval-safe on both. The old "all methods False" conclusion was a harness bug and remains retracted.
 
 **LongBench (Qasper QA-F1, first 10 samples, context truncated to 6144 from the left — higher is better)**
 
 | Model | Method | Mean QA-F1 |
 | :--- | :--- | ---: |
-| Meta-Llama-3.1-8B | fp16 | 0.2997 * |
+| Meta-Llama-3.1-8B | fp16 | 0.2997 |
 | | turbo_quant | 0.1580 |
 | | rotor_quant | 0.2551 |
 | | hyper_quant | 0.1859 |
 | | ultra_quant | 0.2832 |
-| Mistral-7B-Instruct-v0.3 | fp16 | 0.3256 * |
+| Mistral-7B-Instruct-v0.3 | fp16 | 0.3256 |
 | | turbo_quant | 0.3135 |
 | | rotor_quant | 0.2813 |
 | | hyper_quant | 0.2582 |
 | | ultra_quant | 0.2856 |
 
-\* The two fp16 JSON files were restored from the log after the raw files were lost (questions/references missing, predictions truncated at 80 chars); the mean F1 itself is the value reported by the run and remains valid. The old results (un-scored degenerate text) were caused by the cache bug and are **retracted**.
+The two fp16 runs were re-measured fresh in job 373457, superseding the earlier log-restored files; the mean F1 values reproduced the previously reported numbers exactly (0.2997 / 0.3256). The old results (un-scored degenerate text) were caused by the cache bug and are **retracted**.
 
 **Speed (8K context, 32 generated tokens, median of 3 — a quantization-overhead measurement; no speedup claims)**
 
@@ -397,7 +397,8 @@ kvq-bench/
 │
 └── hpc_scripts/                # 4. HPC (Slurm) job scripts
     ├── run_all_evals_ai_l40s.sh      # sanity → footprint → ppl → fidelity → niah → longbench → speed
-    └── run_sanity_ultra_ai_l40s.sh   # ultra_quant-only sanity
+    ├── run_sanity_ultra_ai_l40s.sh   # ultra_quant-only sanity
+    └── run_rerun_niah_fp16longbench_ai_l40s.sh  # NIAH re-run (trials_per_depth=5) + fp16 LongBench re-run
 ```
 
 ---

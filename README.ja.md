@@ -154,7 +154,7 @@ ultra_quant は FP4 (E2M1) の **16点固定グリッドが手法の定義その
 - **Perplexity**：WikiText-2、window 2048 / stride 512 → `eval_pt/eval_ppl.py`
 - **Logit 忠実度**：最終 logits のコサイン類似度・Top-1一致率・Top-5**重なり率**（seq 1024） → `eval_pt/eval_fidelity.py`
 - **KV 忠実度**：キャッシュの K/V ベクトル自体のコサイン類似度・相対L2誤差（量子化誤差そのものを直接測定） → 同上
-- **NIAH**：深度 {10/30/50/70/90%} × 1 試行の**成功率**（8Kコンテキスト、greedy 16トークン、鍵の完全一致） → `eval_pt/eval_niah.py`
+- **NIAH**：深度 {10/30/50/70/90%} × 各深度5試行（= 計25試行）の**成功率**（8Kコンテキスト、greedy 16トークン、鍵の完全一致） → `eval_pt/eval_niah.py`
 - **LongBench**：正式 LongBench の **Qasper** QAタスク、先頭10サンプル、公式形式のトークンF1、左側6144トークン切り捨て → `eval_pt/eval_longbench.py`
 
 ### システム指標（主張の範囲を限定した扱い）
@@ -176,7 +176,7 @@ ultra_quant は FP4 (E2M1) の **16点固定グリッドが手法の定義その
 対象モデル：`meta-llama/Meta-Llama-3.1-8B`、`mistralai/Mistral-7B-Instruct-v0.3`
 比較手法：fp16（ベースライン）、turbo_quant、rotor_quant、hyper_quant、ultra_quant
 
-> 🗂️ **結果の出処**：以下の表は 2026-08 の修正済みハーネスでの再計測値です（jobs 373124 + 373434、`results/ai-l40s/*.json` を機械集計した全表は [`results/ai-l40s/valid_results_summary.md`](results/ai-l40s/valid_results_summary.md)）。
+> 🗂️ **結果の出処**：以下の表は 2026-08 の修正済みハーネスでの再計測値です（jobs 373124 + 373434、および NIAH の `trials_per_depth=5` 再実行・fp16 LongBench 再実行の job 373457、ultra_quant 専用 sanity の job 373515。`results/ai-l40s/*.json` を機械集計した全表は [`results/ai-l40s/valid_results_summary.md`](results/ai-l40s/valid_results_summary.md)、マージ済みデータは `python results/summarize_results.py` で生成した [`summary_results.csv`](summary_results.csv)）。
 
 ### 1. KVキャッシュ footprint（解析的、8Kコンテキスト、導出値）
 
@@ -237,39 +237,39 @@ ultra_quant は FP4 (E2M1) の **16点固定グリッドが手法の定義その
 
 **Sanity gate**：両モデル PASS（passthrough が fp16 とトークン完全一致、7bit で準ロスレス生成。Llama の hyper_quant 7bit のみ一致率 0.875 でしたが基準 0.5 はクリア。なお ultra_quant は 7bit テスト対象外のため含まず、専用 sanity は `run_sanity_ultra_ai_l40s.sh` で別途実施）。
 
-**NIAH（8Kコンテキスト、深度5 × 1試行の成功率）**
+**NIAH（8Kコンテキスト、深度5 × 各5試行 = 計25試行の成功率）**
 
 | モデル | 手法 | 成功率 |
 | :--- | :--- | :---: |
-| Meta-Llama-3.1-8B | fp16 | 5/5 (1.00) |
-| | turbo_quant | 5/5 (1.00) |
-| | rotor_quant | 5/5 (1.00) |
-| | hyper_quant | 5/5 (1.00) |
-| | ultra_quant | 5/5 (1.00) |
-| Mistral-7B-Instruct-v0.3 | fp16 | 5/5 (1.00) |
-| | turbo_quant | 5/5 (1.00) |
-| | rotor_quant | 3/5 (0.60) |
-| | hyper_quant | 2/5 (0.40) |
-| | ultra_quant | 5/5 (1.00) |
+| Meta-Llama-3.1-8B | fp16 | 25/25 (1.00) |
+| | turbo_quant | 25/25 (1.00) |
+| | rotor_quant | 25/25 (1.00) |
+| | hyper_quant | 25/25 (1.00) |
+| | ultra_quant | 25/25 (1.00) |
+| Mistral-7B-Instruct-v0.3 | fp16 | 25/25 (1.00) |
+| | turbo_quant | 16/25 (0.64) |
+| | rotor_quant | 19/25 (0.76) |
+| | hyper_quant | 5/25 (0.20) |
+| | ultra_quant | 25/25 (1.00) |
 
-なお1深度1試行のため統計的な分解能は小さい点に注意。旧結論「全手法 False」はハーネスのバグ由来で撤回済みです。
+統計的分解能を上げるため各深度5試行（job 373457）で再計測しました。25試行プロトコルでは5試行版では見えなかった劣化も捕捉されます（Mistral の turbo_quant は 5/5 → 16/25）。モデル依存性の向きは PPL・忠実度と逆です：検索タスクでは Llama-3.1-8B が全手法パーフェクトなのに対し、Mistral-7B では 3bit手法が劣化（turbo 0.64 / rotor 0.76 / hyper 0.20）。ultra_quant は両モデルで検索耐性があります。旧結論「全手法 False」はハーネスのバグ由来で撤回済みです。
 
 **LongBench（Qasper QA-F1、先頭10サンプル、左6144トークン切り捨て — 高いほど良い）**
 
 | モデル | 手法 | 平均 QA-F1 |
 | :--- | :--- | ---: |
-| Meta-Llama-3.1-8B | fp16 | 0.2997 * |
+| Meta-Llama-3.1-8B | fp16 | 0.2997 |
 | | turbo_quant | 0.1580 |
 | | rotor_quant | 0.2551 |
 | | hyper_quant | 0.1859 |
 | | ultra_quant | 0.2832 |
-| Mistral-7B-Instruct-v0.3 | fp16 | 0.3256 * |
+| Mistral-7B-Instruct-v0.3 | fp16 | 0.3256 |
 | | turbo_quant | 0.3135 |
 | | rotor_quant | 0.2813 |
 | | hyper_quant | 0.2582 |
 | | ultra_quant | 0.2856 |
 
-\* fp16 の2ファイルは、失われた生JSONをログから復元したものです（question/references欠損・予測文80字打ち切り）。平均F1の値自体はログの生値で有効です。旧結果（スコアなしの崩壊テキスト）はキャッシュバグ由来で**撤回済み**です。
+fp16 の2本は job 373457 で正規に再計測され、以前のログ復元ファイルを置き換えました（平均F1は従来の報告値 0.2997 / 0.3256 を完全一致で再現）。旧結果（スコアなしの崩壊テキスト）はキャッシュバグ由来で**撤回済み**です。
 
 **速度（8Kコンテキスト、32トークン生成、3回中央値 — 量子化オーバーヘッドの測定であり、高速化の主張はしません）**
 
@@ -395,7 +395,8 @@ kvq-bench/
 │
 └── hpc_scripts/                # 4. HPC (Slurm) ジョブスクリプト
     ├── run_all_evals_ai_l40s.sh      # sanity → footprint → ppl → fidelity → niah → longbench → speed
-    └── run_sanity_ultra_ai_l40s.sh   # ultra_quant 専用 sanity のみ
+    ├── run_sanity_ultra_ai_l40s.sh   # ultra_quant 専用 sanity のみ
+    └── run_rerun_niah_fp16longbench_ai_l40s.sh  # NIAH再実行（trials_per_depth=5）＋ fp16 LongBench再実行
 ```
 
 ---
