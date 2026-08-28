@@ -262,7 +262,7 @@ These are single-forward (prefill-style) evaluations. Fidelity is measured in **
 
 ![Fidelity comparison](plots/fidelity_comparison.png)
 
-> Observation: the natural-text re-measurement confirms the same trend — the 3-bit per-token-scaled methods (turbo/hyper) now also degrade in Top-1 on Llama-3.1-8B (91%, logit cos 0.82–0.85), while Mistral-7B holds up much better (Top-1 92–93%, cos ≥0.98). rotor/ultra stay high-fidelity on both models thanks to their finer scaling (per-3D-block / 4-bit grid): Top-1 ≥96.6%, cos ≥0.987. Susceptibility clearly depends on the base model, now visible in Top-1 as well.
+> Observation: the natural-text re-measurement is consistent with the same trend — the 3-bit per-token-scaled methods (turbo/hyper) now also degrade in Top-1 on Llama-3.1-8B (91%, logit cos 0.82–0.85), while Mistral-7B holds up much better (Top-1 92–93%, cos ≥0.98). rotor/ultra stay high-fidelity on both models thanks to their finer scaling (per-3D-block / 4-bit grid): Top-1 ≥96.6%, cos ≥0.987. Susceptibility appears to depend on the base model, now visible in Top-1 as well.
 
 ### 3. Re-measured results (NIAH, LongBench, speed)
 
@@ -283,7 +283,7 @@ These are single-forward (prefill-style) evaluations. Fidelity is measured in **
 | | hyper_quant | 5/25 (0.20) |
 | | ultra_quant | 25/25 (1.00) |
 
-Re-measured at 5 trials per depth (job 373457) for better statistical resolution; the 25-trial protocol also reveals degradation the 5-trial version missed (Mistral turbo_quant dropped from 5/5 to 16/25). The model-dependence is inverted vs. PPL/fidelity: on retrieval, Mistral-7B suffers under the 3-bit methods (turbo 0.64 / rotor 0.76 / hyper 0.20) while Llama-3.1-8B stays perfect across all five methods; ultra_quant is retrieval-safe on both. The old "all methods False" conclusion was a harness bug and remains retracted.
+Re-measured at 5 trials per depth (job 373457) for better statistical resolution; the 25-trial protocol also reveals degradation the 5-trial version missed (Mistral turbo_quant dropped from 5/5 to 16/25). The model-dependence appears inverted vs. PPL/fidelity: on retrieval, Mistral-7B suffers under the 3-bit methods (turbo 0.64 / rotor 0.76 / hyper 0.20) while Llama-3.1-8B stays perfect across all five methods; ultra_quant appears retrieval-safe on both. The old "all methods False" conclusion was a harness bug and remains retracted.
 
 ![NIAH success rate](plots/niah_success_rate.png)
 
@@ -331,27 +331,27 @@ Every quantized method is slower than fp16 (the quantizer's added cost); rotor's
 
 ### 1. Compression must be discussed at designed bits + metadata, not stored bytes
 
-Because the simulation stores everything as int8 + fp32 scales, all methods previously "measured" 528 MB regardless of bit-width — a tautology of the storage format, not a finding. The analytical view is the honest one: turbo/hyper ≈ 4.9×, ultra ≈ 3.8×, and rotor collapses to ≈ 1.1× because per-3D-block fp32 scales outgrow the 3-bit payload. Real hardware numbers would further require true bit-packing.
+Because the simulation stores everything as int8 + fp32 scales, all methods previously "measured" 528 MB regardless of bit-width — most likely a tautology of the storage format rather than a finding. The analytical view therefore appears to be the more appropriate basis: turbo/hyper ≈ 4.9×, ultra ≈ 3.8×, and rotor drops to ≈ 1.1×, plausibly because per-3D-block fp32 scales outgrow the 3-bit payload. Real hardware numbers would further require true bit-packing.
 
-Compression ratio is **governed by metadata granularity, not bit-width alone**: rotor_quant's per-3D-block fp32 scales (704 MB) reach ≈3.7× its 3-bit payload (192 MB), erasing the compression almost entirely. Fine-grained scaling buys fidelity but eats the compression — an inherent trade-off. hyper_quant matching turbo_quant's footprint is a direct consequence of its unimplemented Rice coding: without entropy coding the paper's 1.7–2 bps is unreachable (3.0 bit/scalar here).
+The results suggest that compression ratio is **governed by metadata granularity rather than bit-width alone**: rotor_quant's per-3D-block fp32 scales (704 MB) reach ≈3.7× its 3-bit payload (192 MB), nearly erasing the compression. This points to a likely inherent trade-off in which fine-grained scaling buys fidelity but eats compression. hyper_quant matching turbo_quant's footprint most likely reflects its unimplemented Rice coding: without entropy coding the paper's 1.7–2 bps would be unreachable here (3.0 bit/scalar).
 
-### 2. Quantization robustness differs by base model (GQA etc.)
+### 2. Quantization robustness appears to differ by base model (GQA etc.)
 
-PPL, logit/KV fidelity, and LongBench QA-F1 all consistently show Llama-3.1-8B suffering more than Mistral-7B under the 3-bit per-token methods (turbo/hyper). Even on the end task, turbo nearly halves its QA-F1 on Llama (0.1580 vs 0.2997 fp16) while almost matching fp16 on Mistral (0.3135 vs 0.3256). Architecture-dependent robustness is real, and there is no universally "safe" method among these simplified implementations.
+PPL, logit/KV fidelity, and LongBench QA-F1 all consistently point in the same direction: Llama-3.1-8B tends to suffer more than Mistral-7B under the 3-bit per-token methods (turbo/hyper). Even on the end task, turbo nearly halves its QA-F1 on Llama (0.1580 vs 0.2997 fp16) while almost matching fp16 on Mistral (0.3135 vs 0.3256). These results suggest that quantization robustness is architecture-dependent, and no universally "safe" method emerged among these simplified implementations.
 
-On the overall **compression × quality × overhead** balance, the methods split into clear profiles: turbo/hyper offer the highest compression (4.92×) but large quality drops on Llama; rotor_quant is high-fidelity but pays heavily in practice (1.14× compression, slowest); and **ultra_quant (4-bit, 272 MB, ~1.3× slowdown) emerged as the most robust all-around option** in this comparison.
+On the overall **compression × quality × overhead** balance, the methods appear to split into distinct profiles: turbo/hyper offer the highest compression (4.92×) but show large quality drops on Llama; rotor_quant is high-fidelity but seems to pay heavily in practice (1.14× compression, slowest); and **ultra_quant (4-bit, 272 MB, ~1.3× slowdown) appears to offer the most robust all-around balance** in this comparison.
 
 ### 3. Single-forward metrics and decode-path tasks can disagree (NIAH)
 
-The PPL/fidelity story ("Mistral is more robust") inverts on retrieval: on NIAH, Llama keeps 25/25 for *all* methods while Mistral fails under the 3-bit methods (turbo 16/25, rotor 19/25, hyper 5/25; ultra stays perfect). Notably, rotor_quant holds Mistral's best fidelity (KV cos 0.987, PPL 4.93) yet still degrades in NIAH — **prefill-style fidelity cannot capture error accumulation across decode steps**. Trial count also matters: the 25-trial protocol revealed Mistral turbo's degradation (16/25) that the earlier 5-trial version missed (5/5) — a concrete example of statistical resolution changing the conclusion.
+The PPL/fidelity picture ("Mistral is more robust") appears to invert on retrieval: on NIAH, Llama keeps 25/25 for *all* methods while Mistral drops under the 3-bit methods (turbo 16/25, rotor 19/25, hyper 5/25; ultra stays perfect). Notably, rotor_quant holds Mistral's best fidelity (KV cos 0.987, PPL 4.93) yet still degrades in NIAH — suggesting that **prefill-style fidelity may not capture error accumulation across decode steps**. Trial count also appears to matter: the 25-trial protocol revealed Mistral turbo's degradation (16/25) that the earlier 5-trial version missed (5/5) — a concrete example of how statistical resolution can change the conclusion.
 
-### 4. Method rankings flip across metrics — do not judge on a single metric (LongBench)
+### 4. Method rankings appear to flip across metrics — judging on a single metric is risky (LongBench)
 
-The end-task QA reproduces the base-model-dependent trend seen in PPL/fidelity, but rankings do not carry over: rotor_quant's top-tier fidelity does not translate into QA-F1 gains (0.2551 / 0.2813, below fp16 on both models), and ultra_quant is closest to fp16 on Llama (0.2832) while turbo is closest on Mistral (0.3135). With only 10 samples, read these as trends — but the lesson stands: **rankings depend on the metric, so method selection needs multi-metric evidence**.
+The end-task QA appears to reproduce the base-model-dependent trend seen in PPL/fidelity, but the rankings do not carry over: rotor_quant's top-tier fidelity does not translate into QA-F1 gains (0.2551 / 0.2813, below fp16 on both models), and ultra_quant is closest to fp16 on Llama (0.2832) while turbo is closest on Mistral (0.3135). With only 10 samples these numbers should be read as trends — even so, the results suggest that **rankings are metric-dependent, so method selection is best supported by multi-metric evidence**.
 
-### 5. Overhead is an evaluation axis independent of compression and accuracy (Speed)
+### 5. Overhead appears to be an evaluation axis independent of compression and accuracy (Speed)
 
-All quantizers add overhead over fp16, ranked: turbo (1.26–1.27×) < ultra (1.29–1.31×) < hyper (1.86–1.89×, D4 lattice projection cost) < rotor (2.35–2.45×, slowest — per-3D-block scale processing). The differences follow each quantizer's processing structure (rotation cost, scale granularity, lattice projection). rotor_quant pays the largest cost on both memory and speed for its fidelity; turbo is lightest but degrades sharply on Llama; ultra_quant sits at only ~1.3× overhead with stable quality — i.e., **speed must be evaluated independently of footprint/quality claims**.
+All quantizers added overhead over fp16, ranked: turbo (1.26–1.27×) < ultra (1.29–1.31×) < hyper (1.86–1.89×, D4 lattice projection cost) < rotor (2.35–2.45×, slowest — per-3D-block scale processing). These differences appear to follow each quantizer's processing structure (rotation cost, scale granularity, lattice projection). rotor_quant seems to pay the largest cost on both memory and speed for its fidelity; turbo is lightest but degrades sharply on Llama; ultra_quant sits at only ~1.3× overhead with stable quality — suggesting that **speed is best treated as an evaluation axis independent of footprint/quality claims**.
 
 ### 6. What this benchmark deliberately does not claim
 
