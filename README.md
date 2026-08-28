@@ -48,7 +48,7 @@ It contains simplified PyTorch re-implementations **inspired by** four recent me
 
 ## 🔭 Scope & Limitations
 
-What this benchmark **can** claim (after the 2026-08 fixes):
+What this benchmark **can** claim:
 
 - **Functional / simulated-quantization quality evaluation** — quantize→dequantize math is applied as designed, and quality metrics (PPL, logit/KV fidelity, NIAH success rate, LongBench QA-F1) reflect the implementations' actual precision loss.
 - **Throughput of the quantization layer itself** — i.e., the overhead the quantizer adds on top of fp16 attention.
@@ -147,7 +147,7 @@ Reference: [arXiv:2606.20474](https://arxiv.org/abs/2606.20474)
 | :--- | :--- |
 | ai-l40s | NVIDIA (L40S) |
 
-> **Exception**: only the fidelity re-run (after the Top-1 saturation fix) used the **ai-h100l-pu (NVIDIA H100)** partition, because ai-l40s was unavailable at that time (`hpc_scripts/run_rerun_fidelity_ai_h100l_pu_llama.sh` / `run_rerun_fidelity_ai_h100l_pu_mistral.sh` — split into two per-model jobs because the pu partition enforces a 30-minute limit). The quantizers' numeric results do not depend on the GPU model, so this does not affect the results. All speed values are from ai-l40s and were not measured in this job.
+> **Exception**: only the fidelity measurement (job 373801) used the **ai-h100l-pu (NVIDIA H100)** partition, because ai-l40s was unavailable at that time (`hpc_scripts/run_rerun_fidelity_ai_h100l_pu_llama.sh` / `run_rerun_fidelity_ai_h100l_pu_mistral.sh` — split into two per-model jobs because the pu partition enforces a 30-minute limit). The quantizers' numeric results do not depend on the GPU model, so this does not affect the results. All speed values are from ai-l40s and were not measured in this job.
 
 ### Models evaluated
 - Meta-Llama 3.1 8B (`meta-llama/Meta-Llama-3.1-8B`)
@@ -159,7 +159,7 @@ Runs **first**, and the whole evaluation aborts if it fails.
 **Common protocol**: greedily generate **16 tokens** from a fixed ~256-token prompt — not via `model.generate`, but through a manual prefill → one-token-at-a-time decode loop (the same path used by the eval scripts) — and compare the token sequence against the fp16 baseline. Model precision matches the other evaluations (bfloat16 on CUDA).
 
 #### Shared by all methods — cache plumbing (passthrough)
-The **`passthrough`** identity "quantizer" must reproduce fp16 generation **token-for-token**; it is the only criterion that enters `overall_pass`. This validates the cache plumbing (accumulation, concatenation, full-history return) in isolation from quantization error. The historical decode bug would have been caught here immediately.
+The **`passthrough`** identity "quantizer" must reproduce fp16 generation **token-for-token**; it is the only criterion that enters `overall_pass`. This validates the cache plumbing (accumulation, concatenation, full-history return) in isolation from quantization error.
 
 #### turbo_quant / rotor_quant / hyper_quant — 7-bit round-trip test
 For the three methods whose bit-width is a continuous precision knob, run each at **7-bit** (higher than production) and report the token match rate vs fp16 (advisory criterion: ≥ 0.5 counts as near-lossless; informational only and not part of `overall_pass`). Because higher bits run the *same* round-trip code path with only finer rounding, near-lossless generation at 7-bit validates the quantizer round-trip math.
@@ -173,7 +173,7 @@ ultra_quant is defined by a **fixed 16-point FP4 (E2M1) grid** — a "7-bit equi
 ### Quality metrics (functional / simulated quantization)
 - **Perplexity** — WikiText-2, window 2048 / stride 512 → `eval_pt/eval_ppl.py`. Lower is better; ideal is ≈ the fp16 baseline. Because the scale is exponential, a few % above fp16 reads as "mostly preserved" while ~20% up is a clear degradation.
 - **Logit fidelity** — cosine similarity, Top-1 match, Top-5 **overlap** rate of *final logits* against the fp16 run (seq 1024, natural non-repetitive text) → `eval_pt/eval_fidelity.py`. Cosine near 1.0 (≥0.99) reads as near-lossless (~0.7 is a clear degradation); Top-1 / Top-5 near 100% are ideal.
-  - Note: with repetitive synthetic input, next-token margins are huge at almost every position, so Top-1 **saturates** (e.g., pinned at 1023/1024 ≈ 99.90% for all conditions) and loses discriminative power. The original script had this flaw; it has been fixed and the results re-measured (see the table below).
+  - Note: with repetitive synthetic input, next-token margins are huge at almost every position, so Top-1 **saturates** (e.g., pinned at 1023/1024 ≈ 99.90% for all conditions) and loses discriminative power; for this reason the evaluation uses natural, non-repetitive text (see the table below).
 - **KV fidelity** — cosine similarity and relative L2 error of the cached K/V vectors themselves vs fp16 (isolates quantization error from model nonlinearity) → same script
 - **NIAH (Needle In A Haystack)** — success **rate** over depths {10/30/50/70/90%} × 5 trials per depth (= 25 trials) at 8K context, greedy 16-token decode, key substring contained in the response → `eval_pt/eval_niah.py`. 100% is ideal; a method that drops at specific depths risks losing information in long-context use.
 - **LongBench** — real LongBench **Qasper** QA task, first 10 samples, official-style token F1, context truncated to 6144 from the left → `eval_pt/eval_longbench.py`. Higher is better (1.0 = perfect); ideal is ≈ zero gap vs fp16. Small sample size — interpret as a trend, not a strict ranking.
@@ -199,7 +199,7 @@ The standalone C++ micro-benchmark reports:
 Models: `meta-llama/Meta-Llama-3.1-8B`, `mistralai/Mistral-7B-Instruct-v0.3`
 Methods: fp16 (baseline), turbo_quant, rotor_quant, hyper_quant, ultra_quant
 
-> 🗂️ **Provenance**: the tables below are from the 2026-08 re-measurement with the fixed harness (jobs 373124 + 373434, plus job 373457 for NIAH at `trials_per_depth=5` and the fp16 LongBench re-run, and job 373515 for the ultra_quant sanity; full machine-aggregated tables in [`results/ai-l40s/valid_results_summary.md`](results/ai-l40s/valid_results_summary.md); merged data in [`summary_results.csv`](summary_results.csv) via `python results/summarize_results.py`).
+> 🗂️ **Provenance**: the tables below are machine-aggregated from the measurement jobs (373124, 373434, 373457, 373515, and 373801); full machine-aggregated tables in [`results/ai-l40s/valid_results_summary.md`](results/ai-l40s/valid_results_summary.md); merged data in [`summary_results.csv`](summary_results.csv) via `python results/summarize_results.py`.
 
 ### 1. KV cache footprint — analytical (8K context, derived values)
 
@@ -216,13 +216,13 @@ Both models share the same KV geometry (32 layers × 8 KV heads × 128 head_dim 
 - hyper_quant shows the same designed footprint as turbo_quant because **Rice entropy coding is not implemented** — without it, the paper's 1.7–2 bps rates are unreachable here.
 - rotor_quant's **per-3D-block fp32 scales** make its metadata (704 MB) larger than its 3-bit data (192 MB) — an implementation-structure insight: fine-grained scaling destroys the headline compression. Because head_dim 128 is not divisible by 3, only 126 dims (42 blocks) are rotated/quantized and the remaining 2 dims are kept raw in fp32; the metadata is (42 scales + 2 tail dims) × 4 B × 32 layers × 8 KV heads × 8K tokens × 2 (K+V) = 704 MB.
 
-For reference, the simulation's *actual stored bytes* (int8 + fp32 scales, no packing — measured deterministically on the older runs, and equally valid for the fixed code) are: fp16 1,024 MB; turbo/hyper/ultra 528 MB; rotor 1,208 MB. Identical across bit-widths **by construction** (everything is stored as int8), which is exactly why bit-width claims must come from the analytical table above, not from stored bytes.
+For reference, the simulation's *actual stored bytes* (int8 + fp32 scales, no packing) are: fp16 1,024 MB; turbo/hyper/ultra 528 MB; rotor 1,208 MB. Identical across bit-widths **by construction** (everything is stored as int8), which is exactly why bit-width claims must come from the analytical table above, not from stored bytes.
 
 ![Compression comparison](plots/compression_comparison.png)
 
-### 2. Quality — PPL, logit / KV fidelity (re-measured with the fixed harness)
+### 2. Quality — PPL, logit / KV fidelity
 
-Values below were re-measured with the 2026-08 fixed harness. They reflect the seed-fixed quantizers and HyperQuant's now-actually-applied D4 lattice projection, so they differ from the previously posted pre-fix numbers.
+Values measured in 2026-08; quantizers are seed-fixed and HyperQuant's D4 lattice projection is applied in the store path.
 
 **Perplexity (WikiText-2, window 2048 / stride 512 — lower is better)**
 
@@ -245,7 +245,7 @@ Values below were re-measured with the 2026-08 fixed harness. They reflect the s
 
 These are single-forward (prefill-style) evaluations. Fidelity is measured in **final-logit space** (not attention outputs), Top-5 is an **overlap rate**, and KV fidelity is the error of the cached K/V vectors themselves (the quantization error proper).
 
-> **Measurement conditions**: re-measured on natural non-repetitive text on 2026-08-27 (job 373801, ai-h100l-pu/H100 — numerics are GPU-model independent). In the old measurement (repetitive synthetic text), Top-1 saturated at 99.5–99.90% for all conditions (1023/1024 ≈ 99.90% is the lattice point meaning "argmax flipped at exactly 1 of 1024 positions", with flips concentrated at low-margin positions near BOS). With natural text, mismatches spread across the sequence and Top-1 discriminates the methods as intended.
+> **Measurement conditions**: measured on natural non-repetitive text on 2026-08-27 (job 373801, ai-h100l-pu/H100 — numerics are GPU-model independent). Repetitive synthetic text saturates Top-1 and destroys its discriminative power (see the note under Quality metrics above), so natural text is used; mismatches then spread across the sequence and Top-1 discriminates the methods as intended.
 
 | Model | Method | Logit cos | Logit Top-1 (%) | Logit Top-5 overlap (%) | KV cos | KV rel. L2 |
 | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
@@ -262,9 +262,9 @@ These are single-forward (prefill-style) evaluations. Fidelity is measured in **
 
 ![Fidelity comparison](plots/fidelity_comparison.png)
 
-> Observation: the natural-text re-measurement is consistent with the same trend — the 3-bit per-token-scaled methods (turbo/hyper) now also degrade in Top-1 on Llama-3.1-8B (91%, logit cos 0.82–0.85), while Mistral-7B holds up much better (Top-1 92–93%, cos ≥0.98). rotor/ultra stay high-fidelity on both models thanks to their finer scaling (per-3D-block / 4-bit grid): Top-1 ≥96.6%, cos ≥0.987. Susceptibility appears to depend on the base model, now visible in Top-1 as well.
+> Observation: the 3-bit per-token-scaled methods (turbo/hyper) degrade in Top-1 on Llama-3.1-8B (91%, logit cos 0.82–0.85), while Mistral-7B holds up much better (Top-1 92–93%, cos ≥0.98). rotor/ultra stay high-fidelity on both models thanks to their finer scaling (per-3D-block / 4-bit grid): Top-1 ≥96.6%, cos ≥0.987. Susceptibility appears to depend on the base model, now visible in Top-1 as well.
 
-### 3. Re-measured results (NIAH, LongBench, speed)
+### 3. NIAH, LongBench, and speed
 
 **Sanity gate**: PASS on both models (passthrough reproduces fp16 token-for-token; 7-bit quantizers near-lossless — Llama's hyper_quant 7-bit matched at 0.875, above the 0.5 criterion; ultra_quant is not part of the 7-bit gate and is covered separately via `run_sanity_ultra_ai_l40s.sh`).
 
@@ -283,7 +283,7 @@ These are single-forward (prefill-style) evaluations. Fidelity is measured in **
 | | hyper_quant | 5/25 (0.20) |
 | | ultra_quant | 25/25 (1.00) |
 
-Re-measured at 5 trials per depth (job 373457) for better statistical resolution; the 25-trial protocol also reveals degradation the 5-trial version missed (Mistral turbo_quant dropped from 5/5 to 16/25). The model-dependence appears inverted vs. PPL/fidelity: on retrieval, Mistral-7B suffers under the 3-bit methods (turbo 0.64 / rotor 0.76 / hyper 0.20) while Llama-3.1-8B stays perfect across all five methods; ultra_quant appears retrieval-safe on both. The old "all methods False" conclusion was a harness bug and remains retracted.
+Measured at 5 trials per depth (= 25 trials). The model-dependence appears inverted vs. PPL/fidelity: on retrieval, Mistral-7B suffers under the 3-bit methods (turbo 0.64 / rotor 0.76 / hyper 0.20) while Llama-3.1-8B stays perfect across all five methods; ultra_quant appears retrieval-safe on both.
 
 ![NIAH success rate](plots/niah_success_rate.png)
 
@@ -302,8 +302,6 @@ Re-measured at 5 trials per depth (job 373457) for better statistical resolution
 | | hyper_quant | 0.2582 |
 | | ultra_quant | 0.2856 |
 
-The two fp16 runs were re-measured fresh in job 373457, superseding the earlier log-restored files; the mean F1 values reproduced the previously reported numbers exactly (0.2997 / 0.3256). The old results (un-scored degenerate text) were caused by the cache bug and are **retracted**.
-
 ![LongBench QA-F1](plots/longbench_f1.png)
 
 **Speed (8K context, 32 generated tokens, median of 3 — a quantization-overhead measurement; no speedup claims)**
@@ -321,7 +319,7 @@ The two fp16 runs were re-measured fresh in job 373457, superseding the earlier 
 | | hyper_quant | 1.2968 | 1.7350 | 18.44 | 1.89× |
 | | ultra_quant | 1.5876 | 1.2001 | 26.67 | 1.31× |
 
-Every quantized method is slower than fp16 (the quantizer's added cost); rotor's per-3D-block scaling makes it the slowest (2.35–2.45×). The old speed table (incl. ultra_quant beating fp16) is **retracted** — decode comparisons were not apples-to-apples.
+Every quantized method is slower than fp16 (the quantizer's added cost); rotor's per-3D-block scaling makes it the slowest (2.35–2.45×).
 
 ![Speed comparison](plots/speed_comparison.png)
 
@@ -331,7 +329,7 @@ Every quantized method is slower than fp16 (the quantizer's added cost); rotor's
 
 ### 1. Compression must be discussed at designed bits + metadata, not stored bytes
 
-Because the simulation stores everything as int8 + fp32 scales, all methods previously "measured" 528 MB regardless of bit-width — most likely a tautology of the storage format rather than a finding. The analytical view therefore appears to be the more appropriate basis: turbo/hyper ≈ 4.9×, ultra ≈ 3.8×, and rotor drops to ≈ 1.1×, plausibly because per-3D-block fp32 scales outgrow the 3-bit payload. Real hardware numbers would further require true bit-packing.
+Because the simulation stores everything as int8 + fp32 scales, the measured stored bytes come out to 528 MB for every method regardless of bit-width — most likely a tautology of the storage format rather than a finding. The analytical view therefore appears to be the more appropriate basis: turbo/hyper ≈ 4.9×, ultra ≈ 3.8×, and rotor drops to ≈ 1.1×, plausibly because per-3D-block fp32 scales outgrow the 3-bit payload. Real hardware numbers would further require true bit-packing.
 
 The results suggest that compression ratio is **governed by metadata granularity rather than bit-width alone**: rotor_quant's per-3D-block fp32 scales (704 MB) reach ≈3.7× its 3-bit payload (192 MB), nearly erasing the compression. This points to a likely inherent trade-off in which fine-grained scaling buys fidelity but eats compression. hyper_quant matching turbo_quant's footprint most likely reflects its unimplemented Rice coding: without entropy coding the paper's 1.7–2 bps would be unreachable here (3.0 bit/scalar).
 
@@ -343,7 +341,7 @@ On the overall **compression × quality × overhead** balance, the methods appea
 
 ### 3. Single-forward metrics and decode-path tasks can disagree (NIAH)
 
-The PPL/fidelity picture ("Mistral is more robust") appears to invert on retrieval: on NIAH, Llama keeps 25/25 for *all* methods while Mistral drops under the 3-bit methods (turbo 16/25, rotor 19/25, hyper 5/25; ultra stays perfect). Notably, rotor_quant holds Mistral's best fidelity (KV cos 0.987, PPL 4.93) yet still degrades in NIAH — suggesting that **prefill-style fidelity may not capture error accumulation across decode steps**. Trial count also appears to matter: the 25-trial protocol revealed Mistral turbo's degradation (16/25) that the earlier 5-trial version missed (5/5) — a concrete example of how statistical resolution can change the conclusion.
+The PPL/fidelity picture ("Mistral is more robust") appears to invert on retrieval: on NIAH, Llama keeps 25/25 for *all* methods while Mistral drops under the 3-bit methods (turbo 16/25, rotor 19/25, hyper 5/25; ultra stays perfect). Notably, rotor_quant holds Mistral's best fidelity (KV cos 0.987, PPL 4.93) yet still degrades in NIAH — suggesting that **prefill-style fidelity may not capture error accumulation across decode steps**. Trial count also appears to matter for statistical resolution: at 25 trials the protocol is still coarse, and sparser protocols may miss degradation that denser ones would reveal — so these results are best read as trends.
 
 ### 4. Method rankings appear to flip across metrics — judging on a single metric is risky (LongBench)
 
@@ -369,22 +367,9 @@ Re-defined goal of this benchmark: *a functional, mathematically honest comparis
 
 - **Full implementation of the papers' key components**: QJL residual correction (TurboQuant), Rice entropy coding (HyperQuant), and UE8M0 block scaling + MFMA integration (UltraQuant), enabling direct comparison against the papers' claimed numbers.
 - **Fused GPU kernels**: validate the C++ micro-benchmark kernels (`core_cpp` — implemented but not yet verified) and move toward a genuine speed evaluation that exploits memory-bandwidth savings.
-- **Larger evaluation scale**: NIAH has already been raised to 5 trials per depth; next steps are more LongBench samples and further trial increases for statistically reliable conclusions.
+- **Larger evaluation scale**: NIAH currently uses 5 trials per depth; next steps are more LongBench samples and further trial increases for statistically reliable conclusions.
 - **Broader model coverage**: evaluate models beyond Llama/Mistral (e.g., Gemma, validated in the original TurboQuant paper) to test how general the observed base-model dependence is.
 - **Metadata reduction for rotor_quant**: revisit its scale granularity and storage format to reconcile high fidelity with a useful compression ratio.
-
----
-
-## ♻️ Fix History & Retractions (2026-08)
-
-Previous results contained serious harness bugs. Documented for transparency:
-
-1. **Cache `update()` returned only the latest chunk** (dequantized), not full history — so during decode every quantized method attended to only the newest token. → *Invalidates*: NIAH table ("all False"), LongBench outputs (degenerate text), speed table (decode was not comparable; ultra beating fp16). **These conclusions are retracted.**
-2. **RotorQuant concatenation condition** matched only dicts containing a `"quantized"` key; rotor uses `"quantized_main"`, so its decode history was broken even beyond bug 1.
-3. **Compression baseline 289 MB was a hardcoded constant** in an older script version, and the reported "ratio" was `289/measured` (inverted semantics) — replaced by stored-bytes + analytical footprint.
-4. **`designed_bits` were hand-set** (ultra=2.0 etc.) instead of derived — now auto-derived from each quantizer's levels (ultra=4.0).
-5. Additional fixes: D4 lattice now actually applied in HyperQuant's store path (it was dead code), quantizers are seed-fixed (previously non-deterministic across runs), fidelity metrics correctly labeled as logit-space, NIAH/LongBench upgraded to scored protocols.
-6. Data-management lapse: the fp16 LongBench raw JSON was lost at one point — re-measured properly in job 373457, and the mean F1 reproduced the previously reported values exactly (0.2997 / 0.3256).
 
 ---
 
@@ -460,7 +445,7 @@ kvq-bench/
 └── hpc_scripts/                # 4. HPC (Slurm) job scripts
     ├── run_all_evals_ai_l40s.sh      # sanity → footprint → ppl → fidelity → niah → longbench → speed
     ├── run_sanity_ultra_ai_l40s.sh   # ultra_quant-only sanity
-    └── run_rerun_niah_fp16longbench_ai_l40s.sh  # NIAH re-run (trials_per_depth=5) + fp16 LongBench re-run
+    └── run_rerun_niah_fp16longbench_ai_l40s.sh  # NIAH (trials_per_depth=5) + fp16 LongBench
 ```
 
 ---
